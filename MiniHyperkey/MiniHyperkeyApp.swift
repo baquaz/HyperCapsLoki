@@ -95,46 +95,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if type == .keyDown {
           print("F14 key down intercepted")
           
-          // Synthesize new events for the combination of keys
-          if let shiftKeyDown = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: true),
-             let controlKeyDown = CGEvent(keyboardEventSource: nil, virtualKey: 59, keyDown: true),
-             let optionKeyDown = CGEvent(keyboardEventSource: nil, virtualKey: 58, keyDown: true),
-             let commandKeyDown = CGEvent(keyboardEventSource: nil, virtualKey: 55, keyDown: true) {
-            
-            shiftKeyDown.flags = .maskShift
-            controlKeyDown.flags = .maskControl
-            optionKeyDown.flags = .maskAlternate
-            commandKeyDown.flags = .maskCommand
-            
-            shiftKeyDown.post(tap: .cgAnnotatedSessionEventTap)
-            controlKeyDown.post(tap: .cgAnnotatedSessionEventTap)
-            optionKeyDown.post(tap: .cgAnnotatedSessionEventTap)
-            commandKeyDown.post(tap: .cgAnnotatedSessionEventTap)
-            
-            print("Posted key down events for modifiers")
+          // Mimic hyper key press sequence
+          let flagSequences: [CGEventFlags] = [
+            .maskCommand,
+            [.maskCommand, .maskShift],
+            [.maskCommand, .maskShift, .maskControl],
+            [.maskCommand, .maskShift, .maskControl, .maskAlternate]
+          ]
+          
+          for flags in flagSequences {
+            if let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
+              event.flags = flags
+              event.post(tap: .cgAnnotatedSessionEventTap)
+              print("Posted flags: \(flags.rawValue)")
+            }
           }
           
           isHyperkeyActive = true
         } else if type == .keyUp {
           print("F14 key up intercepted")
           
-          // Synthesize new events to release the combination of keys
-          if let shiftKeyUp = CGEvent(keyboardEventSource: nil, virtualKey: 56, keyDown: false),
-             let controlKeyUp = CGEvent(keyboardEventSource: nil, virtualKey: 59, keyDown: false),
-             let optionKeyUp = CGEvent(keyboardEventSource: nil, virtualKey: 58, keyDown: false),
-             let commandKeyUp = CGEvent(keyboardEventSource: nil, virtualKey: 55, keyDown: false) {
-            
-            shiftKeyUp.flags = .maskShift
-            controlKeyUp.flags = .maskControl
-            optionKeyUp.flags = .maskAlternate
-            commandKeyUp.flags = .maskCommand
-            
-            shiftKeyUp.post(tap: .cgAnnotatedSessionEventTap)
-            controlKeyUp.post(tap: .cgAnnotatedSessionEventTap)
-            optionKeyUp.post(tap: .cgAnnotatedSessionEventTap)
-            commandKeyUp.post(tap: .cgAnnotatedSessionEventTap)
-            
-            print("Posted key up events for modifiers")
+          // Mimic hyper key release sequence
+          let flagSequences: [CGEventFlags] = [
+            [.maskCommand, .maskShift, .maskControl, .maskAlternate],
+            [.maskCommand, .maskShift, .maskControl],
+            [.maskCommand, .maskShift],
+            .maskCommand
+          ]
+          
+          for flags in flagSequences.reversed() {
+            if let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) {
+              event.flags = flags
+              event.post(tap: .cgAnnotatedSessionEventTap)
+              print("Posted flags: \(flags.rawValue)")
+            }
           }
           
           isHyperkeyActive = false
@@ -158,7 +152,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func shell(_ command: String) -> String {
     let task = Process()
-
+    
     task.launchPath = "/bin/bash"
     task.arguments = ["-c", command]
     
@@ -172,6 +166,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return output
   }
 }
+
 
 
 
@@ -226,7 +221,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //@main
 //struct MiniHyperkeyApp: App {
 //  @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-//  
+//
 //  var body: some Scene {
 //    WindowGroup {
 //      ContentView()
@@ -236,23 +231,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //
 //class AppDelegate: NSObject, NSApplicationDelegate {
 //  var hidManager: IOHIDManager?
-//  
+//
 //  func applicationDidFinishLaunching(_ notification: Notification) {
 //    setupHIDManager()
-//    
+//
 //    // Schedule a delayed Caps Lock remapping after 5 seconds
 //    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
 //      print("Remapping Caps Lock programmatically after 5 seconds")
 //      self.remapCapsLock()
 //    }
 //  }
-//  
+//
 //  func setupHIDManager() {
 //    hidManager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-//    
+//
 //    let matchingDict: [String: Any] = [kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop,
 //                                           kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard]
-//    
+//
 //    IOHIDManagerSetDeviceMatching(hidManager!, matchingDict as CFDictionary)
 //    IOHIDManagerRegisterInputValueCallback(hidManager!, { context, result, sender, value in
 //      let element = IOHIDValueGetElement(value)
@@ -260,43 +255,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 //      let pressed = IOHIDValueGetIntegerValue(value)
 //      print("Scancode: \(scancode), Pressed: \(pressed)")
 //    }, nil)
-//    
+//
 //    IOHIDManagerScheduleWithRunLoop(hidManager!, CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode.rawValue)
 //    IOHIDManagerOpen(hidManager!, IOOptionBits(kIOHIDOptionsTypeNone))
 //    print("HID Manager setup completed.")
 //  }
-//  
+//
 //  func remapCapsLock() {
 //    print("Remapping Caps Lock")
-//    
+//
 //    let userKeyMapping: [[String: Any]] = [
 //      ["HIDKeyboardModifierMappingSrc": kHIDUsage_KeyboardCapsLock,
 //       "HIDKeyboardModifierMappingDst": kHIDUsage_KeyboardEscape] // Example remap to Escape key
 //    ]
-//    
+//
 //    let data = try! JSONSerialization.data(withJSONObject: userKeyMapping, options: [])
 //    let jsonString = String(data: data, encoding: .utf8)
-//    
+//
 //    let command = "hidutil property --set '{\"UserKeyMapping\": \(jsonString!)}'"
 //    print("Executing command: \(command)")
 //    let output = shell(command)
 //    print("Command output: \(output)")
-//    
+//
 //    print("Caps Lock remapped.")
 //  }
-//  
+//
 //  func shell(_ command: String) -> String {
 //    let task = Process()
 //    task.launchPath = "/bin/bash"
 //    task.arguments = ["-c", command]
-//    
+//
 //    let pipe = Pipe()
 //    task.standardOutput = pipe
 //    task.launch()
-//    
+//
 //    let data = pipe.fileHandleForReading.readDataToEndOfFile()
 //    let output = String(data: data, encoding: .utf8) ?? ""
-//    
+//
 //    return output
 //  }
 //}
