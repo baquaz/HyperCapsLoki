@@ -91,46 +91,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
       
       // Handle F14 key press (remapped from Caps Lock)
-      if keyCode == 0x68 { // F14
+      if keyCode == 0x69 { // F14q
+        print("F14 key detected")
         if type == .keyDown {
           print("F14 key down intercepted")
           
           // Mimic hyper key press sequence
-          let flagSequences: [CGEventFlags] = [
-            .maskCommand,
-            [.maskCommand, .maskShift],
-            [.maskCommand, .maskShift, .maskControl],
-            [.maskCommand, .maskShift, .maskControl, .maskAlternate]
-          ]
-          
-          for flags in flagSequences {
-            if let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
-              event.flags = flags
-              event.post(tap: .cgAnnotatedSessionEventTap)
-              print("Posted flags: \(flags.rawValue)")
-            }
-          }
-          
+          injectFlagsSequence(isKeyDown: true)
           isHyperkeyActive = true
         } else if type == .keyUp {
           print("F14 key up intercepted")
           
           // Mimic hyper key release sequence
-          let flagSequences: [CGEventFlags] = [
-            [.maskCommand, .maskShift, .maskControl, .maskAlternate],
-            [.maskCommand, .maskShift, .maskControl],
-            [.maskCommand, .maskShift],
-            .maskCommand
-          ]
-          
-          for flags in flagSequences.reversed() {
-            if let event = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) {
-              event.flags = flags
-              event.post(tap: .cgAnnotatedSessionEventTap)
-              print("Posted flags: \(flags.rawValue)")
-            }
-          }
-          
+          injectFlagsSequence(isKeyDown: false)
           isHyperkeyActive = false
         }
         
@@ -150,6 +123,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return Unmanaged.passRetained(event)
   }
   
+  func injectFlagsSequence(isKeyDown: Bool) {
+    let flagsSequence: [CGEventFlags] = isKeyDown ? [
+      .maskShift, .maskShift.union(.maskControl),
+      .maskShift.union(.maskControl).union(.maskAlternate),
+      .maskShift.union(.maskControl).union(.maskAlternate).union(.maskCommand)
+    ] : [
+      .maskShift.union(.maskControl).union(.maskAlternate).union(.maskCommand),
+      .maskShift.union(.maskControl).union(.maskAlternate),
+      .maskShift.union(.maskControl),
+      .maskShift
+    ]
+    
+    for flags in flagsSequence {
+      let eventType: CGEventType = .flagsChanged
+      if let flagsChangedEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
+        flagsChangedEvent.flags = flags
+        flagsChangedEvent.type = eventType
+        flagsChangedEvent.post(tap: .cghidEventTap)
+        print("Injected \(eventType) with flags: \(flags.rawValue)")
+      } else {
+        print("Failed to create flagsChangedEvent for flags: \(flags.rawValue)")
+      }
+    }
+  }
+  
   func shell(_ command: String) -> String {
     let task = Process()
     
@@ -166,6 +164,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return output
   }
 }
+
+
+
+
+
+
 
 
 
