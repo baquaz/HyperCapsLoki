@@ -91,7 +91,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
       
       // Handle F14 key press (remapped from Caps Lock)
-      if keyCode == 0x69 { // F14q
+      if keyCode == 0x69 { // F14 (adjusted to match the detected keyCode)
         print("F14 key detected")
         if type == .keyDown {
           print("F14 key down intercepted")
@@ -124,15 +124,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func injectFlagsSequence(isKeyDown: Bool) {
+    // Adjust flags to better match native Hyper key behavior
     let flagsSequence: [CGEventFlags] = isKeyDown ? [
-      .maskShift, .maskShift.union(.maskControl),
-      .maskShift.union(.maskControl).union(.maskAlternate),
-      .maskShift.union(.maskControl).union(.maskAlternate).union(.maskCommand)
+      .maskCommand,
+      .maskCommand.union(.maskControl),
+      .maskCommand.union(.maskControl).union(.maskShift),
+      .maskCommand.union(.maskControl).union(.maskShift).union(.maskAlternate)
     ] : [
-      .maskShift.union(.maskControl).union(.maskAlternate).union(.maskCommand),
-      .maskShift.union(.maskControl).union(.maskAlternate),
-      .maskShift.union(.maskControl),
-      .maskShift
+      .maskCommand.union(.maskControl).union(.maskShift).union(.maskAlternate),
+      .maskCommand.union(.maskControl).union(.maskShift),
+      .maskCommand.union(.maskControl),
+      .maskCommand
     ]
     
     for flags in flagsSequence {
@@ -140,10 +142,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       if let flagsChangedEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
         flagsChangedEvent.flags = flags
         flagsChangedEvent.type = eventType
-        flagsChangedEvent.post(tap: .cghidEventTap)
-        print("Injected \(eventType) with flags: \(flags.rawValue)")
+        flagsChangedEvent.post(tap: .cgAnnotatedSessionEventTap)
+        print("Injected \(eventType) with flags: \(flags.rawValue). Expected: \(flagsSequence)")
       } else {
         print("Failed to create flagsChangedEvent for flags: \(flags.rawValue)")
+      }
+    }
+    
+    // Ensure flags are fully reset
+    if !isKeyDown {
+      if let resetEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
+        resetEvent.flags = []
+        resetEvent.type = .flagsChanged
+        resetEvent.post(tap: .cgAnnotatedSessionEventTap)
+        print("Injected final flags reset event with flags: 0")
       }
     }
   }
@@ -164,6 +176,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return output
   }
 }
+
 
 
 
