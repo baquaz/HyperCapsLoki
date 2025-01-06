@@ -94,14 +94,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       if keyCode == 0x69 { // F14 (adjusted to match the detected keyCode)
         print("F14 key detected")
         if type == .keyDown {
-          print("F14 key down intercepted")
-          
-          // Mimic hyper key press sequence
-          injectFlagsSequence(isKeyDown: true)
-          isHyperkeyActive = true
+          if !isHyperkeyActive {
+            print("F14 key down intercepted")
+            // Mimic hyper key press sequence
+            injectFlagsSequence(isKeyDown: true)
+            isHyperkeyActive = true
+          }
         } else if type == .keyUp {
           print("F14 key up intercepted")
-          
           // Mimic hyper key release sequence
           injectFlagsSequence(isKeyDown: false)
           isHyperkeyActive = false
@@ -176,6 +176,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return output
   }
 }
+
 
 
 
