@@ -137,19 +137,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func injectFlagsSequence(isKeyDown: Bool) {
+    let command: CGEventFlags = .maskCommand
+    let option: CGEventFlags = .maskAlternate
+    let control: CGEventFlags = .maskControl
+    let shift: CGEventFlags = .maskShift
+    
     let downFlagsSequence: [CGEventFlags] = [
-      CGEventFlags(rawValue: 1048840),  // Command
-      CGEventFlags(rawValue: 1573160),  // Command + Option
-      CGEventFlags(rawValue: 1835305),  // Command + Option + Control
-      CGEventFlags(rawValue: 1966379)   // Command + Option + Control + Shift
+      command,
+      command.union(option),
+      command.union(option).union(control),
+      command.union(option).union(control).union(shift)
     ]
     
     let upFlagsSequence: [CGEventFlags] = [
-      CGEventFlags(rawValue: 1966379),  // Command + Option + Control + Shift
-      CGEventFlags(rawValue: 1835305),  // Command + Option + Control
-      CGEventFlags(rawValue: 1573160),  // Command + Option
-      CGEventFlags(rawValue: 1048840),  // Command
-      CGEventFlags(rawValue: 256)       // None
+      command.union(option).union(control).union(shift),
+      command.union(option).union(control),
+      command.union(option),
+      command,
+      []
     ]
     
     let flagsSequence = isKeyDown ? downFlagsSequence : upFlagsSequence
