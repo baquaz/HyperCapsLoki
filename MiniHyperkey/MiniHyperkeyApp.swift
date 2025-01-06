@@ -23,6 +23,8 @@ struct MiniHyperkeyApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
   var eventTap: CFMachPort?
   var isHyperkeyActive = false
+  var lastKeyCode: CGKeyCode? = nil
+  var lastEventType: CGEventType? = nil
   
   func applicationDidFinishLaunching(_ notification: Notification) {
     // Reset previous key mappings
@@ -66,7 +68,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func setupEventTap() {
     let eventMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
-    eventTap = CGEvent.tapCreate(tap: .cgAnnotatedSessionEventTap, place: .headInsertEventTap, options: .defaultTap, eventsOfInterest: CGEventMask(eventMask), callback: eventTapCallback, userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
+    eventTap = CGEvent.tapCreate(tap: .cghidEventTap, place: .headInsertEventTap, options: .defaultTap, eventsOfInterest: CGEventMask(eventMask), callback: eventTapCallback, userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
     
     if let eventTap = eventTap {
       let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
@@ -85,8 +87,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   func handleEventTap(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
     if type == .keyDown || type == .keyUp {
-      let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+      let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode)) // Convert keyCode to correct type
       let flags = event.flags.rawValue
+      
+      // Avoid multiple handling of the same key event
+      if let lastKeyCode = lastKeyCode, lastKeyCode == keyCode && lastEventType == type {
+        return nil
+      }
       
       print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
       
@@ -107,6 +114,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
           isHyperkeyActive = false
         }
         
+        lastKeyCode = keyCode
+        lastEventType = type
+        
         return nil // Prevent default F14 action
       }
       
@@ -115,6 +125,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         print("Hyperkey active, handling key event with modifiers")
         event.flags.insert([.maskShift, .maskControl, .maskAlternate, .maskCommand])
       }
+      
+      lastKeyCode = keyCode
+      lastEventType = type
     } else if type == .flagsChanged {
       let flags = event.flags.rawValue
       print("Flags changed: \(flags)")
@@ -124,26 +137,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
   
   func injectFlagsSequence(isKeyDown: Bool) {
-    // Adjust flags to better match native Hyper key behavior
-    let flagsSequence: [CGEventFlags] = isKeyDown ? [
-      .maskCommand,
-      .maskCommand.union(.maskControl),
-      .maskCommand.union(.maskControl).union(.maskShift),
-      .maskCommand.union(.maskControl).union(.maskShift).union(.maskAlternate)
-    ] : [
-      .maskCommand.union(.maskControl).union(.maskShift).union(.maskAlternate),
-      .maskCommand.union(.maskControl).union(.maskShift),
-      .maskCommand.union(.maskControl),
-      .maskCommand
+    let downFlagsSequence: [CGEventFlags] = [
+      CGEventFlags(rawValue: 1048840),  // Command
+      CGEventFlags(rawValue: 1573160),  // Command + Option
+      CGEventFlags(rawValue: 1835305),  // Command + Option + Control
+      CGEventFlags(rawValue: 1966379)   // Command + Option + Control + Shift
     ]
+    
+    let upFlagsSequence: [CGEventFlags] = [
+      CGEventFlags(rawValue: 1966379),  // Command + Option + Control + Shift
+      CGEventFlags(rawValue: 1835305),  // Command + Option + Control
+      CGEventFlags(rawValue: 1573160),  // Command + Option
+      CGEventFlags(rawValue: 1048840),  // Command
+      CGEventFlags(rawValue: 256)       // None
+    ]
+    
+    let flagsSequence = isKeyDown ? downFlagsSequence : upFlagsSequence
     
     for flags in flagsSequence {
       let eventType: CGEventType = .flagsChanged
       if let flagsChangedEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
         flagsChangedEvent.flags = flags
         flagsChangedEvent.type = eventType
-        flagsChangedEvent.post(tap: .cgAnnotatedSessionEventTap)
-        print("Injected \(eventType) with flags: \(flags.rawValue). Expected: \(flagsSequence)")
+        flagsChangedEvent.post(tap: .cghidEventTap)
+        print("Injected \(eventType) with flags: \(flags.rawValue).")
+        
+        // Introduce a small delay for processing
+        usleep(5000) // 5 milliseconds
       } else {
         print("Failed to create flagsChangedEvent for flags: \(flags.rawValue)")
       }
@@ -154,7 +174,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       if let resetEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
         resetEvent.flags = []
         resetEvent.type = .flagsChanged
-        resetEvent.post(tap: .cgAnnotatedSessionEventTap)
+        resetEvent.post(tap: .cghidEventTap)
         print("Injected final flags reset event with flags: 0")
       }
     }
@@ -176,6 +196,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return output
   }
 }
+
+
+
+
 
 
 
