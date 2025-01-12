@@ -26,6 +26,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var lastKeyCode: CGKeyCode? = nil
   var lastEventType: CGEventType? = nil
   
+  var capsLockReady = true
+  
+  var capsLockTriggerTimer: Timer?
+  
   func applicationDidFinishLaunching(_ notification: Notification) {
     // Reset previous key mappings
     resetHidutilMappings()
@@ -90,17 +94,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode)) // Convert keyCode to correct type
       let flags = event.flags.rawValue
       
-      // Avoid multiple handling of the same key event
-      if let lastKeyCode = lastKeyCode, lastKeyCode == keyCode && lastEventType == type {
+      // Avoid multiple handling of the same hyper key event
+      if let lastKeyCode = lastKeyCode, lastKeyCode == keyCode && lastEventType == type && keyCode == kHIDUsage_KeyboardF14 {
         return nil
       }
       
       print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
       
       // Handle F14 key press (remapped from Caps Lock)
-      if keyCode == 0x69 { // F14 (adjusted to match the detected keyCode)
+      if keyCode == kHIDUsage_KeyboardF14 { // F14 (adjusted to match the detected keyCode)
         print("F14 key detected")
+        
         if type == .keyDown {
+          capsLockReady = true
+          
+          capsLockTriggerTimer = .scheduledTimer(withTimeInterval: 1.5 , repeats: false) { [weak self] _ in
+            guard let self else { return }
+            print("caps lock trigger timer off")
+            capsLockTriggerTimer?.invalidate()
+            capsLockTriggerTimer = nil
+            capsLockReady = false
+          }
+        
           if !isHyperkeyActive {
             print("F14 key down intercepted")
             // Mimic hyper key press sequence
@@ -109,15 +124,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
           }
         } else if type == .keyUp {
           print("F14 key up intercepted")
-          // Mimic hyper key release sequence
-          injectFlagsSequence(isKeyDown: false)
+          if capsLockReady {
+            print("Caps lock ready - injecting caps lock")
+            injectCapsLockFlag()
+          } else {
+            print("Caps lock unavailable - injecting hyper key")
+            // Mimic hyper key release sequence
+          }
           isHyperkeyActive = false
+          
+          injectFlagsSequence(isKeyDown: false)
         }
         
         lastKeyCode = keyCode
         lastEventType = type
         
         return nil // Prevent default F14 action
+        
+      } else if type == .keyDown {
+        capsLockTriggerTimer?.invalidate()
+        capsLockTriggerTimer = nil
+        capsLockReady = false
       }
       
       // Handle other key events when Hyperkey is active
