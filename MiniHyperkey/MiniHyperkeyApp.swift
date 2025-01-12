@@ -8,6 +8,7 @@
 import IOKit.hid
 import SwiftUI
 import Cocoa
+import Foundation
 
 @main
 struct MiniHyperkeyApp: App {
@@ -20,15 +21,15 @@ struct MiniHyperkeyApp: App {
   }
 }
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
   var eventTap: CFMachPort?
   var isHyperkeyActive = false
   var lastKeyCode: CGKeyCode? = nil
   var lastEventType: CGEventType? = nil
   
-  var capsLockReady = true
-  
-  var capsLockTriggerTimer: Timer?
+  private var capsLockReady = true
+  private var capsLockTriggerTimer: Task<Void, Never>?
   
   func applicationDidFinishLaunching(_ notification: Notification) {
     // Reset previous key mappings
@@ -102,49 +103,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
       
       // Handle F14 key press (remapped from Caps Lock)
-      if keyCode == kHIDUsage_KeyboardF14 { // F14 (adjusted to match the detected keyCode)
-        print("F14 key detected")
-        
-        if type == .keyDown {
-          capsLockReady = true
-          
-          capsLockTriggerTimer = .scheduledTimer(withTimeInterval: 1.5 , repeats: false) { [weak self] _ in
-            guard let self else { return }
-            print("caps lock trigger timer off")
-            capsLockTriggerTimer?.invalidate()
-            capsLockTriggerTimer = nil
-            capsLockReady = false
-          }
-        
-          if !isHyperkeyActive {
-            print("F14 key down intercepted")
-            // Mimic hyper key press sequence
-            injectFlagsSequence(isKeyDown: true)
-            isHyperkeyActive = true
-          }
-        } else if type == .keyUp {
-          print("F14 key up intercepted")
-          if capsLockReady {
-            print("Caps lock ready - injecting caps lock")
-            injectCapsLockFlag()
-          } else {
-            print("Caps lock unavailable - injecting hyper key")
-            // Mimic hyper key release sequence
-          }
-          isHyperkeyActive = false
-          
-          injectFlagsSequence(isKeyDown: false)
+      if keyCode == kHIDUsage_KeyboardF14 {
+        Task {
+          await handleHyperKeyPress(type)
         }
-        
         lastKeyCode = keyCode
         lastEventType = type
         
         return nil // Prevent default F14 action
         
       } else if type == .keyDown {
-        capsLockTriggerTimer?.invalidate()
-        capsLockTriggerTimer = nil
-        capsLockReady = false
+        // Cancel the timer if any other key is pressed
+        cancelCapsLockTriggerTimer()
       }
       
       // Handle other key events when Hyperkey is active
@@ -153,14 +123,58 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         event.flags.insert([.maskShift, .maskControl, .maskAlternate, .maskCommand])
       }
       
-      lastKeyCode = keyCode
-      lastEventType = type
     } else if type == .flagsChanged {
       let flags = event.flags.rawValue
       print("Flags changed: \(flags)")
     }
     
     return Unmanaged.passRetained(event)
+  }
+  
+  private func handleHyperKeyPress(_ type: CGEventType) async {
+    if type == .keyDown {
+      print("F14 key DOWN intercepted")
+      
+      startCapsLockTriggerTimer()
+      
+      if !isHyperkeyActive {
+        injectFlagsSequence(isKeyDown: true)
+        isHyperkeyActive = true
+      }
+      
+    } else if type == .keyUp {
+      print("F14 key UP intercepted")
+      
+      if capsLockReady {
+        print("Caps lock ready - injecting caps lock")
+        injectCapsLockFlag()
+      } else {
+        print("Caps lock unavailable")
+      }
+      
+      isHyperkeyActive = false
+      injectFlagsSequence(isKeyDown: false)
+    }
+  }
+  
+  func startCapsLockTriggerTimer() {
+    cancelCapsLockTriggerTimer()
+    capsLockReady = true
+    capsLockTriggerTimer = Task {
+      do {
+        try await Task.sleep(for: .seconds(1.5))
+        capsLockReady = false
+        print("Caps lock trigger timer expired")
+      } catch {
+        print("Caps lock trigger timer canceled")
+      }
+    }
+  }
+  
+  func cancelCapsLockTriggerTimer() {
+    capsLockTriggerTimer?.cancel()
+    capsLockTriggerTimer = nil
+    capsLockReady = false
   }
   
   //Should mimic - Flags changed: 65792
