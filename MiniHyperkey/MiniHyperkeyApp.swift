@@ -136,6 +136,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return Unmanaged.passRetained(event)
   }
   
+  //Should mimic - Flags changed: 65792
+  func injectCapsLockFlag() {
+    var ioConnect: io_connect_t = 0
+    let ioService = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching(kIOHIDSystemClass))
+    
+    if ioService == 0 {
+      print("Failed to find IOHID system service.")
+      return
+    }
+    
+    let result = IOServiceOpen(ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
+    
+    if result != KERN_SUCCESS {
+      print("Failed to open IOService: \(result)")
+      return
+    }
+    
+    var modifierLockState: Bool = false
+    
+    // Retrieve the current state of Caps Lock
+    let getResult = IOHIDGetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
+    
+    if getResult != KERN_SUCCESS {
+      print("Failed to get Caps Lock state: \(getResult)")
+      IOServiceClose(ioConnect)
+      return
+    }
+    
+    // Toggle the Caps Lock state
+    modifierLockState.toggle()
+    
+    // Set the new state of Caps Lock
+    let setResult = IOHIDSetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), modifierLockState)
+    
+    if setResult != KERN_SUCCESS {
+      print("Failed to set Caps Lock state: \(setResult)")
+    } else {
+      print("Caps Lock state toggled successfully.")
+    }
+    
+    IOServiceClose(ioConnect)
+  }
+
   func injectFlagsSequence(isKeyDown: Bool) {
     let command: CGEventFlags = .maskCommand
     let option: CGEventFlags = .maskAlternate
