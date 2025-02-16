@@ -18,9 +18,6 @@ struct HyperKeyManager {
     self.keysProvider = keysProvider
     self.remapper = Remapper(keysProvider: keysProvider)
     self.eventsHandler = eventsHandler
-    Task { [self] in
-      await self.launch()
-    }
   }
   
   @MainActor func launch() {

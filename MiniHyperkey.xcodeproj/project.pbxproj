@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		B0C7FA412D46E2FE00F706D1 /* EventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C7FA402D46E2FE00F706D1 /* EventsHandler.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		B0C32E142D21C1710096F6AD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -31,7 +27,6 @@
 		B0C32E022D21C16F0096F6AD /* MiniHyperkey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiniHyperkey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0C32E132D21C1710096F6AD /* MiniHyperkeyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniHyperkeyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0C32E1D2D21C1710096F6AD /* MiniHyperkeyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniHyperkeyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B0C7FA402D46E2FE00F706D1 /* EventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsHandler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -80,7 +75,6 @@
 		B0C32DF92D21C16F0096F6AD = {
 			isa = PBXGroup;
 			children = (
-				B0C7FA402D46E2FE00F706D1 /* EventsHandler.swift */,
 				B0C32E042D21C16F0096F6AD /* MiniHyperkey */,
 				B0C32E162D21C1710096F6AD /* MiniHyperkeyTests */,
 				B0C32E202D21C1710096F6AD /* MiniHyperkeyUITests */,
@@ -242,7 +236,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B0C7FA412D46E2FE00F706D1 /* EventsHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -58,8 +58,18 @@ class EventsHandler {
       print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
       
       let f14Usage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: kHIDUsage_KeyboardF14)
-      // Handle F14 key press (remapped from Caps Lock)
-      if keyCode == CGKeyCode(f14Usage & 0xFFFF)/*kHIDUsage_KeyboardF14*/ {
+      let f14KeyCode = f14Usage & 0xFFFF // Ensure only the keycode part is extracted
+      
+      let expectedKeyCode = keysProvider.getExpectedKeyCode(for: .f14)
+      print("""
+    🔍 Debug:
+    - EventTap KeyCode: \(keyCode)
+    - Expected KeyCode (F14): \(expectedKeyCode)
+    """)
+      
+      print("cgkeycode: \(CGKeyCode(f14KeyCode)), f14KeyCode: \(f14KeyCode), f14UsageNumber: \(f14Usage)")
+      
+      if keyCode == expectedKeyCode {
         Task {
           await handleHyperKeyPress(type)
         }
