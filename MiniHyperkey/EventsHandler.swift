@@ -9,9 +9,10 @@ import Foundation
 import Cocoa
 import IOKit.hid
 
-@MainActor
-class EventsHandler {
-  let keysProvider: KeysProvider
+final class EventsHandler {
+  var hyperKey: KeysProvider.Key?
+  
+  private let keysProvider: KeysProvider
   
   private var eventTap: CFMachPort?
   private var isHyperkeyActive = false
@@ -31,11 +32,21 @@ class EventsHandler {
     self.keysProvider = keysProvider
   }
   
+  /// Sets up event tap handler to detect key events and flags
   func setupEventTap() {
-    let eventMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
-    eventTap = CGEvent.tapCreate(tap: .cghidEventTap, place: .headInsertEventTap, options: .defaultTap, eventsOfInterest: CGEventMask(eventMask), callback: eventTapCallback, userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()))
+    let eventMask =
+    (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
     
-    if let eventTap = eventTap {
+    eventTap = CGEvent.tapCreate(
+      tap: .cghidEventTap,
+      place: .headInsertEventTap,
+      options: .defaultTap,
+      eventsOfInterest: CGEventMask(eventMask),
+      callback: eventTapCallback,
+      userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+    )
+    
+    if let eventTap {
       let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
       CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
       CGEvent.tapEnable(tap: eventTap, enable: true)
@@ -49,24 +60,32 @@ class EventsHandler {
     if type == .keyDown || type == .keyUp {
       let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode)) // Convert keyCode to correct type
       let flags = event.flags.rawValue
+      let hyperKeyCode = hyperKey?.carbonKeyCode
       
       // Avoid multiple handling of the same hyper key event
-      if let lastKeyCode = lastKeyCode, lastKeyCode == keyCode && lastEventType == type && keyCode == kHIDUsage_KeyboardF14 {
+      if let lastKeyCode = lastKeyCode, lastKeyCode == keyCode && lastEventType == type && keyCode == hyperKeyCode {
         return nil
       }
       
       print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
       
-      let f14Usage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: kHIDUsage_KeyboardF14)
-      // Handle F14 key press (remapped from Caps Lock)
-      if keyCode == CGKeyCode(f14Usage & 0xFFFF)/*kHIDUsage_KeyboardF14*/ {
+      print(
+      """
+      🔍 Debug:
+      - EventTap CGKeyCode: \(keyCode)
+      - Expected Hyper CGKeyCode (\(hyperKey?.rawValue ?? "")): \(hyperKeyCode as Any)
+
+      """
+      )
+      
+      if keyCode == hyperKeyCode {
         Task {
-          await handleHyperKeyPress(type)
+          await handleHyperkeyPress(type)
         }
         lastKeyCode = keyCode
         lastEventType = type
         
-        return nil // Prevent default F14 action
+        return nil // Prevent default Hyperkey source action
         
       } else if type == .keyDown {
         // Cancel the timer if any other key is pressed
@@ -75,7 +94,7 @@ class EventsHandler {
       
       // Handle other key events when Hyperkey is active
       if isHyperkeyActive {
-        print("Hyperkey active, handling key event with modifiers")
+        print("Hyper key active, handling key event with modifiers")
         event.flags.insert([.maskShift, .maskControl, .maskAlternate, .maskCommand])
       }
       
@@ -87,9 +106,9 @@ class EventsHandler {
     return Unmanaged.passRetained(event)
   }
   
-  private func handleHyperKeyPress(_ type: CGEventType) async {
+  private func handleHyperkeyPress(_ type: CGEventType) async {
     if type == .keyDown {
-      print("F14 key DOWN intercepted")
+      print("Hyper key DOWN intercepted")
       
       startCapsLockTriggerTimer()
       
@@ -99,7 +118,7 @@ class EventsHandler {
       }
       
     } else if type == .keyUp {
-      print("F14 key UP intercepted")
+      print("Hyper key UP intercepted")
       
       if capsLockReady {
         print("Caps lock ready - injecting caps lock")

@@ -8,7 +8,7 @@
 import Foundation
 
 protocol RemapExecutor {
-  func remapUserKeyMappingCapsLock(using keyName: KeysProvider.KeyName)
+  func remapUserKeyMappingCapsLock(using key: KeysProvider.Key?)
   func resetUserKeyMapping()
 }
 
@@ -21,16 +21,20 @@ struct Remapper: RemapExecutor {
     self.keysProvider = keysProvider
   }
   
-  func remapUserKeyMappingCapsLock(using keyName: KeysProvider.KeyName) {
+  // MARK: - Remap
+  func remapUserKeyMappingCapsLock(using key: KeysProvider.Key?) {
+    guard let key else { return }
     let capsLockUsage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: kHIDUsage_KeyboardCapsLock)
     
-    guard let destinationUsageCode = keysProvider.hidUsageCode(for: keyName) else {
-      fatalError("\(keyName) key not found.")
+    guard let destinationUsageCode = keysProvider.hidUsageCode(for: key) else {
+      fatalError("\(key.rawValue) key not found.")
     }
     let destinationUsage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: destinationUsageCode)
     
+    print("🔍 Debug: Remapping Caps Lock to \(String(format: "0x%X", destinationUsage))")
+    
     let userKeyMapping: [[String: Any]] = [
-      ["HIDKeyboardModifierMappingSrc": capsLockUsage /*0x700000039*/, // Caps Lock
+      ["HIDKeyboardModifierMappingSrc": capsLockUsage, // Caps Lock (0x700000039)
        "HIDKeyboardModifierMappingDst": destinationUsage]
     ]
     
@@ -41,13 +45,14 @@ struct Remapper: RemapExecutor {
         print("Executing command: \(command)")
         let output = self.shell(command)
         print("Command output: \(output)")
-        print("Caps Lock remapped to \(keyName).")
+        print("Caps Lock remapped to \(key.rawValue).")
       }
     } catch {
       print("Error serializing JSON: \(error)")
     }
   }
   
+  // MARK: - Reset
   func resetUserKeyMapping() {
     let command = "hidutil property --set '{\"UserKeyMapping\": []}'"
     print("Executing command to reset key mappings: \(command)")
