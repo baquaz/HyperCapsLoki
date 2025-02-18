@@ -23,10 +23,10 @@ struct MiniHyperkeyApp: App {
 
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
-  private var hyperkeyManager: HyperKeyManager?
+  private var hyperkeyManager: HyperkeyManager?
   
   func applicationDidFinishLaunching(_ notification: Notification) {
-    hyperkeyManager = HyperKeyManager(remapper: Remapper(), eventsHandler: .init())
+    hyperkeyManager = HyperkeyManager(remapper: Remapper(), eventsHandler: .init())
     hyperkeyManager?.launch()
   }
 }

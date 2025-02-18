@@ -18,7 +18,7 @@ struct KeysProvider {
   typealias HIDUsageCode = Int
   
   /// Enum defining all supported keys with their corresponding HID usage and Carbon key codes.
-  enum Key: String, CaseIterable {
+  enum Key: String, CaseIterable, Hashable {
     case capsLock = "caps lock"
     case leftCommand = "left command"
     case leftOption = "left option"
@@ -118,20 +118,16 @@ struct KeysProvider {
     }
   }
   
+  // MARK: - Selected Hyperkey
+  /// Currently selected hyper key
+  var selectedHyperkey: Key? {
+    .init(rawValue: KeyPreferences.selectedHyperkey ?? "")
+  }
   
   // MARK: - Init
   static let shared = KeysProvider()
   
   private init(){}
-  
-  func getExpectedKeyCode(for key: Key) -> CGKeyCode {
-    guard let hidCode = hidUsageCode(for: key) else {
-      fatalError("Key mapping for \(key.rawValue) not found.")
-    }
-    
-    // Convert HID usage code into CGKeyCode
-    return CGKeyCode(hidCode & 0xFFFF) // Mask to extract correct key code
-  }
   
   // MARK: - Create
   
@@ -156,9 +152,17 @@ struct KeysProvider {
   
   // MARK: - Read
   
+  /// Retrieves the _Carbon_ key code for a given key name.
+  ///
+  /// - Parameter key: The `Key` for which the Carbon key code is required.
+  /// - Returns: The corresponding `CGKeyCode`, or `nil` if the key is unsupported.
+  func carbonKeyCode(for key: Key) -> CGKeyCode? {
+    key.carbonKeyCode
+  }
+  
   /// Retrieves the HID usage code for a given key name.
   ///
-  /// - Parameter key: The `KeyName` for which the HID usage code is required.
+  /// - Parameter key: The `Key` name for which the HID usage code is required.
   /// - Returns: The corresponding HID usage code, or `nil` if the key is unsupported.
   ///
   func hidUsageCode(for key: Key) -> HIDUsageCode? {
@@ -168,7 +172,7 @@ struct KeysProvider {
   /// Retrieves the key name for a given HID usage code.
   ///
   /// - Parameter code: The HID usage code to search for.
-  /// - Returns: The corresponding `KeyName`, or `nil` if the code is not recognized.
+  /// - Returns: The corresponding `Key` name, or `nil` if the code is not recognized.
   ///
   func keyName(for code: HIDUsageCode) -> String? {
     Key.allCases.first(where: { $0.hidUsageKeyboardCode == code })?.rawValue
@@ -232,8 +236,8 @@ struct KeysProvider {
   /// - Parameter keys: A set of `KeyName`.
   /// - Returns: A set of corresponding HID usage codes.
   ///
-  func transform(keyNames: Set<Key>) -> Set<HIDUsageCode> {
-    Set(Key.allCases.compactMap( { hidUsageCode(for: $0) } ))
+  func transform(keys: Set<Key>) -> Set<HIDUsageCode> {
+    Set(keys.compactMap( { hidUsageCode(for: $0) } ))
   }
   
   /// Transform a collection of HID usage codes to their corresponding key names using a Set.
