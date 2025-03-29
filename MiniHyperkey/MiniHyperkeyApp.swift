@@ -15,9 +15,17 @@ struct MiniHyperkeyApp: App {
   @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
   
   var body: some Scene {
-    WindowGroup {
-      ContentView()
+    MenuBarExtra("HyperCapsLoki", systemImage: "keyboard.onehanded.right.fill") {
+      AppMenu()
     }
+    .menuBarExtraStyle(.window)
+  }
+}
+
+struct AppMenu: View {
+  var body: some View {
+    Text("Hello, World!")
+      .padding()
   }
 }
 
@@ -33,5 +41,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   func applicationWillTerminate(_ notification: Notification) {
     hyperkeyManager?.exit()
   }
-    
+   
 }
