@@ -29,4 +29,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     hyperkeyManager = HyperkeyManager(remapper: Remapper(), eventsHandler: .init())
     hyperkeyManager?.launch()
   }
+  
+  func applicationWillTerminate(_ notification: Notification) {
+    hyperkeyManager?.exit()
+  }
+    
 }

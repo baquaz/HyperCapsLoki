@@ -29,6 +29,11 @@ struct HyperkeyManager {
     setUpEvents()
   }
   
+  func exit() {
+    remapper.resetUserKeyMapping()
+    eventsHandler.disableEventTap()
+  }
+  
   private func setMappings() {
     remapper.resetUserKeyMapping()
     remapper.remapUserKeyMappingCapsLock(using: keysProvider.selectedHyperkey)

@@ -56,7 +56,13 @@ final class EventsHandler {
     }
   }
   
-  func handleEventTap(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
+  func disableEventTap() {
+    if let eventTap {
+      CGEvent.tapEnable(tap: eventTap, enable: false)
+    }
+  }
+  
+  private func handleEventTap(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
     if type == .keyDown || type == .keyUp {
       let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode)) // Convert keyCode to correct type
       let flags = event.flags.rawValue

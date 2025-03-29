@@ -54,6 +54,9 @@ struct Remapper: RemapExecutor {
   
   // MARK: - Reset
   func resetUserKeyMapping() {
+    
+    // FIXME: save current user mappings to avoid any mappings loss
+    
     let command = "hidutil property --set '{\"UserKeyMapping\": []}'"
     print("Executing command to reset key mappings: \(command)")
     
