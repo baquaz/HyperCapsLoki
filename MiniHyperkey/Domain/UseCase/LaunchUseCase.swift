@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol LaunchUseCase {
   func launch() async
 }
@@ -27,8 +28,7 @@ final class LaunchUseCaseImpl: LaunchUseCase {
     self.keyStorageRepository = keyStorageRepository
   }
   
-  @MainActor
-  func launch() {
+  func launch() async {
     if keyStorageRepository.getSelectedHyperkey() == nil {
       keyStorageRepository.saveSelectedHyperkey(.f14)
     }

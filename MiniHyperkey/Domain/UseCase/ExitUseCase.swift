@@ -7,8 +7,9 @@
 
 import Foundation
 
+@MainActor
 protocol ExitUseCase {
-  func exit()
+  func exit() async
 }
 
 final class ExitUseCaseImpl: ExitUseCase {

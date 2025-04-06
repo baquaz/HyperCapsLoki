@@ -5,9 +5,7 @@
 //  Created by Piotr Błachewicz on 29/12/2024.
 //
 
-import IOKit.hid
 import SwiftUI
-import Cocoa
 import Foundation
 
 @main

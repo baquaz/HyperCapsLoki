@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol RemapKeyUseCase {
   func execute(newKey: Key)
 }

@@ -34,7 +34,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   // MARK: - applicationWillTerminate
   func applicationWillTerminate(_ notification: Notification) {
-    hyperkeyManager?.exit()
+    Task {
+      await hyperkeyManager?.exit()
+    }
   }
   
   // MARK: - DIContainer bootstrap

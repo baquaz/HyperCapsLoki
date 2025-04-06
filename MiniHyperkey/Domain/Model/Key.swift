@@ -13,7 +13,9 @@ import Carbon
 typealias HIDUsageCode = Int
 
 /// Enum defining all supported keys with their corresponding HID usage and Carbon key codes.
-enum Key: String, CaseIterable, Hashable {
+enum Key: String, CaseIterable, Hashable, Identifiable {
+  var id: Self { self }
+  
   case capsLock = "caps lock"
   case leftCommand = "left command"
   case leftOption = "left option"

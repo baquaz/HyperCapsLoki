@@ -9,6 +9,7 @@ import Foundation
 import Cocoa
 import IOKit.hid
 
+@MainActor
 final class EventsHandler {
   var hyperKey: Key?
   

@@ -8,22 +8,22 @@
 import Foundation
 import Cocoa
 
+@MainActor
 final class HyperkeyManager {
   
   private let launchUseCase: LaunchUseCase
   private let exitUseCase: ExitUseCase
-  
+
   init(launchUseCase: any LaunchUseCase, exitUseCase: any ExitUseCase) {
     self.launchUseCase = launchUseCase
     self.exitUseCase = exitUseCase
   }
 
-  @MainActor
   func launch() async {
     await launchUseCase.launch()
   }
   
-  func exit() {
-    exitUseCase.exit()
+  func exit() async {
+    await exitUseCase.exit()
   }
 }
