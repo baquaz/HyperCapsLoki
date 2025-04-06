@@ -10,9 +10,7 @@ import Cocoa
 import IOKit.hid
 
 final class EventsHandler {
-  var hyperKey: KeysProvider.Key?
-  
-  private let keysProvider: KeysProvider
+  var hyperKey: Key?
   
   private var eventTap: CFMachPort?
   private var isHyperkeyActive = false
@@ -25,11 +23,6 @@ final class EventsHandler {
   private let eventTapCallback: CGEventTapCallBack = { (proxy, type, event, refcon) in
     let handler = Unmanaged<EventsHandler>.fromOpaque(refcon!).takeUnretainedValue()
     return handler.handleEventTap(proxy: proxy, type: type, event: event)
-  }
-  
-  // MARK: - Init
-  init(keysProvider: KeysProvider = .shared) {
-    self.keysProvider = keysProvider
   }
   
   /// Sets up event tap handler to detect key events and flags
