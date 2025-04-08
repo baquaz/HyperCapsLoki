@@ -8,7 +8,7 @@
 import Foundation
 
 protocol RemapExecutor {
-  func remapUserKeyMappingCapsLock(using key: KeysProvider.Key?)
+  func remapUserKeyMappingCapsLock(using key: Key?)
   func resetUserKeyMapping()
 }
 
@@ -22,7 +22,7 @@ struct Remapper: RemapExecutor {
   }
   
   // MARK: - Remap
-  func remapUserKeyMappingCapsLock(using key: KeysProvider.Key?) {
+  func remapUserKeyMappingCapsLock(using key: Key?) {
     guard let key else { return }
     let capsLockUsage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: kHIDUsage_KeyboardCapsLock)
     

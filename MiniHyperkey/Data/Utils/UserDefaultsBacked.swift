@@ -24,8 +24,9 @@ struct UserDefaultsBacked<T: Sendable> {
       defaults.object(forKey: key) as? T ?? defaultValue
     }
     nonmutating set {
-      Task.detached(priority: .utility) { [defaults, key, newValue] in
-        defaults.setValue(newValue, forKey: key)
+      // Avoid Task.detached due to Sendable issues; run async on main queue safely
+      DispatchQueue.global(qos: .utility).async { [key, newValue] in
+        UserDefaults.standard.setValue(newValue, forKey: key)
       }
     }
   }
