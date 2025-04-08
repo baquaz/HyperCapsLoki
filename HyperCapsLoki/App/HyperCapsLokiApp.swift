@@ -22,7 +22,6 @@ struct HyperCapsLokiApp: App {
       AppMenu()
         .environment(appState)
     }
-    
     .menuBarExtraStyle(.window)
   }
 }

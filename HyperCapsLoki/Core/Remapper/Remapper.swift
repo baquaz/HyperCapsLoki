@@ -32,18 +32,41 @@ struct Remapper: RemapExecutor {
     let destinationUsage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: destinationUsageCode)
     
     print("🔍 Debug: Remapping Caps Lock to \(String(format: "0x%X", destinationUsage))")
+        
+    var userKeyMapping = getCurrentUserKeyMapping()
+
+    // remove any existing Caps Lock remap
+    userKeyMapping.removeAll {
+      guard let src = $0["HIDKeyboardModifierMappingSrc"] else { return false }
+      
+      let intValue: Int? = {
+        if let val = src as? Int {
+          val
+        } else if let val = src as? NSNumber {
+          val.intValue
+        } else if let val = src as? String {
+          Int(val)
+        } else {
+          nil
+        }
+      }()
+      
+      return intValue == capsLockUsage
+    }
     
-    let userKeyMapping: [[String: Any]] = [
-      ["HIDKeyboardModifierMappingSrc": capsLockUsage, // Caps Lock (0x700000039)
-       "HIDKeyboardModifierMappingDst": destinationUsage]
-    ]
+    // add new remap
+    userKeyMapping.append([
+      "HIDKeyboardModifierMappingSrc": capsLockUsage, // Caps Lock (0x700000039)
+      "HIDKeyboardModifierMappingDst": destinationUsage
+    ])
     
     do {
       let data = try JSONSerialization.data(withJSONObject: userKeyMapping, options: [])
       if let jsonString = String(data: data, encoding: .utf8) {
         let command = "hidutil property --set '{\"UserKeyMapping\": \(jsonString)}'"
         print("Executing command: \(command)")
-        let output = self.shell(command)
+        
+        let output = shell(command)
         print("Command output: \(output)")
         print("Caps Lock remapped to \(key.rawValue).")
       }
@@ -54,15 +77,40 @@ struct Remapper: RemapExecutor {
   
   // MARK: - Reset
   func resetUserKeyMapping() {
-    
-    // FIXME: save current user mappings to avoid any mappings loss
-    
     let command = "hidutil property --set '{\"UserKeyMapping\": []}'"
     print("Executing command to reset key mappings: \(command)")
     
-    let output = self.shell(command)
+    let output = shell(command)
     print("Command output: \(output)")
     print("Key mappings have been reset.")
+  }
+  
+  // MARK: - Current User Key Mapping
+  private func getCurrentUserKeyMapping() -> [[String: Any]] {
+    let command = "hidutil property --get \"UserKeyMapping\""
+    print("Executing command: \(command)")
+    
+    let output = shell(command)
+    print("Command output: \(output)")
+    
+    guard let data = output.data(using: .utf8) else {
+      fatalError("Failed to convert shell output to data")
+    }
+    do {
+      let plist = try PropertyListSerialization.propertyList(from: data, format: nil)
+      
+      if let mappings = plist as? [[String: Any]] {
+        return mappings
+        
+      } else if let dict = plist as? [String: Any],
+                let mappings = dict["UserKeyMapping"] as? [[String: Any]] {
+        return mappings
+      } else {
+        fatalError("Unexpected plist structure: \(plist)")
+      }
+    } catch {
+      fatalError(error.localizedDescription)
+    }
   }
   
   // MARK: - Shell Executor

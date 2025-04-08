@@ -41,6 +41,8 @@ struct PreviewUseCase: RemapKeyUseCase, LaunchUseCase, ExitUseCase {
 }
 
 struct PreviewRemapExecutor: RemapExecutor {
+  func getCurrentUserKeyMapping() {}
+  
   func remapUserKeyMappingCapsLock(using key: Key?) {}
   func resetUserKeyMapping() {}
 }
