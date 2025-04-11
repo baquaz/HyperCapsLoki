@@ -21,15 +21,20 @@ final class EventsHandler {
   private var capsLockReady = true
   private var capsLockTriggerTimer: Task<Void, Never>?
   
-  private let eventTapCallback: CGEventTapCallBack = { (proxy, type, event, refcon) in
-    let handler = Unmanaged<EventsHandler>.fromOpaque(refcon!).takeUnretainedValue()
+  private let eventTapCallback: CGEventTapCallBack = {
+    (proxy, type, event, refcon) in
+    let handler = Unmanaged<EventsHandler>
+      .fromOpaque(refcon!)
+      .takeUnretainedValue()
     return handler.handleEventTap(proxy: proxy, type: type, event: event)
   }
   
   /// Sets up event tap handler to detect key events and flags
   func setupEventTap() {
     let eventMask =
-    (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
+    (1 << CGEventType.keyDown.rawValue) |
+    (1 << CGEventType.keyUp.rawValue) |
+    (1 << CGEventType.flagsChanged.rawValue)
     
     eventTap = CGEvent.tapCreate(
       tap: .cghidEventTap,
@@ -37,11 +42,15 @@ final class EventsHandler {
       options: .defaultTap,
       eventsOfInterest: CGEventMask(eventMask),
       callback: eventTapCallback,
-      userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+      userInfo: UnsafeMutableRawPointer(
+        Unmanaged.passUnretained(self).toOpaque()
+      )
     )
     
     if let eventTap {
-      let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
+      let runLoopSource = CFMachPortCreateRunLoopSource(
+        kCFAllocatorDefault, eventTap, 0
+      )
       CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
       CGEvent.tapEnable(tap: eventTap, enable: true)
       print("Event tap set up successfully")
@@ -56,14 +65,21 @@ final class EventsHandler {
     }
   }
   
-  private func handleEventTap(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
+  private func handleEventTap(
+    proxy: CGEventTapProxy,
+    type: CGEventType,
+    event: CGEvent
+  ) -> Unmanaged<CGEvent>? {
     if type == .keyDown || type == .keyUp {
-      let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode)) // Convert keyCode to correct type
+      let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode))
       let flags = event.flags.rawValue
       let hyperKeyCode = hyperKey?.carbonKeyCode
       
       // Avoid multiple handling of the same hyper key event
-      if let lastKeyCode = lastKeyCode, lastKeyCode == keyCode && lastEventType == type && keyCode == hyperKeyCode {
+      if let lastKeyCode = lastKeyCode,
+         lastKeyCode == keyCode &&
+          lastEventType == type &&
+          keyCode == hyperKeyCode {
         return nil
       }
       
@@ -155,14 +171,20 @@ final class EventsHandler {
   //Should mimic - Flags changed: 65792
   func injectCapsLockFlag() {
     var ioConnect: io_connect_t = 0
-    let ioService = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching(kIOHIDSystemClass))
+    let ioService = IOServiceGetMatchingService(
+      kIOMainPortDefault,
+      IOServiceMatching(
+        kIOHIDSystemClass
+      )
+    )
     
     if ioService == 0 {
       print("Failed to find IOHID system service.")
       return
     }
     
-    let result = IOServiceOpen(ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
+    let result = IOServiceOpen(
+      ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
     
     if result != KERN_SUCCESS {
       print("Failed to open IOService: \(result)")
@@ -172,7 +194,8 @@ final class EventsHandler {
     var modifierLockState: Bool = false
     
     // Retrieve the current state of Caps Lock
-    let getResult = IOHIDGetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
+    let getResult = IOHIDGetModifierLockState(
+      ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
     
     if getResult != KERN_SUCCESS {
       print("Failed to get Caps Lock state: \(getResult)")
@@ -184,7 +207,8 @@ final class EventsHandler {
     modifierLockState.toggle()
     
     // Set the new state of Caps Lock
-    let setResult = IOHIDSetModifierLockState(ioConnect, Int32(kIOHIDCapsLockState), modifierLockState)
+    let setResult = IOHIDSetModifierLockState(
+      ioConnect, Int32(kIOHIDCapsLockState), modifierLockState)
     
     if setResult != KERN_SUCCESS {
       print("Failed to set Caps Lock state: \(setResult)")

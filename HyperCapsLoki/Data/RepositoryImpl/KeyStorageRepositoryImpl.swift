@@ -18,7 +18,7 @@ final class KeyStorageRepositoryImpl: KeyStorageRepository {
     Key(rawValue: dataSource.selectedHyperkey ?? "")
   }
   
-  func saveSelectedHyperkey(_ key: Key) {
-    dataSource.selectedHyperkey = key.rawValue
+  func saveSelectedHyperkey(_ key: Key?) {
+    dataSource.selectedHyperkey = key?.rawValue
   }
 }

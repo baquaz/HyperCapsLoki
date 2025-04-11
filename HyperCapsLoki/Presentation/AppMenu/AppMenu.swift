@@ -49,7 +49,7 @@ struct AppMenuContent: View {
       })
       
       HStack {
-        Text("Selected: \(viewModel.selectedKey.rawValue)")
+        Text("Selected: \(viewModel.selectedKey?.rawValue ?? "-")")
           .font(.system(.headline))
           .foregroundStyle(.foreground)
       }

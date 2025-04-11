@@ -10,32 +10,35 @@ import SwiftUI
 
 @Observable
 final class AppMenuViewModel {
-  let availableKeys: [Key]
+  let availableKeys: [Key?] =
+    [nil] // none key
+    + Key.allCases.filter { $0 != .capsLock }
+  
   let defaultKey: Key = .f14
   
-  var selectedKey: Key
+  var selectedKey: Key?
   
-  private let keyStorageRepository: KeyStorageRepository
   private let remapKeyUseCase: RemapKeyUseCase
   
   init(
     keyStorageRepository: KeyStorageRepository,
     remapKeyUseCase: RemapKeyUseCase
   ) {
-    self.keyStorageRepository = keyStorageRepository
     self.remapKeyUseCase = remapKeyUseCase
-    self.selectedKey = keyStorageRepository.getSelectedHyperkey() ?? defaultKey
-    self.availableKeys = Key.allCases.filter { $0 != .capsLock }
+    self.selectedKey = keyStorageRepository.getSelectedHyperkey()
   }
   
-  func textForKey(_ key: Key) -> String {
-    guard key == defaultKey else { return key.rawValue }
-    return key.rawValue + (selectedKey != defaultKey ? " (default)" : "")
+  func textForKey(_ key: Key?) -> String {
+    guard let key else { return "----" }
+    if key == defaultKey {
+      return key.rawValue + (selectedKey != defaultKey ? " (default)" : "")
+    } else {
+      return key.rawValue
+    }
   }
   
   @MainActor
-  func onSelectKey(_ key: Key) {
-    keyStorageRepository.saveSelectedHyperkey(key)
+  func onSelectKey(_ key: Key?) {
     selectedKey = key
     remapKeyUseCase.execute(newKey: key)
   }

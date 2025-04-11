@@ -29,13 +29,8 @@ final class LaunchUseCaseImpl: LaunchUseCase {
   }
   
   func launch() async {
-    if keyStorageRepository.getSelectedHyperkey() == nil {
-      keyStorageRepository.saveSelectedHyperkey(.f14)
-    }
-    
     guard let selectedKey = keyStorageRepository.getSelectedHyperkey() else { return }
     
-    remapper.resetUserKeyMapping()
     remapper.remapUserKeyMappingCapsLock(using: selectedKey)
     
     eventsHandler.hyperKey = selectedKey

@@ -35,19 +35,17 @@ extension AppEnvironment {
 }
 
 struct PreviewUseCase: RemapKeyUseCase, LaunchUseCase, ExitUseCase {
-  func execute(newKey: Key) {}
+  func execute(newKey: Key?) {}
   func launch() {}
   func exit() {}
 }
 
 struct PreviewRemapExecutor: RemapExecutor {
-  func getCurrentUserKeyMapping() {}
-  
-  func remapUserKeyMappingCapsLock(using key: Key?) {}
-  func resetUserKeyMapping() {}
+  func remapUserKeyMappingCapsLock(using key: Key) {}
+  func resetUserKeyMappingCapsLock() {}
 }
 
 struct PreviewKeyStorage: KeyStorageRepository {
   func getSelectedHyperkey() -> Key? { .f13 }
-  func saveSelectedHyperkey(_ key: Key) {}
+  func saveSelectedHyperkey(_ key: Key?) {}
 }

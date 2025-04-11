@@ -32,11 +32,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
   
-  // MARK: - applicationWillTerminate
-  func applicationWillTerminate(_ notification: Notification) {
+  // MARK: - applicationShouldTerminate
+  func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
     Task {
       await hyperkeyManager?.exit()
+      NSApp.reply(toApplicationShouldTerminate: true)
     }
+    return .terminateLater
   }
   
   // MARK: - DIContainer bootstrap
@@ -62,6 +64,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     let remapKeyUseCase = RemapKeyUseCaseImpl(
       keyStorageRepo: keyStorageRepo,
+      eventsHandler: eventsHandler,
       remapper: remapper
     )
     

@@ -9,5 +9,5 @@ import Foundation
 
 protocol KeyStorageRepository {
   func getSelectedHyperkey() -> Key?
-  func saveSelectedHyperkey(_ key: Key)
+  func saveSelectedHyperkey(_ key: Key?)
 }

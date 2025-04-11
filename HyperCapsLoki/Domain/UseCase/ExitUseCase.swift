@@ -22,8 +22,9 @@ final class ExitUseCaseImpl: ExitUseCase {
     self.eventsHandler = eventsHandler
   }
   
-  func exit() {
-    remapper.resetUserKeyMapping()
+  func exit() async {
+    remapper.resetUserKeyMappingCapsLock()
     eventsHandler.disableEventTap()
+    print("exit completed!")
   }
 }
