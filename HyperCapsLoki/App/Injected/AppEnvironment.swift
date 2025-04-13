@@ -8,17 +8,20 @@
 import Foundation
 
 struct AppEnvironment {
+  let defaultHyperkey: Key = .f15
+  
   // Core components
   let remapper: RemapExecutor
   let eventsHandler: EventsHandler
   
   // Repositories
-  let keyStorageRepository: KeyStorageRepository
+  let storageRepository: StorageRepository
   
   // Use cases
   let launchUseCase: LaunchUseCase
-  let exitUseCase: ExitUseCase
   let remapKeyUseCase: RemapKeyUseCase
+  let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
+  let exitUseCase: ExitUseCase
 }
 
 // MARK: - Previews
@@ -27,25 +30,44 @@ extension AppEnvironment {
   static let preview = AppEnvironment(
     remapper: PreviewRemapExecutor(),
     eventsHandler: EventsHandler(),
-    keyStorageRepository: PreviewKeyStorage(),
+    storageRepository: PreviewStorage(),
     launchUseCase: PreviewUseCase(),
-    exitUseCase: PreviewUseCase(),
-    remapKeyUseCase: PreviewUseCase()
+    remapKeyUseCase: PreviewUseCase(),
+    hyperkeyFeatureUseCase: PreviewUseCase(),
+    exitUseCase: PreviewUseCase()
   )
 }
 
-struct PreviewUseCase: RemapKeyUseCase, LaunchUseCase, ExitUseCase {
-  func execute(newKey: Key?) {}
-  func launch() {}
-  func exit() {}
+struct PreviewUseCase:
+  LaunchUseCase,
+  RemapKeyUseCase,
+  HyperkeyFeatureUseCase,
+  ExitUseCase
+{
+  func launch() { }
+  func execute(newKey: Key?) { }
+  func setHyperkeyFeature(active: Bool) { }
+  func getHyperkeySequenceKeysEnabled() -> [Key] { [] }
+  func setHyperkeySequence(enabled: Bool, for key: Key) { }
+  func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) { }
+  func terminate() { }
+  func exit() { }
 }
 
 struct PreviewRemapExecutor: RemapExecutor {
-  func remapUserKeyMappingCapsLock(using key: Key) {}
-  func resetUserKeyMappingCapsLock() {}
+  func remapUserKeyMappingCapsLock(using key: Key) { }
+  func resetUserKeyMappingCapsLock() { }
 }
 
-struct PreviewKeyStorage: KeyStorageRepository {
-  func getSelectedHyperkey() -> Key? { .f13 }
-  func saveSelectedHyperkey(_ key: Key?) {}
+struct PreviewStorage: StorageRepository {
+  func getHyperkeyFeatureState() -> Bool? { nil }
+  func setHyperkeyFeatureState(_ isActive: Bool) {  }
+
+  func getSelectedHyperkey() -> Key? { .f15 }
+  func saveSelectedHyperkey(_ key: Key?) { }
+
+  func getHyperkeySequenceKeysUnset() -> [Key] { [] }
+  func getHyperkeySequenceKeysEnabled() -> [Key] { [] }
+  func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) { }
+  func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) { }
 }

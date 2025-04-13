@@ -11,7 +11,7 @@ import AppKit
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
   private var appState: AppState?
-  private var hyperkeyManager: HyperkeyManager?
+  private var runtimeManager: RuntimeManager?
   
   // MARK: - AppState inject
   func inject(appState: AppState) {
@@ -24,18 +24,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     appState?.container = container
     
     Task {
-      hyperkeyManager = HyperkeyManager(
+      runtimeManager = RuntimeManager(
         launchUseCase: container.environment.launchUseCase,
         exitUseCase: container.environment.exitUseCase
       )
-      await hyperkeyManager?.launch()
+      await runtimeManager?.launch()
     }
   }
   
   // MARK: - applicationShouldTerminate
   func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
     Task {
-      await hyperkeyManager?.exit()
+      await runtimeManager?.exit()
       NSApp.reply(toApplicationShouldTerminate: true)
     }
     return .terminateLater
@@ -48,13 +48,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let eventsHandler = EventsHandler()
     
     // MARK: Repositories
-    let keyStorageRepo = KeyStorageRepositoryImpl(dataSource: KeyStorage())
+    let storageRepo = StorageRepositoryImpl(dataSource: Storage())
     
     // MARK: Use Cases
     let launchUseCase = LaunchUseCaseImpl(
       remapper: remapper,
       eventsHandler: eventsHandler,
-      keyStorageRepository: keyStorageRepo
+      storageRepository: storageRepo
+    )
+    
+    let remapKeyUseCase = RemapKeyUseCaseImpl(
+      storageRepo: storageRepo,
+      eventsHandler: eventsHandler,
+      remapper: remapper
+    )
+    
+    let hyperkeyFeatureUseCase = HyperkeyFeatureUseCaseImpl(
+      storageRepository: storageRepo,
+      eventsHandler: eventsHandler,
+      remapper: remapper
     )
     
     let exitUseCase = ExitUseCaseImpl(
@@ -62,20 +74,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       eventsHandler: eventsHandler
     )
     
-    let remapKeyUseCase = RemapKeyUseCaseImpl(
-      keyStorageRepo: keyStorageRepo,
-      eventsHandler: eventsHandler,
-      remapper: remapper
-    )
-    
     // MARK: Environment
     let environment = AppEnvironment(
       remapper: remapper,
       eventsHandler: eventsHandler,
-      keyStorageRepository: keyStorageRepo,
+      storageRepository: storageRepo,
       launchUseCase: launchUseCase,
-      exitUseCase: exitUseCase,
-      remapKeyUseCase: remapKeyUseCase
+      remapKeyUseCase: remapKeyUseCase,
+      hyperkeyFeatureUseCase: hyperkeyFeatureUseCase,
+      exitUseCase: exitUseCase
     )
     
     return DIContainer(environment: environment)

@@ -29,6 +29,26 @@ enum Key: String, CaseIterable, Hashable, Identifiable {
   case f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12,
        f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24
   
+  var symbol: String {
+    switch self {
+      case .leftCommand: "⌘"
+      case .leftOption: "⌥"
+      case .leftControl: "⌃"
+      case .leftShift: "⇧"
+      default: ""
+    }
+  }
+  
+  var alias: String {
+    switch self {
+      case .leftCommand: "meta"
+      case .leftOption: "super"
+      case .leftControl: "hyper"
+      case .leftShift: "shift"
+      default: ""
+    }
+  }
+  
   /// Supported HID Keyboard Usage Codes with their corresponding key names.
   ///
   /// https://developer.apple.com/documentation/hiddriverkit/keyboard-or-keypad-enum
@@ -113,4 +133,14 @@ enum Key: String, CaseIterable, Hashable, Identifiable {
         CGKeyCode(hidUsageKeyboardCode & 0xFFFF)
     }
   }
-  }
+}
+
+// MARK: - All Hyperkey Sequence Keys
+extension Key {
+  static let allHyperkeySequenceKeys: [Key] = [
+    .leftCommand,
+    .leftOption,
+    .leftControl,
+    .leftShift
+  ]
+}

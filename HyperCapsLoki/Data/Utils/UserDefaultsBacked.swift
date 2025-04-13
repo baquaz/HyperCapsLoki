@@ -23,14 +23,11 @@ struct UserDefaultsBacked<T: Sendable> {
     get {
       defaults.object(forKey: key) as? T ?? defaultValue
     }
-    nonmutating set {
-      DispatchQueue.global(qos: .utility).async { [key, newValue] in
-        let defaults = UserDefaults.standard
-        if let value = newValue {
-          defaults.setValue(value, forKey: key)
-        } else {
-          defaults.removeObject(forKey: key)
-        }
+    set {
+      if let value = newValue {
+        defaults.setValue(value, forKey: key)
+      } else {
+        defaults.removeObject(forKey: key)
       }
     }
   }

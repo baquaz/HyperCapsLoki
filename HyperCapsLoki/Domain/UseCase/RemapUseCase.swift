@@ -13,27 +13,32 @@ protocol RemapKeyUseCase {
 }
 
 final class RemapKeyUseCaseImpl: RemapKeyUseCase {
-  private let keyStorageRepo: KeyStorageRepository
+  private let storageRepo: StorageRepository
   private let eventsHandler: EventsHandler
   private let remapper: RemapExecutor
   
   init(
-    keyStorageRepo: any KeyStorageRepository,
+    storageRepo: any StorageRepository,
     eventsHandler: EventsHandler,
     remapper: any RemapExecutor
   ) {
-    self.keyStorageRepo = keyStorageRepo
+    self.storageRepo = storageRepo
     self.eventsHandler = eventsHandler
     self.remapper = remapper
   }
   
   func execute(newKey: Key?) {
-    if let newKey {
-      remapper.remapUserKeyMappingCapsLock(using: newKey)
-    } else {
-      remapper.resetUserKeyMappingCapsLock()
+    let isHyperkeyFeatureActive = storageRepo.getHyperkeyFeatureState() == true
+    
+    if isHyperkeyFeatureActive {
+      if let newKey {
+        remapper.remapUserKeyMappingCapsLock(using: newKey)
+      } else {
+        remapper.resetUserKeyMappingCapsLock()
+      }
     }
-    eventsHandler.hyperKey = newKey
-    keyStorageRepo.saveSelectedHyperkey(newKey)
+    
+    eventsHandler.set(newKey)
+    storageRepo.saveSelectedHyperkey(newKey)
   }
 }

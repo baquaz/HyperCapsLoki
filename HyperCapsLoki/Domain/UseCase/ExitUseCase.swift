@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import SwiftUI
 
 @MainActor
 protocol ExitUseCase {
+  func terminate()
   func exit() async
 }
 
@@ -22,9 +24,13 @@ final class ExitUseCaseImpl: ExitUseCase {
     self.eventsHandler = eventsHandler
   }
   
+  func terminate() {
+    NSApplication.shared.terminate(nil)
+  }
+  
   func exit() async {
     remapper.resetUserKeyMappingCapsLock()
-    eventsHandler.disableEventTap()
+    eventsHandler.setEventTap(enabled: false)
     print("exit completed!")
   }
 }

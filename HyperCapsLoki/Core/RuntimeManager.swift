@@ -9,7 +9,7 @@ import Foundation
 import Cocoa
 
 @MainActor
-final class HyperkeyManager {
+final class RuntimeManager {
   
   private let launchUseCase: LaunchUseCase
   private let exitUseCase: ExitUseCase

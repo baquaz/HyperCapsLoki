@@ -15,25 +15,40 @@ protocol LaunchUseCase {
 final class LaunchUseCaseImpl: LaunchUseCase {
   private let remapper: RemapExecutor
   private let eventsHandler: EventsHandler
-  private let keyStorageRepository: KeyStorageRepository
+  private let storageRepository: StorageRepository
   
   // MARK: - Init
   init(
     remapper: any RemapExecutor,
     eventsHandler: EventsHandler,
-    keyStorageRepository: any KeyStorageRepository
+    storageRepository: any StorageRepository
   ) {
     self.remapper = remapper
     self.eventsHandler = eventsHandler
-    self.keyStorageRepository = keyStorageRepository
+    self.storageRepository = storageRepository
   }
   
   func launch() async {
-    guard let selectedKey = keyStorageRepository.getSelectedHyperkey() else { return }
+    let hyperkeyFeatureIsActive = storageRepository
+      .getHyperkeyFeatureState() == true
     
-    remapper.remapUserKeyMappingCapsLock(using: selectedKey)
-    
-    eventsHandler.hyperKey = selectedKey
     eventsHandler.setupEventTap()
-  } 
+    if !hyperkeyFeatureIsActive {
+      eventsHandler.setEventTap(enabled: false)
+    }
+    
+    let selectedKey = storageRepository.getSelectedHyperkey()
+    if let selectedKey, hyperkeyFeatureIsActive {
+      remapper.remapUserKeyMappingCapsLock(using: selectedKey)
+    }
+    
+    storageRepository.getHyperkeySequenceKeysUnset().forEach {
+      storageRepository.setHyperkeySequence(enabled: true, for: $0)
+    }
+    
+    eventsHandler.set(selectedKey)
+    eventsHandler.set(
+      availableSequenceKeys: storageRepository.getHyperkeySequenceKeysEnabled()
+    )
+  }
 }

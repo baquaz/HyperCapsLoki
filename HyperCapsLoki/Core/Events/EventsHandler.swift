@@ -11,7 +11,10 @@ import IOKit.hid
 
 @MainActor
 final class EventsHandler {
-  var hyperKey: Key?
+  private var hyperKey: Key?
+  
+  private var hyperkeyDownSequence: [CGEventFlags] = []
+  private var hyperkeyUpSequence: [CGEventFlags] = []
   
   private var eventTap: CFMachPort?
   private var isHyperkeyActive = false
@@ -29,6 +32,7 @@ final class EventsHandler {
     return handler.handleEventTap(proxy: proxy, type: type, event: event)
   }
   
+  // MARK: - Event Tap
   /// Sets up event tap handler to detect key events and flags
   func setupEventTap() {
     let eventMask =
@@ -59,12 +63,74 @@ final class EventsHandler {
     }
   }
   
-  func disableEventTap() {
+  func setEventTap(enabled: Bool) {
     if let eventTap {
-      CGEvent.tapEnable(tap: eventTap, enable: false)
+      CGEvent.tapEnable(tap: eventTap, enable: enabled)
     }
   }
   
+  // MARK: - Configure
+  func set(_ hyperKey: Key?) {
+    self.hyperKey = hyperKey
+  }
+  
+  func set(availableSequenceKeys: [Key]) {
+    let availableFlags: [CGEventFlags] = availableSequenceKeys
+      .compactMap({
+        switch $0 {
+          case .leftCommand: .maskCommand
+          case .leftOption: .maskAlternate
+          case .leftShift: .maskShift
+          case .leftControl: .maskControl
+          default: nil
+        }
+      })
+    
+    let command: CGEventFlags =
+    availableFlags.contains(.maskCommand) ? .maskCommand : []
+    
+    let option: CGEventFlags =
+    availableFlags.contains(.maskAlternate) ? .maskAlternate : []
+    
+    let control: CGEventFlags =
+    availableFlags.contains(.maskControl) ? .maskControl : []
+
+    let shift: CGEventFlags =
+    availableFlags.contains(.maskShift) ? .maskShift : []
+    
+    let meta = command
+    let superKey = meta.union(option)
+    let hyper = superKey.union(control)
+    let shifty = hyper.union(shift)
+    
+    let keyDownSequence: [CGEventFlags] = [
+      meta,
+      superKey,
+      hyper,
+      shifty
+    ]
+    
+    let keyUpSequence: [CGEventFlags] = [
+      shifty,
+      hyper,
+      superKey,
+      meta,
+      []
+    ]
+    
+    hyperkeyDownSequence = deduplicated(keyDownSequence)
+    hyperkeyUpSequence = deduplicated(keyUpSequence)
+  }
+  
+  private func deduplicated(_ flags: [CGEventFlags]) -> [CGEventFlags] {
+    flags.reduce(into: []) { result, flagsStep in
+      if !result.contains(flagsStep) {
+        result.append(flagsStep)
+      }
+    }
+  }
+  
+  // MARK: - Event Tap Handler
   private func handleEventTap(
     proxy: CGEventTapProxy,
     type: CGEventType,
@@ -148,7 +214,8 @@ final class EventsHandler {
     }
   }
   
-  func startCapsLockTriggerTimer() {
+  // MARK: - Caps Lock Trigger Timer
+  private func startCapsLockTriggerTimer() {
     cancelCapsLockTriggerTimer()
     capsLockReady = true
     capsLockTriggerTimer = Task {
@@ -162,14 +229,15 @@ final class EventsHandler {
     }
   }
   
-  func cancelCapsLockTriggerTimer() {
+  private func cancelCapsLockTriggerTimer() {
     capsLockTriggerTimer?.cancel()
     capsLockTriggerTimer = nil
     capsLockReady = false
   }
   
+  // MARK: - Trigger Caps Lock
   //Should mimic - Flags changed: 65792
-  func injectCapsLockFlag() {
+  private func injectCapsLockFlag() {
     var ioConnect: io_connect_t = 0
     let ioService = IOServiceGetMatchingService(
       kIOMainPortDefault,
@@ -219,28 +287,9 @@ final class EventsHandler {
     IOServiceClose(ioConnect)
   }
   
-  func injectHyperkeyFlagsSequence(isKeyDown: Bool) {
-    let command: CGEventFlags = .maskCommand
-    let option: CGEventFlags = .maskAlternate
-    let control: CGEventFlags = .maskControl
-    let shift: CGEventFlags = .maskShift
-    
-    let downFlagsSequence: [CGEventFlags] = [
-      command,
-      command.union(option),
-      command.union(option).union(control),
-      command.union(option).union(control).union(shift)
-    ]
-    
-    let upFlagsSequence: [CGEventFlags] = [
-      command.union(option).union(control).union(shift),
-      command.union(option).union(control),
-      command.union(option),
-      command,
-      []
-    ]
-    
-    let flagsSequence = isKeyDown ? downFlagsSequence : upFlagsSequence
+  // MARK: - Trigger Hyperkey
+  private func injectHyperkeyFlagsSequence(isKeyDown: Bool) {
+    let flagsSequence = isKeyDown ? hyperkeyDownSequence : hyperkeyUpSequence
     
     for flags in flagsSequence {
       let eventType: CGEventType = .flagsChanged
