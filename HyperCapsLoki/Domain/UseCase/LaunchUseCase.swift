@@ -32,7 +32,7 @@ final class LaunchUseCaseImpl: LaunchUseCase {
     let hyperkeyFeatureIsActive = storageRepository
       .getHyperkeyFeatureState() == true
     
-    eventsHandler.setupEventTap()
+    eventsHandler.setUpEventTap()
     if !hyperkeyFeatureIsActive {
       eventsHandler.setEventTap(enabled: false)
     }

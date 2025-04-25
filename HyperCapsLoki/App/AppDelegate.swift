@@ -45,7 +45,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   private static func bootstrap() -> DIContainer {
     // MARK: Core
     let remapper = Remapper()
-    let eventsHandler = EventsHandler()
+    let eventsHandler = EventsHandler(
+      systemEventsInjector: SystemEventsInjector(),
+      capsLockTriggerTimer: CapsLockTriggerTimer()
+    )
     
     // MARK: Repositories
     let storageRepo = StorageRepositoryImpl(dataSource: Storage())

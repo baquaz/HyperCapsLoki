@@ -10,19 +10,18 @@ import Cocoa
 import IOKit.hid
 
 @MainActor
-final class EventsHandler {
-  private var hyperKey: Key?
+class EventsHandler {
+  private var systemEventsInjector: SystemEventsInjection
+  private let capsLockTriggerTimer: AsyncCapsLockTimer
+  internal var capsLockReady = true
   
-  private var hyperkeyDownSequence: [CGEventFlags] = []
-  private var hyperkeyUpSequence: [CGEventFlags] = []
+  private var hyperkey: Key?
+  internal var isHyperkeyActive = false
+  internal var availableEventFlags: CGEventFlags = []
   
   private var eventTap: CFMachPort?
-  private var isHyperkeyActive = false
   private var lastKeyCode: CGKeyCode? = nil
   private var lastEventType: CGEventType? = nil
-  
-  private var capsLockReady = true
-  private var capsLockTriggerTimer: Task<Void, Never>?
   
   private let eventTapCallback: CGEventTapCallBack = {
     (proxy, type, event, refcon) in
@@ -32,9 +31,18 @@ final class EventsHandler {
     return handler.handleEventTap(proxy: proxy, type: type, event: event)
   }
   
-  // MARK: - Event Tap
+  // MARK: - Init
+  init(
+    systemEventsInjector: SystemEventsInjection,
+    capsLockTriggerTimer: AsyncCapsLockTimer
+  ) {
+    self.systemEventsInjector = systemEventsInjector
+    self.capsLockTriggerTimer = capsLockTriggerTimer
+  }
+  
+  // MARK: - Setup Event Tap
   /// Sets up event tap handler to detect key events and flags
-  func setupEventTap() {
+  func setUpEventTap() {
     let eventMask =
     (1 << CGEventType.keyDown.rawValue) |
     (1 << CGEventType.keyUp.rawValue) |
@@ -63,40 +71,41 @@ final class EventsHandler {
     }
   }
   
+  // MARK: - Configure
   func setEventTap(enabled: Bool) {
     if let eventTap {
       CGEvent.tapEnable(tap: eventTap, enable: enabled)
     }
   }
   
-  // MARK: - Configure
-  func set(_ hyperKey: Key?) {
-    self.hyperKey = hyperKey
+  func set(_ hyperkey: Key?) {
+    self.hyperkey = hyperkey
   }
   
   func set(availableSequenceKeys: [Key]) {
-    let availableFlags: [CGEventFlags] = availableSequenceKeys
-      .compactMap({
-        switch $0 {
-          case .leftCommand: .maskCommand
-          case .leftOption: .maskAlternate
-          case .leftShift: .maskShift
-          case .leftControl: .maskControl
-          default: nil
+    availableEventFlags = availableSequenceKeys
+      .reduce(into: []) { result, key in
+        guard Key.allHyperkeySequenceKeys.contains(key) else { return }
+        switch key {
+          case .leftCommand:  result.insert(.maskCommand)
+          case .leftOption:   result.insert(.maskAlternate)
+          case .leftShift:    result.insert(.maskShift)
+          case .leftControl:  result.insert(.maskControl)
+          default: break
         }
-      })
+      }
     
     let command: CGEventFlags =
-    availableFlags.contains(.maskCommand) ? .maskCommand : []
+    availableEventFlags.contains(.maskCommand) ? .maskCommand : []
     
     let option: CGEventFlags =
-    availableFlags.contains(.maskAlternate) ? .maskAlternate : []
+    availableEventFlags.contains(.maskAlternate) ? .maskAlternate : []
     
     let control: CGEventFlags =
-    availableFlags.contains(.maskControl) ? .maskControl : []
-
+    availableEventFlags.contains(.maskControl) ? .maskControl : []
+    
     let shift: CGEventFlags =
-    availableFlags.contains(.maskShift) ? .maskShift : []
+    availableEventFlags.contains(.maskShift) ? .maskShift : []
     
     let meta = command
     let superKey = meta.union(option)
@@ -118,20 +127,12 @@ final class EventsHandler {
       []
     ]
     
-    hyperkeyDownSequence = deduplicated(keyDownSequence)
-    hyperkeyUpSequence = deduplicated(keyUpSequence)
-  }
-  
-  private func deduplicated(_ flags: [CGEventFlags]) -> [CGEventFlags] {
-    flags.reduce(into: []) { result, flagsStep in
-      if !result.contains(flagsStep) {
-        result.append(flagsStep)
-      }
-    }
+    systemEventsInjector.setUpHyperkeySequenceKeyUp(keyUpSequence)
+    systemEventsInjector.setUpHyperkeySequenceKeyDown(keyDownSequence)
   }
   
   // MARK: - Event Tap Handler
-  private func handleEventTap(
+  internal func handleEventTap(
     proxy: CGEventTapProxy,
     type: CGEventType,
     event: CGEvent
@@ -139,7 +140,7 @@ final class EventsHandler {
     if type == .keyDown || type == .keyUp {
       let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode))
       let flags = event.flags.rawValue
-      let hyperKeyCode = hyperKey?.carbonKeyCode
+      let hyperKeyCode = hyperkey?.carbonKeyCode
       
       // Avoid multiple handling of the same hyper key event
       if let lastKeyCode = lastKeyCode,
@@ -155,15 +156,15 @@ final class EventsHandler {
       """
       🔍 Debug:
       - EventTap CGKeyCode: \(keyCode)
-      - Expected Hyper CGKeyCode (\(hyperKey?.rawValue ?? "")): \(hyperKeyCode as Any)
+      - Expected Hyper CGKeyCode (\(hyperkey?.rawValue ?? "")): \(hyperKeyCode as Any)
 
       """
       )
       
       if keyCode == hyperKeyCode {
-        Task {
-          await handleHyperkeyPress(type)
-        }
+        
+        handleHyperkeyPress(type)
+        
         lastKeyCode = keyCode
         lastEventType = type
         
@@ -177,7 +178,7 @@ final class EventsHandler {
       // Handle other key events when Hyperkey is active
       if isHyperkeyActive {
         print("Hyper key active, handling key event with modifiers")
-        event.flags.insert([.maskShift, .maskControl, .maskAlternate, .maskCommand])
+        event.flags.insert(availableEventFlags)
       }
       
     } else if type == .flagsChanged {
@@ -188,132 +189,55 @@ final class EventsHandler {
     return Unmanaged.passRetained(event)
   }
   
-  private func handleHyperkeyPress(_ type: CGEventType) async {
-    if type == .keyDown {
-      print("Hyper key DOWN intercepted")
-      
-      startCapsLockTriggerTimer()
-      
-      if !isHyperkeyActive {
-        injectHyperkeyFlagsSequence(isKeyDown: true)
-        isHyperkeyActive = true
-      }
-      
-    } else if type == .keyUp {
-      print("Hyper key UP intercepted")
-      
-      if capsLockReady {
-        print("Caps lock ready - injecting caps lock")
-        injectCapsLockFlag()
-      } else {
-        print("Caps lock unavailable")
-      }
-      
-      isHyperkeyActive = false
-      injectHyperkeyFlagsSequence(isKeyDown: false)
+  internal func handleHyperkeyPress(_ type: CGEventType) {
+    switch type {
+      case .keyDown:
+        handleKeyDown()
+      case .keyUp:
+        handleKeyUp()
+      case .flagsChanged:
+        fallthrough
+      default:
+        break
     }
+  }
+  
+  private func handleKeyDown() {
+    print("Hyper key DOWN intercepted")
+    startCapsLockTriggerTimer()
+    
+    if !isHyperkeyActive {
+      systemEventsInjector.injectHyperkeyFlagsSequence(isKeyDown: true)
+      isHyperkeyActive = true
+    }
+  }
+  
+  private func handleKeyUp() {
+    print("Hyper key UP intercepted")
+    
+    if capsLockReady {
+      print("Caps lock ready - injecting caps lock")
+      systemEventsInjector.injectCapsLockStateToggle()
+    } else {
+      print("Caps lock unavailable")
+    }
+    
+    isHyperkeyActive = false
+    systemEventsInjector.injectHyperkeyFlagsSequence(isKeyDown: false)
   }
   
   // MARK: - Caps Lock Trigger Timer
   private func startCapsLockTriggerTimer() {
     cancelCapsLockTriggerTimer()
+    
     capsLockReady = true
-    capsLockTriggerTimer = Task {
-      do {
-        try await Task.sleep(for: .seconds(1.5))
-        capsLockReady = false
-        print("Caps lock trigger timer expired")
-      } catch {
-        print("Caps lock trigger timer canceled")
-      }
-    }
+    capsLockTriggerTimer.start(delay: .seconds(1.5), onExpire: { [weak self] in
+      self?.capsLockReady = false
+    })
   }
-  
+
   private func cancelCapsLockTriggerTimer() {
-    capsLockTriggerTimer?.cancel()
-    capsLockTriggerTimer = nil
+    capsLockTriggerTimer.cancel()
     capsLockReady = false
-  }
-  
-  // MARK: - Trigger Caps Lock
-  //Should mimic - Flags changed: 65792
-  private func injectCapsLockFlag() {
-    var ioConnect: io_connect_t = 0
-    let ioService = IOServiceGetMatchingService(
-      kIOMainPortDefault,
-      IOServiceMatching(
-        kIOHIDSystemClass
-      )
-    )
-    
-    if ioService == 0 {
-      print("Failed to find IOHID system service.")
-      return
-    }
-    
-    let result = IOServiceOpen(
-      ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
-    
-    if result != KERN_SUCCESS {
-      print("Failed to open IOService: \(result)")
-      return
-    }
-    
-    var modifierLockState: Bool = false
-    
-    // Retrieve the current state of Caps Lock
-    let getResult = IOHIDGetModifierLockState(
-      ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
-    
-    if getResult != KERN_SUCCESS {
-      print("Failed to get Caps Lock state: \(getResult)")
-      IOServiceClose(ioConnect)
-      return
-    }
-    
-    // Toggle the Caps Lock state
-    modifierLockState.toggle()
-    
-    // Set the new state of Caps Lock
-    let setResult = IOHIDSetModifierLockState(
-      ioConnect, Int32(kIOHIDCapsLockState), modifierLockState)
-    
-    if setResult != KERN_SUCCESS {
-      print("Failed to set Caps Lock state: \(setResult)")
-    } else {
-      print("Caps Lock state toggled successfully.")
-    }
-    
-    IOServiceClose(ioConnect)
-  }
-  
-  // MARK: - Trigger Hyperkey
-  private func injectHyperkeyFlagsSequence(isKeyDown: Bool) {
-    let flagsSequence = isKeyDown ? hyperkeyDownSequence : hyperkeyUpSequence
-    
-    for flags in flagsSequence {
-      let eventType: CGEventType = .flagsChanged
-      if let flagsChangedEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
-        flagsChangedEvent.flags = flags
-        flagsChangedEvent.type = eventType
-        flagsChangedEvent.post(tap: .cghidEventTap)
-        print("Injected \(eventType) with flags: \(flags.rawValue).")
-        
-        // Introduce a small delay for processing
-        usleep(5000) // 5 milliseconds
-      } else {
-        print("Failed to create flagsChangedEvent for flags: \(flags.rawValue)")
-      }
-    }
-    
-    // Ensure flags are fully reset
-    if !isKeyDown {
-      if let resetEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
-        resetEvent.flags = []
-        resetEvent.type = .flagsChanged
-        resetEvent.post(tap: .cghidEventTap)
-        print("Injected final flags reset event with flags: 0")
-      }
-    }
   }
 }

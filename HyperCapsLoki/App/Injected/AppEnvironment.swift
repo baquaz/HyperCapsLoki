@@ -7,7 +7,22 @@
 
 import Foundation
 
-struct AppEnvironment {
+protocol AppEnvironmentProtocol {
+  var defaultHyperkey: Key { get }
+  
+  var remapper: RemapExecutor { get }
+  var eventsHandler: EventsHandler { get }
+  
+  var storageRepository: StorageRepository { get }
+  
+  var launchUseCase: LaunchUseCase { get }
+  var remapKeyUseCase: RemapKeyUseCase { get }
+  var hyperkeyFeatureUseCase: HyperkeyFeatureUseCase { get }
+  var exitUseCase: ExitUseCase { get }
+}
+
+// MARK: - App Environment
+struct AppEnvironment: AppEnvironmentProtocol {
   let defaultHyperkey: Key = .f15
   
   // Core components
@@ -29,7 +44,10 @@ extension AppEnvironment {
   @MainActor
   static let preview = AppEnvironment(
     remapper: PreviewRemapExecutor(),
-    eventsHandler: EventsHandler(),
+    eventsHandler: EventsHandler(
+      systemEventsInjector: SystemEventsInjector(),
+      capsLockTriggerTimer: CapsLockTriggerTimer()
+    ),
     storageRepository: PreviewStorage(),
     launchUseCase: PreviewUseCase(),
     remapKeyUseCase: PreviewUseCase(),
