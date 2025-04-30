@@ -9,7 +9,7 @@ import Foundation
 
 @MainActor
 protocol LaunchUseCase {
-  func launch() async
+  func launch()
 }
 
 final class LaunchUseCaseImpl: LaunchUseCase {
@@ -28,7 +28,7 @@ final class LaunchUseCaseImpl: LaunchUseCase {
     self.storageRepository = storageRepository
   }
   
-  func launch() async {
+  func launch() {
     let hyperkeyFeatureIsActive = storageRepository
       .getHyperkeyFeatureState() == true
     

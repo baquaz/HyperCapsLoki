@@ -12,7 +12,7 @@ import IOKit.hid
 @MainActor
 class EventsHandler {
   private var systemEventsInjector: SystemEventsInjection
-  private let capsLockTriggerTimer: AsyncCapsLockTimer
+  private let capsLockTriggerTimer: AsyncTimer
   internal var capsLockReady = true
   
   private var hyperkey: Key?
@@ -34,7 +34,7 @@ class EventsHandler {
   // MARK: - Init
   init(
     systemEventsInjector: SystemEventsInjection,
-    capsLockTriggerTimer: AsyncCapsLockTimer
+    capsLockTriggerTimer: AsyncTimer
   ) {
     self.systemEventsInjector = systemEventsInjector
     self.capsLockTriggerTimer = capsLockTriggerTimer
@@ -231,7 +231,7 @@ class EventsHandler {
     cancelCapsLockTriggerTimer()
     
     capsLockReady = true
-    capsLockTriggerTimer.start(delay: .seconds(1.5), onExpire: { [weak self] in
+    capsLockTriggerTimer.start(interval: .seconds(1.5), repeating: false, action: { [weak self] in
       self?.capsLockReady = false
     })
   }

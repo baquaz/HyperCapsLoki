@@ -7,6 +7,8 @@
 
 import Foundation
 
-final class AppState: Observable {
+@Observable
+final class AppState {
   var container: DIContainer?
+  var accessibilityPermissionGranted = false
 }

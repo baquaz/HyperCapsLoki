@@ -76,7 +76,7 @@ final class AppMenuViewModel {
   @MainActor
   func setActiveStatus(_ isActive: Bool) {
     isHyperkeyFeatureActive = isActive
-    hyperkeyFeatureUseCase.setHyperkeyFeature(active: isActive)
+    hyperkeyFeatureUseCase.setHyperkeyFeature(active: isActive, forced: true)
   }
   
   @MainActor

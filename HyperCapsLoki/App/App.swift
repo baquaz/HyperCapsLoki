@@ -13,7 +13,10 @@ struct HyperCapsLokiApp: App {
   @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
   @State private var appState = AppState()
   
+  static var dependencyBuilder: DepenedencyBuilder = AppDependencyBuilder()
+  
   init() {
+    appState.container = Self.dependencyBuilder.build()
     appDelegate.inject(appState: appState)
   }
   

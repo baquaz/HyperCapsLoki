@@ -10,8 +10,10 @@ import AppKit
 
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
-  private var appState: AppState?
-  private var runtimeManager: RuntimeManager?
+  internal var appState: AppState?
+  internal var runtimeManager: RuntimeProtocol?
+  internal var makeRuntimeManager: (_ appState: AppState?) -> RuntimeProtocol =
+  { RuntimeManager(appState: $0) }
   
   // MARK: - AppState inject
   func inject(appState: AppState) {
@@ -20,75 +22,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   
   // MARK: - applicationDidFinishLaunching
   func applicationDidFinishLaunching(_ notification: Notification) {
-    let container = Self.bootstrap()
-    appState?.container = container
+    #if DEBUG
+    if CommandLine.arguments.contains("-ResetAppState") {
+      resetAppState()
+    }
+    #endif
     
     Task {
-      runtimeManager = RuntimeManager(
-        launchUseCase: container.environment.launchUseCase,
-        exitUseCase: container.environment.exitUseCase
-      )
-      await runtimeManager?.launch()
+      runtimeManager = makeRuntimeManager(appState)
+      runtimeManager?.start()
     }
   }
   
   // MARK: - applicationShouldTerminate
   func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
     Task {
-      await runtimeManager?.exit()
+      runtimeManager?.exit()
       NSApp.reply(toApplicationShouldTerminate: true)
     }
     return .terminateLater
   }
   
-  // MARK: - DIContainer bootstrap
-  private static func bootstrap() -> DIContainer {
-    // MARK: Core
-    let remapper = Remapper()
-    let eventsHandler = EventsHandler(
-      systemEventsInjector: SystemEventsInjector(),
-      capsLockTriggerTimer: CapsLockTriggerTimer()
-    )
-    
-    // MARK: Repositories
-    let storageRepo = StorageRepositoryImpl(dataSource: Storage())
-    
-    // MARK: Use Cases
-    let launchUseCase = LaunchUseCaseImpl(
-      remapper: remapper,
-      eventsHandler: eventsHandler,
-      storageRepository: storageRepo
-    )
-    
-    let remapKeyUseCase = RemapKeyUseCaseImpl(
-      storageRepo: storageRepo,
-      eventsHandler: eventsHandler,
-      remapper: remapper
-    )
-    
-    let hyperkeyFeatureUseCase = HyperkeyFeatureUseCaseImpl(
-      storageRepository: storageRepo,
-      eventsHandler: eventsHandler,
-      remapper: remapper
-    )
-    
-    let exitUseCase = ExitUseCaseImpl(
-      remapper: remapper,
-      eventsHandler: eventsHandler
-    )
-    
-    // MARK: Environment
-    let environment = AppEnvironment(
-      remapper: remapper,
-      eventsHandler: eventsHandler,
-      storageRepository: storageRepo,
-      launchUseCase: launchUseCase,
-      remapKeyUseCase: remapKeyUseCase,
-      hyperkeyFeatureUseCase: hyperkeyFeatureUseCase,
-      exitUseCase: exitUseCase
-    )
-    
-    return DIContainer(environment: environment)
+#if DEBUG
+  func resetAppState() {
+    if let appDomain = Bundle.main.bundleIdentifier {
+      UserDefaults.standard.removePersistentDomain(forName: appDomain)
+      UserDefaults.standard.synchronize()
+    }
   }
-  
+#endif
 }

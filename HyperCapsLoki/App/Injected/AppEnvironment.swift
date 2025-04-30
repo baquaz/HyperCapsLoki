@@ -10,11 +10,17 @@ import Foundation
 protocol AppEnvironmentProtocol {
   var defaultHyperkey: Key { get }
   
+  // MARK: - Remapper
   var remapper: RemapExecutor { get }
+  
+  // MARK: - Events Handler
   var eventsHandler: EventsHandler { get }
   
+  // MARK: - Storage Repo
   var storageRepository: StorageRepository { get }
   
+  // MARK: - Use Cases
+  var permissionUseCase: AccessibilityPermissionUseCase { get }
   var launchUseCase: LaunchUseCase { get }
   var remapKeyUseCase: RemapKeyUseCase { get }
   var hyperkeyFeatureUseCase: HyperkeyFeatureUseCase { get }
@@ -23,6 +29,7 @@ protocol AppEnvironmentProtocol {
 
 // MARK: - App Environment
 struct AppEnvironment: AppEnvironmentProtocol {
+  
   let defaultHyperkey: Key = .f15
   
   // Core components
@@ -33,6 +40,7 @@ struct AppEnvironment: AppEnvironmentProtocol {
   let storageRepository: StorageRepository
   
   // Use cases
+  let permissionUseCase: AccessibilityPermissionUseCase
   let launchUseCase: LaunchUseCase
   let remapKeyUseCase: RemapKeyUseCase
   let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
@@ -46,9 +54,10 @@ extension AppEnvironment {
     remapper: PreviewRemapExecutor(),
     eventsHandler: EventsHandler(
       systemEventsInjector: SystemEventsInjector(),
-      capsLockTriggerTimer: CapsLockTriggerTimer()
+      capsLockTriggerTimer: DefaultAsyncTimer()
     ),
     storageRepository: PreviewStorage(),
+    permissionUseCase: PreviewUseCase(),
     launchUseCase: PreviewUseCase(),
     remapKeyUseCase: PreviewUseCase(),
     hyperkeyFeatureUseCase: PreviewUseCase(),
@@ -57,14 +66,19 @@ extension AppEnvironment {
 }
 
 struct PreviewUseCase:
+  AccessibilityPermissionUseCase,
   LaunchUseCase,
   RemapKeyUseCase,
   HyperkeyFeatureUseCase,
   ExitUseCase
 {
+  
+  func ensureAccessibilityPermissionsAreGranted() -> Bool { false }
+  func monitorChanges(completion: @escaping (Bool) -> Void) {}
+  func stopMonitoring() { }
   func launch() { }
   func execute(newKey: Key?) { }
-  func setHyperkeyFeature(active: Bool) { }
+  func setHyperkeyFeature(active: Bool, forced: Bool) {}
   func getHyperkeySequenceKeysEnabled() -> [Key] { [] }
   func setHyperkeySequence(enabled: Bool, for key: Key) { }
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) { }

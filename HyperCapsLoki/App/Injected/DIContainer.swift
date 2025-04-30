@@ -8,5 +8,5 @@
 import Foundation
 
 struct DIContainer {
-  let environment: AppEnvironment
+  var environment: AppEnvironmentProtocol
 }
