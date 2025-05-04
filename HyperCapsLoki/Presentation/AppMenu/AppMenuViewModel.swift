@@ -21,8 +21,8 @@ final class AppMenuViewModel {
   var isHyperkeyFeatureActive: Bool
   var selectedKey: Key?
   
-  private let defaultHyperkey: Key
-  private var hyperkeyEnabledSequenceKeys: [Key]
+  internal let defaultHyperkey: Key
+  internal var hyperkeyEnabledSequenceKeys: [Key]
   
   // MARK: Colors
   private let colorsPalette: [Int: Color] = [
@@ -33,9 +33,9 @@ final class AppMenuViewModel {
   ]
   
   // MARK: Use Cases
-  private let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
-  private let remapKeyUseCase: RemapKeyUseCase
-  private let exitUseCase: ExitUseCase
+  internal let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
+  internal let remapKeyUseCase: RemapKeyUseCase
+  internal let exitUseCase: ExitUseCase
   
   // MARK: - Init
   init(
@@ -62,6 +62,17 @@ final class AppMenuViewModel {
     hyperkeyEnabledSequenceKeys.contains(key) && isHyperkeyFeatureActive
   }
   
+  @MainActor
+  func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) {
+    if isEnabled {
+      hyperkeyEnabledSequenceKeys.append(key)
+    } else {
+      hyperkeyEnabledSequenceKeys.removeAll { $0 == key }
+    }
+    hyperkeyFeatureUseCase.setHyperkeySequence(enabled: isEnabled, for: key)
+  }
+  
+  // MARK: - Sequence Item Color
   func getSequenceColor(for index: Int) -> Color {
     colorsPalette[index] ?? .clear
   }
@@ -80,30 +91,20 @@ final class AppMenuViewModel {
   }
   
   @MainActor
-  func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) {
-    if isEnabled {
-      hyperkeyEnabledSequenceKeys.append(key)
-    } else {
-      hyperkeyEnabledSequenceKeys.removeAll { $0 == key }
-    }
-    hyperkeyFeatureUseCase.setHyperkeySequence(enabled: isEnabled, for: key)
-  }
-  
-  @MainActor
-  func onSelectKey(_ key: Key?, shouldUpdate: Bool = false) {
-    if shouldUpdate { selectedKey = key }
+  func onSelectKey(_ key: Key?) {
+    selectedKey = key
     remapKeyUseCase.execute(newKey: key)
   }
   
   @MainActor
   func resetRemappingToDefault() {
-    onSelectKey(defaultHyperkey, shouldUpdate: true)
+    onSelectKey(defaultHyperkey)
   }
   
   @MainActor
   func resetAll() {
     setActiveStatus(true)
-    onSelectKey(nil, shouldUpdate: true)
+    onSelectKey(nil)
     hyperkeyFeatureUseCase.setHyperkeySequenceKeysAll(enabled: true)
     hyperkeyEnabledSequenceKeys = hyperkeyFeatureUseCase
       .getHyperkeyEnabledSequenceKeys()

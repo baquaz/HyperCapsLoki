@@ -16,3 +16,6 @@ struct CoreTests { }
 
 @Suite("Use Cases Tests")
 struct UseCasesTests { }
+
+@Suite("View Models Tests")
+struct ViewModelTests { }

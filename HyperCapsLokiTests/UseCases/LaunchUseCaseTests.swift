@@ -82,7 +82,7 @@ extension UseCasesTests.LaunchUseCaseTests {
     sut.launch()
     
     // Assert
-    #expect(testEnv.mockRemapper.remappingCapsLockKeyReceived ==
+    #expect(testEnv.mockRemapper.receivedRemappingCapsLockKey ==
             (isHyperkeyFeatureActive ? selectedKey : nil)
     )
   }

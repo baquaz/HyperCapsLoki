@@ -64,7 +64,7 @@ enum Key: String, CaseIterable, Hashable, Identifiable {
       case .rightOption:  kHIDUsage_KeyboardRightAlt
       case .rightShift:   kHIDUsage_KeyboardRightShift
       case .rightControl: kHIDUsage_KeyboardRightControl
-      case .menuKeyboard:       kHIDUsage_KeyboardMenu
+      case .menuKeyboard: kHIDUsage_KeyboardMenu
         
       case .f1:   kHIDUsage_KeyboardF1
       case .f2:   kHIDUsage_KeyboardF2

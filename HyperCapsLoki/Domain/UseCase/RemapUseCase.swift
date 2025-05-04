@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-protocol RemapKeyUseCase {
+protocol RemapKeyUseCase: AnyObject {
   func execute(newKey: Key?)
 }
 

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 @MainActor
-protocol ExitUseCase {
+protocol ExitUseCase: AnyObject {
   func terminate()
   func exit()
 }

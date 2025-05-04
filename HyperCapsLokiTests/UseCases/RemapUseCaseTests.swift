@@ -70,10 +70,10 @@ extension UseCasesTests.RemapUseCaseTests {
     
     // Assert
     if isHyperkeyFeatureActive {
-      #expect(testEnv.mockRemapper.remappingCapsLockKeyReceived == key)
+      #expect(testEnv.mockRemapper.receivedRemappingCapsLockKey == key)
       #expect(testEnv.mockRemapper.resetUserKeyMappingCapsLockCalled == (key == nil))
     } else {
-      #expect(testEnv.mockRemapper.remappingCapsLockKeyReceived == nil)
+      #expect(testEnv.mockRemapper.receivedRemappingCapsLockKey == nil)
       #expect(testEnv.mockRemapper.resetUserKeyMappingCapsLockCalled == false)
     }
   }

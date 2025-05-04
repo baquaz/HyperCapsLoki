@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-protocol HyperkeyFeatureUseCase {
+protocol HyperkeyFeatureUseCase: AnyObject {
   /// Changes **Hyperkey** feature forced by user,
   /// or passively by the system (i.e. due to permission changes)
   ///

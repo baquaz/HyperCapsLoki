@@ -65,7 +65,7 @@ extension AppEnvironment {
   )
 }
 
-struct PreviewUseCase:
+class PreviewUseCase:
   AccessibilityPermissionUseCase,
   LaunchUseCase,
   RemapKeyUseCase,

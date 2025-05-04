@@ -24,7 +24,7 @@ extension AppTests {
         .makeAppDelegate(shouldAutoWireRuntime: true)
       
       let sut = testEnv.appDelegate!
-      // simulate injecting App State, similar as App injects state into AppDelegate
+      // simulate injecting App State (same as App injects state into AppDelegate)
       sut.inject(appState: testEnv.appState)
       
       let runtimeExpectation = AsyncExpectation()

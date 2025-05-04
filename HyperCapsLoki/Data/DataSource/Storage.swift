@@ -20,7 +20,7 @@ protocol StorageProtocol {
 }
 
 extension StorageProtocol {
-  // Protocol extension to provide the common logic for resolving key paths
+  // Provides key path and subscript access to Hyperkey Sequence Keys
   func keyPath(for key: Key) -> WritableKeyPath<Self, Bool?>? {
     switch key {
       case .leftCommand: return \Self.commandKeyInSequence

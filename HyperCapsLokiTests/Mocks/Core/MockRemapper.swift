@@ -9,11 +9,11 @@ import Foundation
 @testable import HyperCapsLoki
 
 final class MockRemapper: RemapExecutor {
-  var remappingCapsLockKeyReceived: Key?
+  var receivedRemappingCapsLockKey: Key?
   var resetUserKeyMappingCapsLockCalled = false
   
   func remapUserKeyMappingCapsLock(using key: Key) {
-    remappingCapsLockKeyReceived = key
+    receivedRemappingCapsLockKey = key
   }
   
   func resetUserKeyMappingCapsLock() {

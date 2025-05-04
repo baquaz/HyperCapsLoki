@@ -43,12 +43,27 @@ struct TestEnvironment {
   var storageRepository: StorageRepository!
   
   // MARK: Use Cases
-  // FIXME: remove Preview Use Cases
   var permissionUseCase: AccessibilityPermissionUseCase!
+  
   var launchUseCase: LaunchUseCase!
+  
   var remapKeyUseCase: RemapKeyUseCase!
+  var mockRemapUseCase: MockRemapKeyUseCase {
+    remapKeyUseCase as! MockRemapKeyUseCase
+  }
+  
   var hyperkeyFeatureUseCase: HyperkeyFeatureUseCase!
+  var mockHyperkeyFeatureUseCase: MockHyperkeyFeatureUseCase {
+    hyperkeyFeatureUseCase as! MockHyperkeyFeatureUseCase
+  }
+  
   var exitUseCase: ExitUseCase!
+  var mockExitUseCase: MockExitUseCase {
+    exitUseCase as! MockExitUseCase
+  }
+  
+  // MARK: View Model
+  var appMenuViewModel: AppMenuViewModel!
 }
 
 // MARK: - App
@@ -164,4 +179,68 @@ extension TestEnvironment {
       dataSource: copy.storage)
     return copy
   }
+}
+
+// MARK: - Use Cases
+extension TestEnvironment {
+  
+  @MainActor
+  @discardableResult
+  func makeHyperkeyFeatureUseCase(
+    _ hyperkeyFeatureUseCase: HyperkeyFeatureUseCase? = nil
+  ) -> Self {
+    var copy = self
+    copy.hyperkeyFeatureUseCase = hyperkeyFeatureUseCase ??
+    MockHyperkeyFeatureUseCase()
+    
+    return copy
+  }
+  
+  @MainActor
+  @discardableResult
+  func makeRemapUseCase(_ remapUseCase: RemapKeyUseCase? = nil) -> Self {
+    var copy = self
+    copy.remapKeyUseCase = remapUseCase ?? MockRemapKeyUseCase()
+    return copy
+  }
+  
+  @MainActor
+  @discardableResult
+  func makeExitUseCase(_ exitUseCase: ExitUseCase? = nil) -> Self {
+    var copy = self
+    copy.exitUseCase = exitUseCase ?? MockExitUseCase()
+    return copy
+  }
+  
+}
+
+// MARK: - View Models
+extension TestEnvironment {
+  
+  static let defaultAppMenuViewModelHyperkey: Key = Key.f1
+  
+  @MainActor
+  @discardableResult
+  func makeAppMenuViewModel(
+    _ appMenuViewModel: AppMenuViewModel? = nil,
+    autoCreateUseCases: Bool = false
+  ) -> Self {
+    var copy = self
+    
+    if autoCreateUseCases {
+      copy.hyperkeyFeatureUseCase = MockHyperkeyFeatureUseCase()
+      copy.remapKeyUseCase = MockRemapKeyUseCase()
+      copy.exitUseCase = MockExitUseCase()
+    }
+    
+    copy.appMenuViewModel = appMenuViewModel ?? AppMenuViewModel(
+      defaultHyperkey: TestEnvironment.defaultAppMenuViewModelHyperkey,
+      storageRepository: copy.storageRepository,
+      hyperkeyFeatureUseCase: copy.hyperkeyFeatureUseCase,
+      remapKeyUseCase: copy.remapKeyUseCase,
+      exitUseCase: copy.exitUseCase
+    )
+    return copy
+  }
+  
 }

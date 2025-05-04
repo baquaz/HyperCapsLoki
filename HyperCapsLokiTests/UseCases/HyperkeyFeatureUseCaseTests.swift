@@ -49,7 +49,7 @@ extension UseCasesTests.HyperkeyFeatureUseCaseTests {
       
       // When active, remaps selected key
       #expect(
-        testEnv.mockRemapper.remappingCapsLockKeyReceived ==
+        testEnv.mockRemapper.receivedRemappingCapsLockKey ==
         ((isActive && selectedKey != nil) ? selectedKey : nil)
       )
     }
