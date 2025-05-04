@@ -15,7 +15,7 @@ protocol LaunchUseCase {
 final class LaunchUseCaseImpl: LaunchUseCase {
   private let remapper: RemapExecutor
   private let eventsHandler: EventsHandler
-  private let storageRepository: StorageRepository
+  internal let storageRepository: StorageRepository
   
   // MARK: - Init
   init(
@@ -42,13 +42,13 @@ final class LaunchUseCaseImpl: LaunchUseCase {
       remapper.remapUserKeyMappingCapsLock(using: selectedKey)
     }
     
-    storageRepository.getHyperkeySequenceKeysUnset().forEach {
+    storageRepository.getHyperkeySequenceUnsetKeys().forEach {
       storageRepository.setHyperkeySequence(enabled: true, for: $0)
     }
     
     eventsHandler.set(selectedKey)
     eventsHandler.set(
-      availableSequenceKeys: storageRepository.getHyperkeySequenceKeysEnabled()
+      availableSequenceKeys: storageRepository.getHyperkeyEnabledSequenceKeys()
     )
   }
 }

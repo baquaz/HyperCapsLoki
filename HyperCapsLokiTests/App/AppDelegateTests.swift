@@ -10,60 +10,66 @@ import Testing
 import AppKit
 @testable import HyperCapsLoki
 
-@Suite("App Delegate Tests")
-struct AppDelegateTests {
+extension AppTests {
   
-  @MainActor
-  @Test("App Delegate receives App State and makes Runtime Manager started")
-  func appDelegateReceivesAppState() async throws {
-    let testEnv = TestEnvironment()
-      .makeAppState()
-      .makeRuntimeManager()
-      .makeAppDelegate(shouldAutoWireRuntime: true)
+  @Suite("App Delegate Tests")
+  struct AppDelegateTests {
     
-    let sut = testEnv.appDelegate!
-    sut.inject(appState: testEnv.appState) // inject App State
-    
-    let runtimeExpectation = AsyncExpectation()
-    testEnv.mockRuntimeManager
-      .onStart = {
-        Task { await runtimeExpectation.fulfill() }
-      }
-    
-    // Act
-    sut.applicationDidFinishLaunching(
-      Notification(name: NSApplication.didFinishLaunchingNotification)
-    )
-    
-    await runtimeExpectation.wait()
-    
-    #expect(sut.appState === testEnv.appState)
-    #expect(testEnv.runTimeManager.appState === testEnv.appState)
-    #expect(testEnv.mockRuntimeManager.didCallStart)
-  }
-  
-  @MainActor
-  @Test("App Delegate calls exit on termination")
-  func appDelegateCallsExitOnTermination() async throws {
-    let testEnv = TestEnvironment()
-      .makeRuntimeManager()
+    @MainActor
+    @Test("App Delegate receives App State and makes Runtime Manager started")
+    func appDelegateReceivesAppStateAndStartsRuntimeManager() async throws {
+      let testEnv = TestEnvironment()
+        .makeAppState()
+        .makeRuntimeManager()
+        .makeAppDelegate(shouldAutoWireRuntime: true)
       
-    let sut = testEnv
-      .makeAppDelegate(runtimeOverride: testEnv.runTimeManager)
-      .appDelegate!
+      let sut = testEnv.appDelegate!
+      // simulate injecting App State, similar as App injects state into AppDelegate
+      sut.inject(appState: testEnv.appState)
+      
+      let runtimeExpectation = AsyncExpectation()
+      testEnv.mockRuntimeManager
+        .onStart = {
+          Task { await runtimeExpectation.fulfill() }
+        }
+      
+      // Act
+      sut.applicationDidFinishLaunching(
+        Notification(name: NSApplication.didFinishLaunchingNotification)
+      )
+      
+      await runtimeExpectation.wait()
+      
+      // Assert
+      #expect(sut.appState === testEnv.appState)
+      #expect(testEnv.runTimeManager.appState === testEnv.appState)
+      #expect(testEnv.mockRuntimeManager.didCallStart)
+    }
     
-    let runtimeExpectation = AsyncExpectation()
-    testEnv.mockRuntimeManager
-      .onExit = {
-        Task { await runtimeExpectation.fulfill() }
-      }
-    
-    // Act
-    let _ = sut.applicationShouldTerminate(NSApplication.shared)
-    
-    await runtimeExpectation.wait()
-    
-    // Assert
-    #expect(testEnv.mockRuntimeManager.didCallExit)
+    @MainActor
+    @Test("App Delegate calls exit on termination")
+    func appDelegateCallsExitOnTermination() async throws {
+      let testEnv = TestEnvironment()
+        .makeRuntimeManager()
+      
+      let sut = testEnv
+        .makeAppDelegate(runtimeOverride: testEnv.runTimeManager)
+        .appDelegate!
+      
+      let runtimeExpectation = AsyncExpectation()
+      testEnv.mockRuntimeManager
+        .onExit = {
+          Task { await runtimeExpectation.fulfill() }
+        }
+      
+      // Act
+      let _ = sut.applicationShouldTerminate(NSApplication.shared)
+      
+      await runtimeExpectation.wait()
+      
+      // Assert
+      #expect(testEnv.mockRuntimeManager.didCallExit)
+    }
   }
+  
 }

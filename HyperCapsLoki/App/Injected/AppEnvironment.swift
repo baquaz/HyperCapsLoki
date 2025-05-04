@@ -79,7 +79,7 @@ struct PreviewUseCase:
   func launch() { }
   func execute(newKey: Key?) { }
   func setHyperkeyFeature(active: Bool, forced: Bool) {}
-  func getHyperkeySequenceKeysEnabled() -> [Key] { [] }
+  func getHyperkeyEnabledSequenceKeys() -> [Key] { [] }
   func setHyperkeySequence(enabled: Bool, for key: Key) { }
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) { }
   func terminate() { }
@@ -92,14 +92,16 @@ struct PreviewRemapExecutor: RemapExecutor {
 }
 
 struct PreviewStorage: StorageRepository {
+  var dataSource: any StorageProtocol = Storage()
+  
   func getHyperkeyFeatureState() -> Bool? { nil }
   func setHyperkeyFeatureState(_ isActive: Bool) {  }
 
   func getSelectedHyperkey() -> Key? { .f15 }
   func saveSelectedHyperkey(_ key: Key?) { }
 
-  func getHyperkeySequenceKeysUnset() -> [Key] { [] }
-  func getHyperkeySequenceKeysEnabled() -> [Key] { [] }
+  func getHyperkeySequenceUnsetKeys() -> [Key] { [] }
+  func getHyperkeyEnabledSequenceKeys() -> [Key] { [] }
   func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) { }
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) { }
 }

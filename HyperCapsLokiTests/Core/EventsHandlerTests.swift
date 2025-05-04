@@ -9,10 +9,12 @@ import Testing
 @testable import HyperCapsLoki
 import CoreGraphics
 
-@Suite("Events Handler Tests")
-struct EventsHandlerTests { }
+extension CoreTests {
+  @Suite("Events Handler Tests")
+  struct EventsHandlerTests { }
+}
 
-extension EventsHandlerTests {
+extension CoreTests.EventsHandlerTests {
   struct SetupTests {
     @MainActor
     @Test func setupEventTap() async {
@@ -37,7 +39,7 @@ extension EventsHandlerTests {
       
       sut.setEventTap(enabled: isEnabled)
       
-      #expect(sut.receivedSetEventTapEnabled == isEnabled)
+      #expect(sut.receivedSetEventTapValue == isEnabled)
     }
     
     @MainActor
@@ -70,8 +72,10 @@ extension EventsHandlerTests {
       
       let sut = testEnv.mockEventsHandler!
       
+      // Act
       sut.set(availableSequenceKeys: testKeys)
       
+      // Assert
       #expect(
         sut.availableEventFlags.isEmpty == testKeys
           .filter({ Key.allHyperkeySequenceKeys.contains($0) })
@@ -87,7 +91,7 @@ extension EventsHandlerTests {
   }
 }
 
-extension EventsHandlerTests {
+extension CoreTests.EventsHandlerTests {
   struct HandlerTests {
     @MainActor
     @Test(
@@ -132,6 +136,7 @@ extension EventsHandlerTests {
       )
       
       // Assert
+      
       // Hyperkey press/release should be filtered (return nil)
       if isKeyUpOrDown && eventKey == hyperkey {
         #expect(returned == nil)
@@ -167,7 +172,7 @@ extension EventsHandlerTests {
       let proxy = OpaquePointer(dummyProxy)
       
       // Act
-      let returned1 = sut.handleEventTap(
+      _ = sut.handleEventTap(
         proxy: proxy,
         type: .keyDown,
         event: fakeEvent
@@ -200,7 +205,10 @@ extension EventsHandlerTests {
       let sut = testEnv.mockEventsHandler!
       sut.isHyperkeyActive = isHyperkeyActive // simulate pre-state
       
+      // Act
       sut.handleHyperkeyPress(.keyDown)
+      
+      // Assert
       
       // Timer started on keyDown
       #expect(testEnv.mockCapsLockTriggerTimer.started == true)
@@ -227,7 +235,10 @@ extension EventsHandlerTests {
       
       sut.capsLockReady = isCapsLockReady // simulate pre-state
       
+      // Act
       sut.handleHyperkeyPress(.keyUp)
+      
+      // Assert
       
       // Caps lock should trigger only if it was ready
       if sut.capsLockReady {

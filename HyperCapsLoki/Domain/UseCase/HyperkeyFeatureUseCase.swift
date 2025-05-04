@@ -20,7 +20,7 @@ protocol HyperkeyFeatureUseCase {
   ///
   func setHyperkeyFeature(active isActive: Bool, forced: Bool)
   
-  func getHyperkeySequenceKeysEnabled() -> [Key]
+  func getHyperkeyEnabledSequenceKeys() -> [Key]
   
   func setHyperkeySequence(enabled: Bool, for key: Key)
   
@@ -28,7 +28,7 @@ protocol HyperkeyFeatureUseCase {
 }
 
 final class HyperkeyFeatureUseCaseImpl: HyperkeyFeatureUseCase {
-  private let storageRepository: StorageRepository
+  internal let storageRepository: StorageRepository
   private let eventsHandler: EventsHandler
   private let remapper: RemapExecutor
 
@@ -62,21 +62,21 @@ final class HyperkeyFeatureUseCaseImpl: HyperkeyFeatureUseCase {
     }
   }
   
-  func getHyperkeySequenceKeysEnabled() -> [Key] {
-    storageRepository.getHyperkeySequenceKeysEnabled()
+  func getHyperkeyEnabledSequenceKeys() -> [Key] {
+    storageRepository.getHyperkeyEnabledSequenceKeys()
   }
   
   func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) {
     storageRepository.setHyperkeySequence(enabled: isEnabled, for: key)
     eventsHandler.set(
-      availableSequenceKeys: storageRepository.getHyperkeySequenceKeysEnabled()
+      availableSequenceKeys: storageRepository.getHyperkeyEnabledSequenceKeys()
     )
   }
   
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) {
     storageRepository.setHyperkeySequenceKeysAll(enabled: isEnabled)
     eventsHandler.set(
-      availableSequenceKeys: storageRepository.getHyperkeySequenceKeysEnabled()
+      availableSequenceKeys: storageRepository.getHyperkeyEnabledSequenceKeys()
     )
   }
 }

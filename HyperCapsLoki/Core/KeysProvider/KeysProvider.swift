@@ -9,7 +9,7 @@ import Foundation
 import IOKit.hid
 import Cocoa
 
-/// Provides mappings and utilities for keyboard keys and their HID usage codes
+/// Provides utilities for keyboard keys and their HID usage codes
 struct KeysProvider {
   // MARK: - Init
   static let shared = KeysProvider()

@@ -9,9 +9,10 @@ import Foundation
 
 final class StorageRepositoryImpl: StorageRepository {
   
-  private var dataSource: Storage
+  internal var dataSource: StorageProtocol
   
-  init(dataSource: Storage) {
+  // MARK: - Init
+  init(dataSource: StorageProtocol) {
     self.dataSource = dataSource
   }
   
@@ -31,60 +32,22 @@ final class StorageRepositoryImpl: StorageRepository {
     dataSource.selectedHyperkey = key?.rawValue
   }
   
-  func getHyperkeySequenceKeysUnset() -> [Key] {
-    Key.allHyperkeySequenceKeys.filter {
-      switch $0 {
-        case .leftCommand: dataSource.commandKeyInSequence == nil
-        case .leftControl: dataSource.controlKeyInSequence == nil
-        case .leftOption: dataSource.optionKeyInSequence == nil
-        case .leftShift: dataSource.shiftKeyInSequence ==  nil
-        default: false
-      }
-    }
+  func getHyperkeySequenceUnsetKeys() -> [Key] {
+    Key.allHyperkeySequenceKeys.filter { dataSource[$0] == nil }
   }
   
-  func getHyperkeySequenceKeysEnabled() -> [Key] {
-    Key.allHyperkeySequenceKeys.filter {
-      switch $0 {
-        case .leftCommand: dataSource.commandKeyInSequence == true
-        case .leftControl: dataSource.controlKeyInSequence == true
-        case .leftOption: dataSource.optionKeyInSequence == true
-        case .leftShift: dataSource.shiftKeyInSequence == true
-        default: false
-      }
-    }
+  func getHyperkeyEnabledSequenceKeys() -> [Key] {
+    Key.allHyperkeySequenceKeys.filter { dataSource[$0] == true }
   }
   
   func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) {
-    if Key.allHyperkeySequenceKeys.first(where: {$0 == key }) != nil {
-      switch key {
-        case .leftCommand:
-          dataSource.commandKeyInSequence = isEnabled
-        case .leftOption:
-          dataSource.optionKeyInSequence = isEnabled
-        case .leftShift:
-          dataSource.shiftKeyInSequence = isEnabled
-        case .leftControl:
-          dataSource.controlKeyInSequence = isEnabled
-        default: break
-      }
+    if Key.allHyperkeySequenceKeys.contains(key) {
+      dataSource[key] = isEnabled
     }
   }
   
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) {
-    Key.allHyperkeySequenceKeys.forEach {
-      switch $0 {
-          case .leftCommand:
-          dataSource.commandKeyInSequence = isEnabled
-        case .leftOption:
-          dataSource.optionKeyInSequence = isEnabled
-        case .leftShift:
-          dataSource.shiftKeyInSequence = isEnabled
-        case .leftControl:
-          dataSource.controlKeyInSequence = isEnabled
-        default: break
-      }
-    }
+    Key.allHyperkeySequenceKeys.forEach { dataSource[$0] = isEnabled }
   }
   
 }

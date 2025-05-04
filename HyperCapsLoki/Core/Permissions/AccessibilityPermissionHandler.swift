@@ -29,7 +29,8 @@ AccessibilityPermissionMonitoring & AccessibilityPermissionChecking
 
 @Observable
 final class AccessibilityPermissionHandler: AccessibilityPermissionService {
-  internal let permissionCheckTimer: AsyncTimer = DefaultAsyncTimer()
+  internal let permissionCheckTimer: AsyncTimer
+  private let permissionStatusProvider: () -> Bool
   
   private var currentInterval: Duration
   private let fastInterval: Duration
@@ -46,11 +47,15 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
       .seconds(60),
       .seconds(120),
       .seconds(300),
-    ]
+    ],
+    permissionCheckTimer: AsyncTimer = DefaultAsyncTimer(),
+    permissionStatusProvider: @escaping () -> Bool = { AXIsProcessTrusted() }
   ) {
     self.fastInterval = fastInterval
     self.backOffIntervals = backoffIntervals
     self.currentInterval = fastInterval
+    self.permissionCheckTimer = permissionCheckTimer
+    self.permissionStatusProvider = permissionStatusProvider
   }
   
   // MARK: - Monitoring
@@ -92,7 +97,7 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
   
   // MARK: - Checking
   func isPermissionGranted() -> Bool {
-    AXIsProcessTrusted()
+    permissionStatusProvider()
   }
   
   func requestAuthorizationIfNeeded() -> Bool {

@@ -18,17 +18,21 @@ final class MockAsyncTimer: AsyncTimer {
              action: @escaping @MainActor @Sendable () -> Void
   ) {
     started = true
-    self.onExpire = action
+    cancelled = false
+    expired = false
+    onExpire = action
   }
   
   func cancel() {
     cancelled = true
+    onExpire = nil
   }
   
   func simulateExpiration() async {
+    guard !cancelled, let action = onExpire else { return }
     expired = true
     Task { @MainActor in
-      onExpire?()
+      action()
     }
   }
 }

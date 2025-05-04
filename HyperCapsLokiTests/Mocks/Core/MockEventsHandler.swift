@@ -15,7 +15,7 @@ class MockEventsHandler: EventsHandler {
   var handleHyperkeyPressCalled = false
   private(set) var setUpEventTapCalled = false
   
-  private(set) var receivedSetEventTapEnabled: Bool?
+  private(set) var receivedSetEventTapValue: Bool?
   private(set) var receivedHyperkey: Key?
   private(set) var receivedAvailableSequenceKeys: [Key]?
   
@@ -25,12 +25,17 @@ class MockEventsHandler: EventsHandler {
   }
   
   override func setEventTap(enabled: Bool) {
-    receivedSetEventTapEnabled = enabled
+    receivedSetEventTapValue = enabled
   }
   
   override func set(_ hyperkey: Key?) {
     super.set(hyperkey)
     receivedHyperkey = hyperkey
+  }
+  
+  override func set(availableSequenceKeys: [Key]) {
+    super.set(availableSequenceKeys: availableSequenceKeys)
+    receivedAvailableSequenceKeys = availableSequenceKeys
   }
   
   override func handleHyperkeyPress(_ type: CGEventType) {

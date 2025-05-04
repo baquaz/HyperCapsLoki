@@ -83,17 +83,15 @@ class EventsHandler {
   }
   
   func set(availableSequenceKeys: [Key]) {
-    availableEventFlags = availableSequenceKeys
-      .reduce(into: []) { result, key in
-        guard Key.allHyperkeySequenceKeys.contains(key) else { return }
-        switch key {
-          case .leftCommand:  result.insert(.maskCommand)
-          case .leftOption:   result.insert(.maskAlternate)
-          case .leftShift:    result.insert(.maskShift)
-          case .leftControl:  result.insert(.maskControl)
-          default: break
+    availableEventFlags =
+      availableSequenceKeys
+        .compactMap { key in
+          Key.allHyperkeySequenceEventFlags[key]
         }
-      }
+        // Combine all event flags into a single CGEventFlags OptionSet
+        .reduce([]) { combinedFlags, currentFlags in
+          combinedFlags.union(currentFlags)
+        }
     
     let command: CGEventFlags =
     availableEventFlags.contains(.maskCommand) ? .maskCommand : []

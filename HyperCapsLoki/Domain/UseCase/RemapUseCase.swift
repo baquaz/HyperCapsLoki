@@ -13,7 +13,7 @@ protocol RemapKeyUseCase {
 }
 
 final class RemapKeyUseCaseImpl: RemapKeyUseCase {
-  private let storageRepo: StorageRepository
+  internal let storageRepo: StorageRepository
   private let eventsHandler: EventsHandler
   private let remapper: RemapExecutor
   

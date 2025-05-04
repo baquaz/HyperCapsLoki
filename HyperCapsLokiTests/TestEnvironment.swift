@@ -27,15 +27,20 @@ struct TestEnvironment {
   }
   
   var remapper: RemapExecutor!
+  var mockRemapper: MockRemapper {
+    remapper as! MockRemapper
+  }
   
   var runTimeManager: RuntimeProtocol!
   var mockRuntimeManager: MockRuntimeManager {
     runTimeManager as! MockRuntimeManager
   }
   
+  // MARK: Data
+  var storage: StorageProtocol!
+  
   // MARK: Domain
-  // FIXME: test storage repository?
-  //  var storageRepository: any StorageRepository = MockStorageRepository()
+  var storageRepository: StorageRepository!
   
   // MARK: Use Cases
   // FIXME: remove Preview Use Cases
@@ -82,6 +87,17 @@ extension TestEnvironment {
   
 }
 
+// MARK: - Data
+extension TestEnvironment {
+  
+  @discardableResult
+  func makeStorage(_ storage: StorageProtocol = MockStorage()) -> Self {
+    var copy = self
+    copy.storage = storage
+    return copy
+  }
+}
+
 // MARK: - Core
 extension TestEnvironment {
   
@@ -118,6 +134,12 @@ extension TestEnvironment {
     return copy
   }
   
+  func makeRemapper(_ remaper: RemapExecutor = MockRemapper()) -> Self {
+    var copy = self
+    copy.remapper = remaper
+    return copy
+  }
+  
   @MainActor
   @discardableResult
   func makeRuntimeManager(
@@ -128,4 +150,18 @@ extension TestEnvironment {
     return copy
   }
   
+}
+
+// MARK: - Domain
+extension TestEnvironment {
+  
+  @MainActor
+  @discardableResult
+  func makeStorageRepository(_ storageRepository: StorageRepository? = nil)
+  -> Self {
+    var copy = self
+    copy.storageRepository = storageRepository ?? StorageRepositoryImpl(
+      dataSource: copy.storage)
+    return copy
+  }
 }

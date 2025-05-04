@@ -25,7 +25,7 @@ enum Key: String, CaseIterable, Hashable, Identifiable {
   case rightOption = "right option"
   case rightShift = "right shift"
   case rightControl = "right control"
-  case menuPC = "menu (PC)"
+  case menuKeyboard = "menu keyboard"
   case f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12,
        f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24
   
@@ -64,7 +64,7 @@ enum Key: String, CaseIterable, Hashable, Identifiable {
       case .rightOption:  kHIDUsage_KeyboardRightAlt
       case .rightShift:   kHIDUsage_KeyboardRightShift
       case .rightControl: kHIDUsage_KeyboardRightControl
-      case .menuPC:       kHIDUsage_KeyboardMenu
+      case .menuKeyboard:       kHIDUsage_KeyboardMenu
         
       case .f1:   kHIDUsage_KeyboardF1
       case .f2:   kHIDUsage_KeyboardF2
@@ -105,7 +105,7 @@ enum Key: String, CaseIterable, Hashable, Identifiable {
       case .rightOption:  CGKeyCode(kVK_RightOption)
       case .rightShift:   CGKeyCode(kVK_RightShift)
       case .rightControl: CGKeyCode(kVK_RightControl)
-      case .menuPC:       CGKeyCode(kVK_ContextualMenu)
+      case .menuKeyboard: CGKeyCode(kVK_ContextualMenu)
         
       case .f1:  CGKeyCode(kVK_F1)
       case .f2:  CGKeyCode(kVK_F2)
@@ -135,7 +135,7 @@ enum Key: String, CaseIterable, Hashable, Identifiable {
   }
 }
 
-// MARK: - All Hyperkey Sequence Keys
+// MARK: - All Hyperkey Sequence Keys and corresponding CGEventFlags
 extension Key {
   static let allHyperkeySequenceKeys: [Key] = [
     .leftCommand,
@@ -143,4 +143,20 @@ extension Key {
     .leftControl,
     .leftShift
   ]
+  
+  static var allHyperkeySequenceEventFlags: [Key: CGEventFlags] {
+    Dictionary(
+      uniqueKeysWithValues:
+        allHyperkeySequenceKeys
+        .compactMap { key in
+          switch key {
+            case .leftCommand: (key, .maskCommand)
+            case .leftOption: (key, .maskAlternate)
+            case .leftControl: (key, .maskControl)
+            case .leftShift: (key, .maskShift)
+            default: nil
+          }
+        }
+    )
+  }
 }

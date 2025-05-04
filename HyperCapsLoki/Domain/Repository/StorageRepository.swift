@@ -9,14 +9,16 @@ import Foundation
 
 @MainActor
 protocol StorageRepository {
+  var dataSource: StorageProtocol { get set }
+  
   func getHyperkeyFeatureState() -> Bool?
   func setHyperkeyFeatureState(_ isActive: Bool)
   
   func getSelectedHyperkey() -> Key?
   func saveSelectedHyperkey(_ key: Key?)
   
-  func getHyperkeySequenceKeysUnset() -> [Key]
-  func getHyperkeySequenceKeysEnabled() -> [Key]
+  func getHyperkeySequenceUnsetKeys() -> [Key]
+  func getHyperkeyEnabledSequenceKeys() -> [Key]
   func setHyperkeySequence(enabled isEnabled: Bool, for key: Key)
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool)
 }

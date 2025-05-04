@@ -22,7 +22,7 @@ final class AppMenuViewModel {
   var selectedKey: Key?
   
   private let defaultHyperkey: Key
-  private var enabledHyperkeySequenceKeys: [Key]
+  private var hyperkeyEnabledSequenceKeys: [Key]
   
   // MARK: Colors
   private let colorsPalette: [Int: Color] = [
@@ -51,7 +51,7 @@ final class AppMenuViewModel {
     self.exitUseCase = exitUseCase
     
     allHyperkeySequenceKeys = Key.allHyperkeySequenceKeys
-    enabledHyperkeySequenceKeys = storageRepository.getHyperkeySequenceKeysEnabled()
+    hyperkeyEnabledSequenceKeys = storageRepository.getHyperkeyEnabledSequenceKeys()
     
     isHyperkeyFeatureActive = storageRepository.getHyperkeyFeatureState() ?? true
     selectedKey = storageRepository.getSelectedHyperkey()
@@ -59,7 +59,7 @@ final class AppMenuViewModel {
   
   // MARK: - Hyperkey Sequence Keys
   func isSequenceEnabled(for key: Key) -> Bool {
-    enabledHyperkeySequenceKeys.contains(key) && isHyperkeyFeatureActive
+    hyperkeyEnabledSequenceKeys.contains(key) && isHyperkeyFeatureActive
   }
   
   func getSequenceColor(for index: Int) -> Color {
@@ -82,9 +82,9 @@ final class AppMenuViewModel {
   @MainActor
   func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) {
     if isEnabled {
-      enabledHyperkeySequenceKeys.append(key)
+      hyperkeyEnabledSequenceKeys.append(key)
     } else {
-      enabledHyperkeySequenceKeys.removeAll { $0 == key }
+      hyperkeyEnabledSequenceKeys.removeAll { $0 == key }
     }
     hyperkeyFeatureUseCase.setHyperkeySequence(enabled: isEnabled, for: key)
   }
@@ -105,8 +105,8 @@ final class AppMenuViewModel {
     setActiveStatus(true)
     onSelectKey(nil, shouldUpdate: true)
     hyperkeyFeatureUseCase.setHyperkeySequenceKeysAll(enabled: true)
-    enabledHyperkeySequenceKeys = hyperkeyFeatureUseCase
-      .getHyperkeySequenceKeysEnabled()
+    hyperkeyEnabledSequenceKeys = hyperkeyFeatureUseCase
+      .getHyperkeyEnabledSequenceKeys()
   }
   
   @MainActor

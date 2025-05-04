@@ -7,7 +7,44 @@
 
 import Foundation
 
-struct Storage {
+// MARK: - StorageProtocol
+protocol StorageProtocol {
+  var isHyperkeyFeatureActive: Bool? { get set }
+  var selectedHyperkey: String? { get set }
+  
+  // Hyperkey Sequence Keys
+  var commandKeyInSequence: Bool? { get set }
+  var controlKeyInSequence: Bool? { get set }
+  var optionKeyInSequence: Bool? { get set }
+  var shiftKeyInSequence: Bool? { get set }
+}
+
+extension StorageProtocol {
+  // Protocol extension to provide the common logic for resolving key paths
+  func keyPath(for key: Key) -> WritableKeyPath<Self, Bool?>? {
+    switch key {
+      case .leftCommand: return \Self.commandKeyInSequence
+      case .leftControl: return \Self.controlKeyInSequence
+      case .leftOption:  return \Self.optionKeyInSequence
+      case .leftShift:   return \Self.shiftKeyInSequence
+      default: return nil
+    }
+  }
+  
+  subscript(key: Key) -> Bool? {
+    get {
+      guard let path = keyPath(for: key) else { return nil }
+      return self[keyPath: path]
+    }
+    set {
+      guard let path = keyPath(for: key) else { return }
+      self[keyPath: path] = newValue
+    }
+  }
+}
+
+// MARK: - Storage
+struct Storage: StorageProtocol {
   
   @UserDefaultsBacked(key: "isHyperkeyFeatureActive", defaultValue: true)
   var isHyperkeyFeatureActive: Bool?
@@ -15,6 +52,7 @@ struct Storage {
   @UserDefaultsBacked(key: "selectedHyperkey", defaultValue: nil)
   var selectedHyperkey: String?
   
+  // MARK: - Hyperkey Sequence Keys
   @UserDefaultsBacked(key: "commandKeyInSequence", defaultValue: nil)
   var commandKeyInSequence: Bool?
   
