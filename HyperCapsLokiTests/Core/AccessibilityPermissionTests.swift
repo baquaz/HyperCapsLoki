@@ -21,8 +21,8 @@ extension CoreTests {
     )
     func startMonitoringCallsCompletion() async throws {
       let timer = MockAsyncTimer()
-      
-      var stubbed = false
+      var isPermissionGranted = false
+      var results: [Bool] = []
       
       let sut = AccessibilityPermissionHandler(
         fastInterval: .seconds(1.0),
@@ -32,28 +32,27 @@ extension CoreTests {
           .seconds(3)
         ],
         permissionCheckTimer: timer,
-        permissionStatusProvider: { stubbed }
+        permissionStatusProvider: { isPermissionGranted }
       )
       
-      var results: [Bool] = []
+      // Act
+      sut.startMonitoring { results.append($0) }
       
-      sut.startMonitoring { permissionGranted in
-        results.append(permissionGranted)
-      }
+      // Assert
       
+      // 1st check: permission is false
       await timer.simulateExpiration()
       #expect(results == [false])
       
-      stubbed = true
+      // 2nd check: permission becomes true
+      isPermissionGranted = true
       await timer.simulateExpiration()
       #expect(results == [false , true])
       
-      // Tear down
+      // 3rd check should not be called after stopMonitoring
       sut.stopMonitoring()
-      
-      // Simulate again — nothing should happen
       await timer.simulateExpiration()
-      #expect(results == [false, true])  // no change
+      #expect(results == [false, true])  // unchanged
     }
     
   }
