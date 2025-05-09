@@ -13,20 +13,25 @@ protocol LaunchUseCase {
 }
 
 final class LaunchUseCaseImpl: LaunchUseCase {
+  private let loginItemHandler: AppLoginItemService
   private let remapper: RemapExecutor
   private let eventsHandler: EventsHandler
   internal let storageRepository: StorageRepository
   
   // MARK: - Init
   init(
+    loginItemHandler: any AppLoginItemService,
     remapper: any RemapExecutor,
     eventsHandler: EventsHandler,
     storageRepository: any StorageRepository
   ) {
+    self.loginItemHandler = loginItemHandler
     self.remapper = remapper
     self.eventsHandler = eventsHandler
     self.storageRepository = storageRepository
   }
+  
+  
   
   func launch() {
     let hyperkeyFeatureIsActive = storageRepository

@@ -28,6 +28,9 @@ final class RuntimeManager: RuntimeProtocol {
   }
 
   func start() {
+    let isLoginItem = environment?.loginItemUseCase.checkLoginItemEnabledStatus() ?? false
+    environment?.loginItemUseCase.saveState(isLoginItem)
+    
     let grantedPermission = environment?
       .permissionUseCase.ensureAccessibilityPermissionsAreGranted()
     
@@ -36,9 +39,9 @@ final class RuntimeManager: RuntimeProtocol {
       environment?.launchUseCase.launch()
     } else {
       appState?.accessibilityPermissionGranted = false
-      
-      setUpMonitoringPermission()
     }
+    
+    setUpMonitoringPermission()
   }
   
   func exit() {

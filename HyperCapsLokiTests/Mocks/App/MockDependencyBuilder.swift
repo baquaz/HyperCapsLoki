@@ -18,6 +18,7 @@ final class MockDependencyBuilder: DepenedencyBuilder {
           capsLockTriggerTimer: MockAsyncTimer()
         ),
         storageRepository: PreviewStorage(),
+        loginItemUseCase: PreviewUseCase(),
         permissionUseCase: PreviewUseCase(),
         launchUseCase: PreviewUseCase(),
         remapKeyUseCase: PreviewUseCase(),

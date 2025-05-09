@@ -9,6 +9,8 @@ import Foundation
 @testable import HyperCapsLoki
 
 struct MockStorage: StorageProtocol {
+  var isLoginItemEnabled: Bool?
+  
   var isHyperkeyFeatureActive: Bool?
   var selectedHyperkey: String?
   

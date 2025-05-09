@@ -10,6 +10,8 @@ import Foundation
 
 
 class MockAccessibilityPermissionService: AccessibilityPermissionService {
+  private(set) var openAccessibilitySettingsCalled = false
+  
   var permissionGranted = false
   var shouldRequestAuthorizationSucceded = true
   
@@ -17,6 +19,10 @@ class MockAccessibilityPermissionService: AccessibilityPermissionService {
   private(set) var startMonitoringCalled = false
   private(set) var stopMonitoringCalled = false
   private(set) var completion: ((Bool) -> Void)?
+  
+  func openAccessibilitySettings() {
+    openAccessibilitySettingsCalled = true
+  }
   
   func isPermissionGranted() -> Bool {
     permissionGranted

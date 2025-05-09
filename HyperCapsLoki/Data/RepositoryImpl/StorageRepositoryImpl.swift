@@ -15,6 +15,13 @@ final class StorageRepositoryImpl: StorageRepository {
   init(dataSource: StorageProtocol) {
     self.dataSource = dataSource
   }
+  func getLoginItemEnabledState() -> Bool {
+    dataSource.isLoginItemEnabled ?? false
+  }
+  
+  func setLoginItemEnabledState(_ isEnabled: Bool) {
+    dataSource.isLoginItemEnabled = isEnabled
+  }
   
   func getHyperkeyFeatureState() -> Bool? {
     dataSource.isHyperkeyFeatureActive

@@ -8,6 +8,7 @@
 import Foundation
 import ApplicationServices
 import IOKit
+import AppKit
 
 // MARK: - Permission Monitoring
 @MainActor
@@ -23,9 +24,15 @@ protocol AccessibilityPermissionChecking {
   func requestAuthorizationIfNeeded() -> Bool
 }
 
+// MARK: - Permission Settings Opener
+@MainActor
+protocol AccessibilityPermissionOpener {
+  func openAccessibilitySettings()
+}
+
 // MARK: - Permission Service
 typealias AccessibilityPermissionService =
-AccessibilityPermissionMonitoring & AccessibilityPermissionChecking
+AccessibilityPermissionMonitoring & AccessibilityPermissionChecking & AccessibilityPermissionOpener
 
 @Observable
 final class AccessibilityPermissionHandler: AccessibilityPermissionService {
@@ -56,6 +63,17 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
     self.currentInterval = fastInterval
     self.permissionCheckTimer = permissionCheckTimer
     self.permissionStatusProvider = permissionStatusProvider
+  }
+  
+  // MARK: - Open Settings
+  func openAccessibilitySettings() {
+    guard let url = URL(
+      string:
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+    )
+    else { return }
+      
+    NSWorkspace.shared.open(url)
   }
   
   // MARK: - Monitoring

@@ -23,6 +23,8 @@ struct AppMenu: View {
         vm = AppMenuViewModel(
           defaultHyperkey: container.environment.defaultHyperkey,
           storageRepository: container.environment.storageRepository,
+          loginItemUseCase: container.environment.loginItemUseCase,
+          permissionUseCase: container.environment.permissionUseCase,
           hyperkeyFeatureUseCase: container.environment.hyperkeyFeatureUseCase,
           remapKeyUseCase: container.environment.remapKeyUseCase,
           exitUseCase: container.environment.exitUseCase
@@ -40,12 +42,13 @@ struct AppMenuContent: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
       Headline()
+      PermissionInfoSection(vm: vm)
       SubHeadline()
       RemappingSection(vm: vm)
       Divider()
       HyperkeySequenceSection(vm: vm)
       Divider()
-      BottonSection(vm: vm)
+      BottomSection(vm: vm)
     }
     .padding(.all, 16)
     .frame(width: 400)
@@ -57,25 +60,46 @@ struct Headline: View {
   @Environment(AppState.self) private var appState
   
   var body: some View {
-    HStack(alignment: .bottom, spacing: 16) {
+    HStack(alignment: .center, spacing: 16) {
       Image(.logo)
         .resizable()
         .interpolation(.high)
         .scaledToFit()
         .frame(height: 64)
       
-      VStack {
+      VStack(alignment: .leading) {
         Spacer()
         Text("Hyper Caps Loki")
           .font(.title3)
           .fixedSize()
         Spacer()
-        if !appState.accessibilityPermissionGranted {
-          Text("Permissions !!!")
-        }
       }
     }
     .padding(.horizontal, -5)
+  }
+}
+
+// MARK: -
+struct PermissionInfoSection: View {
+  @Environment(AppState.self) private var appState
+  @Bindable var vm: AppMenuViewModel
+  
+  var body: some View {
+    if !appState.accessibilityPermissionGranted {
+      HStack(alignment: .center) {
+        Spacer()
+        
+        VStack {
+          Button("Open Accessibility Settings") {
+            vm.openAccessibilityPermissionSettings()
+          }
+          .buttonStyle(.borderedProminent)
+          Text("App needs permission to track keyboard events")
+        }
+        
+        Spacer()
+      }
+    }
   }
 }
 
@@ -235,24 +259,51 @@ struct TopLabelCheckboxStyle: ToggleStyle {
 }
 
 // MARK: -
-struct BottonSection: View {
+struct BottomSection: View {
   @Environment(AppState.self) private var appState
   @Bindable var vm: AppMenuViewModel
   
   var body: some View {
-    HStack(spacing: 20) {
-      Spacer()
+    VStack {
+    
+      HStack(alignment: .bottom) {
+        Toggle(
+          isOn:
+            Binding(
+              get: { vm.isOpenAtLoginEnabled },
+              set: { newValue in
+                vm.setLoginItem(newValue)
+              })
+        ) {
+          Group {
+            Text("Launch app on system login")
+            Text("System Settings / Login Items & Extensions")
+          }
+          .padding(.leading, 4)
+        }
+
+        Spacer()
+      }.padding(.bottom)
       
-      Button("Reset All") {
-        vm.resetAll()
+      HStack(spacing: 20) {
+        Button("About") {
+          // TODO: about info
+        }
+        .buttonStyle(.bordered)
+        
+        Spacer()
+        
+        Button("Reset All") {
+          vm.resetAll()
+        }
+        .buttonStyle(.bordered)
+        .disabled(!appState.accessibilityPermissionGranted)
+        
+        Button("Quit ( ⌘Q )") {
+          vm.quit()
+        }
+        .buttonStyle(.bordered)
       }
-      .buttonStyle(.bordered)
-      .disabled(!appState.accessibilityPermissionGranted)
-      
-      Button("Quit ( ⌘Q )") {
-        vm.quit()
-      }
-      .buttonStyle(.bordered)
     }
   }
 }

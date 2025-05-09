@@ -18,4 +18,4 @@ struct CoreTests { }
 struct UseCasesTests { }
 
 @Suite("View Models Tests")
-struct ViewModelTests { }
+struct ViewModelsTests { }

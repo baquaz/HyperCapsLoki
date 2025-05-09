@@ -10,6 +10,7 @@ import Cocoa
 @testable import HyperCapsLoki
 
 final class MockAppEnvironment: AppEnvironmentProtocol {
+  
   let defaultHyperkey: Key = .f15
   
   var remapper: any RemapExecutor = MockRemapper()
@@ -17,6 +18,7 @@ final class MockAppEnvironment: AppEnvironmentProtocol {
   
   var storageRepository: any StorageRepository
   
+  var loginItemUseCase: any HyperCapsLoki.LoginItemUseCase
   var permissionUseCase: any AccessibilityPermissionUseCase
   var launchUseCase: any LaunchUseCase
   var remapKeyUseCase: any RemapKeyUseCase
@@ -28,6 +30,7 @@ final class MockAppEnvironment: AppEnvironmentProtocol {
     remapper: any RemapExecutor,
     eventsHandler: EventsHandler,
     storageRepository: any StorageRepository,
+    loginItemUseCase: any LoginItemUseCase,
     permissionUseCase: any AccessibilityPermissionUseCase,
     launchUseCase: any LaunchUseCase,
     remapKeyUseCase: any RemapKeyUseCase,
@@ -37,6 +40,7 @@ final class MockAppEnvironment: AppEnvironmentProtocol {
     self.remapper = remapper
     self.eventsHandler = eventsHandler
     self.storageRepository = storageRepository
+    self.loginItemUseCase = loginItemUseCase
     self.permissionUseCase = permissionUseCase
     self.launchUseCase = launchUseCase
     self.remapKeyUseCase = remapKeyUseCase

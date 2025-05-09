@@ -133,6 +133,7 @@ extension UseCasesTests.HyperkeyFeatureUseCaseTests {
 }
 
 extension UseCasesTests.HyperkeyFeatureUseCaseTests {
+  
   @Suite("Hyperkey Sequence Keys Tests")
   struct HyperkeySequenceKeysTests {
     

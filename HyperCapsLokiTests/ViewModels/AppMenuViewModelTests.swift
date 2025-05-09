@@ -9,13 +9,13 @@ import Foundation
 import Testing
 @testable import HyperCapsLoki
 
-extension ViewModelTests {
+extension ViewModelsTests {
   
   @Suite("App Menu View Model Tests")
   struct AppMenuViewModelTests { }
 }
 
-extension ViewModelTests.AppMenuViewModelTests {
+extension ViewModelsTests.AppMenuViewModelTests {
   
   @Suite("Initial Setup Tests")
   struct InitialSetupTests {
@@ -26,6 +26,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       let testEnv = TestEnvironment()
         .makeStorage()
         .makeStorageRepository()
+        .makeLoginItemUseCase()
+        .makeAccessibiltyPermissionUseCase()
         .makeHyperkeyFeatureUseCase()
         .makeRemapUseCase()
         .makeExitUseCase()
@@ -36,6 +38,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       sut = .init(
         defaultHyperkey: expectedDefaultHyperkey,
         storageRepository: testEnv.storageRepository,
+        loginItemUseCase: testEnv.loginItemUseCase,
+        permissionUseCase: testEnv.permissionUseCase,
         hyperkeyFeatureUseCase: testEnv.hyperkeyFeatureUseCase,
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
@@ -71,6 +75,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       let testEnv = TestEnvironment()
         .makeStorage(mockStorage)
         .makeStorageRepository()
+        .makeLoginItemUseCase()
+        .makeAccessibiltyPermissionUseCase()
         .makeHyperkeyFeatureUseCase()
         .makeRemapUseCase()
         .makeExitUseCase()
@@ -81,6 +87,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       sut = .init(
         defaultHyperkey: stubbed,
         storageRepository: testEnv.storageRepository,
+        loginItemUseCase: testEnv.loginItemUseCase,
+        permissionUseCase: testEnv.permissionUseCase,
         hyperkeyFeatureUseCase: testEnv.hyperkeyFeatureUseCase,
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
@@ -107,6 +115,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       let testEnv = TestEnvironment()
         .makeStorage(mockStorage)
         .makeStorageRepository()
+        .makeLoginItemUseCase()
+        .makeAccessibiltyPermissionUseCase()
         .makeHyperkeyFeatureUseCase()
         .makeRemapUseCase()
         .makeExitUseCase()
@@ -117,6 +127,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       sut = .init(
         defaultHyperkey: stubbed,
         storageRepository: testEnv.storageRepository,
+        loginItemUseCase: testEnv.loginItemUseCase,
+        permissionUseCase: testEnv.permissionUseCase,
         hyperkeyFeatureUseCase: testEnv.hyperkeyFeatureUseCase,
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
@@ -145,6 +157,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       let testEnv = TestEnvironment()
         .makeStorage(mockStorage)
         .makeStorageRepository()
+        .makeLoginItemUseCase()
+        .makeAccessibiltyPermissionUseCase()
         .makeHyperkeyFeatureUseCase()
         .makeRemapUseCase()
         .makeExitUseCase()
@@ -155,6 +169,8 @@ extension ViewModelTests.AppMenuViewModelTests {
       sut = .init(
         defaultHyperkey: stubbed,
         storageRepository: testEnv.storageRepository,
+        loginItemUseCase: testEnv.loginItemUseCase,
+        permissionUseCase: testEnv.permissionUseCase,
         hyperkeyFeatureUseCase: testEnv.hyperkeyFeatureUseCase,
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
@@ -166,7 +182,7 @@ extension ViewModelTests.AppMenuViewModelTests {
   }
 }
 
-extension ViewModelTests.AppMenuViewModelTests {
+extension ViewModelsTests.AppMenuViewModelTests {
   
   @Suite("Sequence Items Tests")
   struct SequenceItemsTests {
@@ -264,7 +280,7 @@ extension ViewModelTests.AppMenuViewModelTests {
   }
 }
 
-extension ViewModelTests.AppMenuViewModelTests {
+extension ViewModelsTests.AppMenuViewModelTests {
   
   @Suite("Text Tests")
   struct TextTests {
@@ -295,11 +311,100 @@ extension ViewModelTests.AppMenuViewModelTests {
   }
 }
 
-extension ViewModelTests.AppMenuViewModelTests {
+extension ViewModelsTests.AppMenuViewModelTests {
   
   @Suite("Actions Tests")
   struct ActionsTests {
     // TODO: all Actions tests
+    
+    @MainActor
+    @Test("Open Accessibility Permission Settings Triggers Use Case")
+    func openPermissionSettingsTriggersUseCase() async throws {
+      let testEnv = TestEnvironment()
+        .makeStorage()
+        .makeStorageRepository()
+        .makeAppMenuViewModel(autoCreateUseCases: true)
+      
+      let sut = testEnv.appMenuViewModel!
+      
+      sut.openAccessibilityPermissionSettings()
+      
+      #expect(testEnv.mockPermissionUseCase.openAccessibilityPermissionSettingsCalled)
+    }
+    
+    @MainActor
+    @Test(
+      "Successful Setting Login Item State Updates View Model",
+      arguments: [true, false]
+    )
+    func successfulSettingLoginItemState(_ expectedState: Bool) async throws {
+      let testEnv = TestEnvironment()
+        .makeStorage()
+        .makeStorageRepository()
+        .makeAppMenuViewModel(autoCreateUseCases: true)
+      
+      let sut = testEnv.appMenuViewModel!
+      
+      sut.setLoginItem(expectedState)
+      
+      #expect(sut.isOpenAtLoginEnabled == expectedState)
+    }
+    
+    @MainActor
+    @Test(
+      "Setting Login Item State Triggers Use Case",
+      arguments: [true, false]
+    )
+    func settingLoginItemTriggersUseCase(state: Bool) async throws {
+      let testEnv = TestEnvironment()
+        .makeStorage()
+        .makeStorageRepository()
+        .makeAppMenuViewModel(autoCreateUseCases: true)
+      
+      let sut = testEnv.appMenuViewModel!
+      
+      sut.setLoginItem(state)
+      
+      #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemIsEnabled == state)
+    }
+    
+    @MainActor
+    @Test("Failed Setting Login Item ON Does Not Update View Model")
+    func failedSettingLoginItemOn() async throws {
+      let testEnv = TestEnvironment()
+        .makeStorage()
+        .makeStorageRepository()
+        .makeAppMenuViewModel(autoCreateUseCases: true)
+      
+      testEnv.mockLoginItemUseCase.shouldThrowError = true
+      
+      let sut = testEnv.appMenuViewModel!
+      sut.isOpenAtLoginEnabled = false
+      
+      sut.setLoginItem(true)
+      
+      #expect(sut.isOpenAtLoginEnabled == false)
+    }
+
+    @MainActor
+    @Test("Failed Setting Login Item OFF Does Not Update View Model")
+    func failedSettingLoginItemOff() async throws {
+      let testEnv = TestEnvironment()
+        .makeStorage()
+        .makeStorageRepository()
+        .makeAppMenuViewModel(autoCreateUseCases: true)
+      
+      testEnv.mockLoginItemUseCase.shouldThrowError = true
+      
+      let sut = testEnv.appMenuViewModel!
+      sut.isOpenAtLoginEnabled = true
+      
+      // Act
+      sut.setLoginItem(false)
+      
+      // Assert
+      #expect(sut.isOpenAtLoginEnabled == true)
+    }
     
     @MainActor
     @Test(
@@ -430,6 +535,25 @@ extension ViewModelTests.AppMenuViewModelTests {
       
       #expect(testEnv.mockHyperkeyFeatureUseCase
         .receivedHyperkeySequenceKeysAll == true)
+    }
+    
+    @MainActor
+    @Test(
+      "Reset All Sets Login Item OFF"
+    )
+    func resetAllSetsLoginItemOff() async throws {
+      let testEnv = TestEnvironment()
+        .makeStorage()
+        .makeStorageRepository()
+        .makeAppMenuViewModel(autoCreateUseCases: true)
+      
+      let sut = testEnv.appMenuViewModel!
+      sut.isOpenAtLoginEnabled = true
+      
+      sut.resetAll()
+      
+      #expect(sut.isOpenAtLoginEnabled == false)
+      #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemIsEnabled == false)
     }
     
     @MainActor

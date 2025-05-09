@@ -15,6 +15,7 @@ protocol DepenedencyBuilder {
 struct AppDependencyBuilder: DepenedencyBuilder {
   func build() -> DIContainer {
     // MARK: Core
+    let loginItemHandler = AppLoginItemHandler()
     let remapper = Remapper()
     let eventsHandler = EventsHandler(
       systemEventsInjector: SystemEventsInjector(),
@@ -25,11 +26,17 @@ struct AppDependencyBuilder: DepenedencyBuilder {
     let storageRepo = StorageRepositoryImpl(dataSource: Storage())
     
     // MARK: Use Cases
+    let loginItemUseCase = LoginItemUseCaseImpl(
+      loginItemHandler: loginItemHandler,
+      storageRepository: storageRepo
+    )
+    
     let permissionUseCase = AccessibilityPermissionUseCaseImpl(
       permissionService: AccessibilityPermissionHandler()
     )
     
     let launchUseCase = LaunchUseCaseImpl(
+      loginItemHandler: loginItemHandler,
       remapper: remapper,
       eventsHandler: eventsHandler,
       storageRepository: storageRepo
@@ -57,6 +64,7 @@ struct AppDependencyBuilder: DepenedencyBuilder {
       remapper: remapper,
       eventsHandler: eventsHandler,
       storageRepository: storageRepo,
+      loginItemUseCase: loginItemUseCase,
       permissionUseCase: permissionUseCase,
       launchUseCase: launchUseCase,
       remapKeyUseCase: remapKeyUseCase,

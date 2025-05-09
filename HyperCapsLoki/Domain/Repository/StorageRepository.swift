@@ -11,6 +11,9 @@ import Foundation
 protocol StorageRepository {
   var dataSource: StorageProtocol { get set }
   
+  func getLoginItemEnabledState() -> Bool
+  func setLoginItemEnabledState(_ isEnabled: Bool)
+  
   func getHyperkeyFeatureState() -> Bool?
   func setHyperkeyFeatureState(_ isActive: Bool)
   

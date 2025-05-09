@@ -9,6 +9,8 @@ import Foundation
 
 // MARK: - StorageProtocol
 protocol StorageProtocol {
+  var isLoginItemEnabled: Bool? { get set }
+  
   var isHyperkeyFeatureActive: Bool? { get set }
   var selectedHyperkey: String? { get set }
   
@@ -45,6 +47,9 @@ extension StorageProtocol {
 
 // MARK: - Storage
 struct Storage: StorageProtocol {
+  
+  @UserDefaultsBacked(key: "isLoginItemEnabled", defaultValue: true)
+  var isLoginItemEnabled: Bool?
   
   @UserDefaultsBacked(key: "isHyperkeyFeatureActive", defaultValue: true)
   var isHyperkeyFeatureActive: Bool?

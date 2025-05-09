@@ -18,6 +18,7 @@ final class AppMenuViewModel {
   let allHyperkeySequenceKeys: [Key]
   
   // MARK: Feature
+  var isOpenAtLoginEnabled: Bool
   var isHyperkeyFeatureActive: Bool
   var selectedKey: Key?
   
@@ -33,6 +34,8 @@ final class AppMenuViewModel {
   ]
   
   // MARK: Use Cases
+  internal let loginItemUseCase: LoginItemUseCase
+  internal let permissionUseCase: AccessibilityPermissionUseCase
   internal let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
   internal let remapKeyUseCase: RemapKeyUseCase
   internal let exitUseCase: ExitUseCase
@@ -41,11 +44,15 @@ final class AppMenuViewModel {
   init(
     defaultHyperkey: Key,
     storageRepository: StorageRepository,
+    loginItemUseCase: LoginItemUseCase,
+    permissionUseCase: AccessibilityPermissionUseCase,
     hyperkeyFeatureUseCase: HyperkeyFeatureUseCase,
     remapKeyUseCase: RemapKeyUseCase,
     exitUseCase: ExitUseCase
   ) {
     self.defaultHyperkey = defaultHyperkey
+    self.loginItemUseCase = loginItemUseCase
+    self.permissionUseCase = permissionUseCase
     self.hyperkeyFeatureUseCase = hyperkeyFeatureUseCase
     self.remapKeyUseCase = remapKeyUseCase
     self.exitUseCase = exitUseCase
@@ -53,6 +60,7 @@ final class AppMenuViewModel {
     allHyperkeySequenceKeys = Key.allHyperkeySequenceKeys
     hyperkeyEnabledSequenceKeys = storageRepository.getHyperkeyEnabledSequenceKeys()
     
+    isOpenAtLoginEnabled = storageRepository.getLoginItemEnabledState()
     isHyperkeyFeatureActive = storageRepository.getHyperkeyFeatureState() ?? true
     selectedKey = storageRepository.getSelectedHyperkey()
   }
@@ -84,6 +92,19 @@ final class AppMenuViewModel {
   }
   
   // MARK: - Actions
+  func setLoginItem(_ isEnabled: Bool) {
+    do {
+      try loginItemUseCase.setLoginItem(isEnabled)
+      isOpenAtLoginEnabled = isEnabled
+    } catch {
+      print("Error setting login item: \(error)")
+    }
+  }
+  
+  func openAccessibilityPermissionSettings() {
+    permissionUseCase.openAccessibilityPermissionSettings()
+  }
+  
   @MainActor
   func setActiveStatus(_ isActive: Bool) {
     isHyperkeyFeatureActive = isActive
@@ -108,6 +129,7 @@ final class AppMenuViewModel {
     hyperkeyFeatureUseCase.setHyperkeySequenceKeysAll(enabled: true)
     hyperkeyEnabledSequenceKeys = hyperkeyFeatureUseCase
       .getHyperkeyEnabledSequenceKeys()
+    setLoginItem(false)
   }
   
   @MainActor
