@@ -1,22 +1,23 @@
 //
-//  HyperCapsLokiApp.swift
+//  App.swift
 //  HyperCapsLoki
 //
 //  Created by Piotr Błachewicz on 29/12/2024.
 //
 
 import SwiftUI
-import Foundation
+import HyperCapsLokiUI
+import HyperCapsLokiModule
 
 @main
 struct HyperCapsLokiApp: App {
   @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
   @State private var appState = AppState()
   
-  static var dependencyBuilder: DepenedencyBuilder = AppDependencyBuilder()
+  static var dependencies: DepenedencyBuilder = AppDependencyBuilder()
   
   init() {
-    appState.container = Self.dependencyBuilder.build()
+    appState.container = Self.dependencies.build()
     appDelegate.inject(appState: appState)
   }
   

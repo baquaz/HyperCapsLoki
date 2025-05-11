@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1630"
-   version = "2.2">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
@@ -15,20 +15,11 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B0C32E012D21C16F0096F6AD"
-               BuildableName = "HyperCapsLoki.app"
-               BlueprintName = "HyperCapsLoki"
-               ReferencedContainer = "container:HyperCapsLoki.xcodeproj">
+               BlueprintIdentifier = "HyperCapsLokiModule"
+               BuildableName = "HyperCapsLokiModule"
+               BlueprintName = "HyperCapsLokiModule"
+               ReferencedContainer = "container:">
             </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <AutocreatedTestPlanReference>
-            </AutocreatedTestPlanReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
@@ -40,14 +31,13 @@
       shouldAutocreateTestPlan = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
+            skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B0631EFC2DA5B4E300CBC777"
-               BuildableName = "HyperCapsLokiTests.xctest"
-               BlueprintName = "HyperCapsLokiTests"
-               ReferencedContainer = "container:HyperCapsLoki.xcodeproj">
+               BlueprintIdentifier = "Tests"
+               BuildableName = "Tests"
+               BlueprintName = "Tests"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -62,22 +52,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B0C32E012D21C16F0096F6AD"
-            BuildableName = "HyperCapsLoki.app"
-            BlueprintName = "HyperCapsLoki"
-            ReferencedContainer = "container:HyperCapsLoki.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "-ResetAppState"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -85,16 +59,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B0C32E012D21C16F0096F6AD"
-            BuildableName = "HyperCapsLoki.app"
-            BlueprintName = "HyperCapsLoki"
-            ReferencedContainer = "container:HyperCapsLoki.xcodeproj">
+            BlueprintIdentifier = "HyperCapsLokiModule"
+            BuildableName = "HyperCapsLokiModule"
+            BlueprintName = "HyperCapsLokiModule"
+            ReferencedContainer = "container:">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

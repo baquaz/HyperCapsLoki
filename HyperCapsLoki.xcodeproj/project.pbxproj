@@ -6,27 +6,20 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXContainerItemProxy section */
-		B0631F012DA5B4E300CBC777 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B0C32DFA2D21C16F0096F6AD /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B0C32E012D21C16F0096F6AD;
-			remoteInfo = HyperCapsLoki;
-		};
-/* End PBXContainerItemProxy section */
+/* Begin PBXBuildFile section */
+		B0C4E4972DD0241E0072C299 /* HyperCapsLokiModule in Frameworks */ = {isa = PBXBuildFile; productRef = B0C4E4962DD0241E0072C299 /* HyperCapsLokiModule */; };
+		B0C4E4992DD0241E0072C299 /* HyperCapsLokiUI in Frameworks */ = {isa = PBXBuildFile; productRef = B0C4E4982DD0241E0072C299 /* HyperCapsLokiUI */; };
+		B0C4E49B2DD0241E0072C299 /* SharedAssets in Frameworks */ = {isa = PBXBuildFile; productRef = B0C4E49A2DD0241E0072C299 /* SharedAssets */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B0631EFD2DA5B4E300CBC777 /* HyperCapsLokiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HyperCapsLokiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0C32E022D21C16F0096F6AD /* HyperCapsLoki.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HyperCapsLoki.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0C4E4932DD0223D0072C299 /* HyperCapsLokiModule */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HyperCapsLokiModule; sourceTree = "<group>"; };
+		B0C4E4942DD0223D0072C299 /* HyperCapsLokiUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HyperCapsLokiUI; sourceTree = "<group>"; };
+		B0C4E4952DD0223D0072C299 /* SharedAssets */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SharedAssets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B0631EFE2DA5B4E300CBC777 /* HyperCapsLokiTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = HyperCapsLokiTests;
-			sourceTree = "<group>";
-		};
 		B0C32E042D21C16F0096F6AD /* HyperCapsLoki */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = HyperCapsLoki;
@@ -35,17 +28,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		B0631EFA2DA5B4E300CBC777 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B0C32DFF2D21C16F0096F6AD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B0C4E49B2DD0241E0072C299 /* SharedAssets in Frameworks */,
+				B0C4E4972DD0241E0072C299 /* HyperCapsLokiModule in Frameworks */,
+				B0C4E4992DD0241E0072C299 /* HyperCapsLokiUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,7 +45,10 @@
 			isa = PBXGroup;
 			children = (
 				B0C32E042D21C16F0096F6AD /* HyperCapsLoki */,
-				B0631EFE2DA5B4E300CBC777 /* HyperCapsLokiTests */,
+				B0C4E4932DD0223D0072C299 /* HyperCapsLokiModule */,
+				B0C4E4942DD0223D0072C299 /* HyperCapsLokiUI */,
+				B0C4E4952DD0223D0072C299 /* SharedAssets */,
+				B0C7A0152DD01D6800C59B75 /* Frameworks */,
 				B0C32E032D21C16F0096F6AD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,37 +57,20 @@
 			isa = PBXGroup;
 			children = (
 				B0C32E022D21C16F0096F6AD /* HyperCapsLoki.app */,
-				B0631EFD2DA5B4E300CBC777 /* HyperCapsLokiTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B0C7A0152DD01D6800C59B75 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B0631EFC2DA5B4E300CBC777 /* HyperCapsLokiTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B0631F032DA5B4E300CBC777 /* Build configuration list for PBXNativeTarget "HyperCapsLokiTests" */;
-			buildPhases = (
-				B0631EF92DA5B4E300CBC777 /* Sources */,
-				B0631EFA2DA5B4E300CBC777 /* Frameworks */,
-				B0631EFB2DA5B4E300CBC777 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B0631F022DA5B4E300CBC777 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				B0631EFE2DA5B4E300CBC777 /* HyperCapsLokiTests */,
-			);
-			name = HyperCapsLokiTests;
-			packageProductDependencies = (
-			);
-			productName = HyperCapsLokiTests;
-			productReference = B0631EFD2DA5B4E300CBC777 /* HyperCapsLokiTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		B0C32E012D21C16F0096F6AD /* HyperCapsLoki */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B0C32E272D21C1710096F6AD /* Build configuration list for PBXNativeTarget "HyperCapsLoki" */;
@@ -113,6 +88,9 @@
 			);
 			name = HyperCapsLoki;
 			packageProductDependencies = (
+				B0C4E4962DD0241E0072C299 /* HyperCapsLokiModule */,
+				B0C4E4982DD0241E0072C299 /* HyperCapsLokiUI */,
+				B0C4E49A2DD0241E0072C299 /* SharedAssets */,
 			);
 			productName = MiniHyperkey;
 			productReference = B0C32E022D21C16F0096F6AD /* HyperCapsLoki.app */;
@@ -128,10 +106,6 @@
 				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
-					B0631EFC2DA5B4E300CBC777 = {
-						CreatedOnToolsVersion = 16.3;
-						TestTargetID = B0C32E012D21C16F0096F6AD;
-					};
 					B0C32E012D21C16F0096F6AD = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -146,25 +120,19 @@
 			);
 			mainGroup = B0C32DF92D21C16F0096F6AD;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B0C32E032D21C16F0096F6AD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				B0C32E012D21C16F0096F6AD /* HyperCapsLoki */,
-				B0631EFC2DA5B4E300CBC777 /* HyperCapsLokiTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		B0631EFB2DA5B4E300CBC777 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B0C32E002D21C16F0096F6AD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -175,13 +143,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		B0631EF92DA5B4E300CBC777 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B0C32DFE2D21C16F0096F6AD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -191,51 +152,7 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		B0631F022DA5B4E300CBC777 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B0C32E012D21C16F0096F6AD /* HyperCapsLoki */;
-			targetProxy = B0631F012DA5B4E300CBC777 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
-		B0631F042DA5B4E300CBC777 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P8MU7FPT4U;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = baquaz.HyperCapsLokiTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HyperCapsLoki.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HyperCapsLoki";
-			};
-			name = Debug;
-		};
-		B0631F052DA5B4E300CBC777 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P8MU7FPT4U;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 15.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = baquaz.HyperCapsLokiTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HyperCapsLoki.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HyperCapsLoki";
-			};
-			name = Release;
-		};
 		B0C32E252D21C1710096F6AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -369,7 +286,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"HyperCapsLoki/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -397,7 +314,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"HyperCapsLoki/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -417,15 +334,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B0631F032DA5B4E300CBC777 /* Build configuration list for PBXNativeTarget "HyperCapsLokiTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B0631F042DA5B4E300CBC777 /* Debug */,
-				B0631F052DA5B4E300CBC777 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		B0C32DFD2D21C16F0096F6AD /* Build configuration list for PBXProject "HyperCapsLoki" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -445,6 +353,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B0C4E4962DD0241E0072C299 /* HyperCapsLokiModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HyperCapsLokiModule;
+		};
+		B0C4E4982DD0241E0072C299 /* HyperCapsLokiUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HyperCapsLokiUI;
+		};
+		B0C4E49A2DD0241E0072C299 /* SharedAssets */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedAssets;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B0C32DFA2D21C16F0096F6AD /* Project object */;
 }
