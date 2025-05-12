@@ -50,12 +50,12 @@ public extension SystemEventsInjection {
         flagsChangedEvent.flags = flags
         flagsChangedEvent.type = eventType
         flagsChangedEvent.post(tap: .cghidEventTap)
-        print("Injected \(eventType) with flags: \(flags.rawValue).")
         
         // Introduce a small delay for processing
         usleep(5000) // 5 milliseconds
       } else {
-        print("Failed to create flagsChangedEvent for flags: \(flags.rawValue)")
+        Applog.print(tag: .critical, context: .keyboardEvents,
+                     "Failed injecting part of <Hyperkey> sequence!")
       }
     }
     
@@ -65,13 +65,12 @@ public extension SystemEventsInjection {
         resetEvent.flags = []
         resetEvent.type = .flagsChanged
         resetEvent.post(tap: .cghidEventTap)
-        print("Injected final flags reset event with flags: 0")
+        Applog.print(context: .keyboardEvents, "<Hyperkey> sequence off")
       }
     }
   }
   
   // MARK: - Inject Caps Lock
-  //Should mimic - Flags changed: 65792
   func injectCapsLockStateToggle() {
     var ioConnect: io_connect_t = 0
     let ioService = IOServiceGetMatchingService(
@@ -82,7 +81,8 @@ public extension SystemEventsInjection {
     )
     
     if ioService == 0 {
-      print("Failed to find IOHID system service.")
+      Applog.print(tag: .critical, context: .keyboardEvents,
+                   "Failed to find IOHID system service.")
       return
     }
     
@@ -90,7 +90,8 @@ public extension SystemEventsInjection {
       ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
     
     if result != KERN_SUCCESS {
-      print("Failed to open IOService: \(result)")
+      Applog.print(tag: .critical, context: .keyboardEvents,
+                   "Failed to open IOService: \(result)")
       return
     }
     
@@ -101,7 +102,8 @@ public extension SystemEventsInjection {
       ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
     
     if getResult != KERN_SUCCESS {
-      print("Failed to get Caps Lock state: \(getResult)")
+      Applog.print(tag: .critical, context: .keyboardEvents,
+                   "Failed to get Caps Lock state: \(getResult)")
       IOServiceClose(ioConnect)
       return
     }
@@ -114,9 +116,11 @@ public extension SystemEventsInjection {
       ioConnect, Int32(kIOHIDCapsLockState), modifierLockState)
     
     if setResult != KERN_SUCCESS {
-      print("Failed to set Caps Lock state: \(setResult)")
+      Applog.print(tag: .critical, context: .keyboardEvents,
+                   "Failed to set Caps Lock state: \(setResult)")
     } else {
-      print("Caps Lock state toggled successfully.")
+      Applog.print(context: .keyboardEvents,
+                   "Caps Lock state toggled successfully.")
     }
     
     IOServiceClose(ioConnect)

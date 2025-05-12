@@ -81,21 +81,23 @@ struct KeysProvider {
     // Open HID Manager
     let openResult = IOHIDManagerOpen(hidManager, IOOptionBits(kIOHIDOptionsTypeNone))
     if openResult != kIOReturnSuccess {
-      print("failed to open HID Manager with error: \(openResult)")
+      Applog.print(tag: .error, context: .keyboardEvents,
+                   "failed to open HID Manager with error: \(openResult)")
       return keyMapping
     }
     
     // Get All Matching Devices
     guard let devices = IOHIDManagerCopyDevices(hidManager) as? Set<IOHIDDevice> else {
-      print("No HID devices found.")
+      Applog.print(tag: .warning, context: .keyboardEvents,
+                   "No HID devices found.")
       return keyMapping
     }
     
-    print("Devices found: \(devices.count)")
+    Applog.print(context: .keyboardEvents, "Devices found: \(devices.count)")
     for device in devices {
       // Print Device Properties
       if let product = IOHIDDeviceGetProperty(device, kIOHIDProductKey as CFString) as? String {
-        print("found Device: \(product)")
+        Applog.print(context: .keyboardEvents, "found Device: \(product)")
       }
       
       // Get All Elements for the Device
@@ -108,7 +110,8 @@ struct KeysProvider {
         let usage = IOHIDElementGetUsage(element)
         if usagePage == kHIDPage_KeyboardOrKeypad {
           keyMapping["Usage \(usage)"] = Int(usage)
-          print("Keyboard Element - Usage Page: \(usagePage), Usage: \(usage)")
+          Applog.printCustom(
+            "Keyboard Element - Usage Page: \(usagePage), Usage: \(usage)")
         }
       }
     }

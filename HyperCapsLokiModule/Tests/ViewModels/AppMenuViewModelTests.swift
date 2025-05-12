@@ -352,7 +352,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
     
     @MainActor
     @Test(
-      "Setting Login Item State Triggers Use Case",
+      "Setting Login Item New Different State Triggers Use Case",
       arguments: [true, false]
     )
     func settingLoginItemTriggersUseCase(state: Bool) async throws {
@@ -362,10 +362,17 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withAppMenuViewModel(autoCreateUseCases: true)
       
       let sut = testEnv.appMenuViewModel!
-      
+      // Act
       sut.setLoginItem(state)
       
-      #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemIsEnabled == state)
+      // Assert
+      if testEnv.mockLoginItemUseCase.loginItemEnabledState == state {
+        // same old state - nothing is changed
+        #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemState == nil)
+      } else {
+        // different new state
+        #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemState == state)
+      }
     }
     
     @MainActor
@@ -461,7 +468,6 @@ extension ViewModelsTests.AppMenuViewModelTests {
       
       // Assert
       #expect(sut.selectedKey == expected)
-      #expect(testEnv.mockRemapUseCase.receivedExecuteNewKey == expected)
     }
     
     @MainActor
@@ -539,21 +545,28 @@ extension ViewModelsTests.AppMenuViewModelTests {
     
     @MainActor
     @Test(
-      "Reset All Sets Login Item OFF"
+      "Reset All Sets Login Item OFF If Needed",
+      arguments: [true, false]
     )
-    func resetAllSetsLoginItemOff() async throws {
+    func resetAllSetsLoginItemOff(_ currentStatus: Bool) async throws {
       let testEnv = TestEnvironment()
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
       
+      testEnv.mockLoginItemUseCase.loginItemEnabledState = currentStatus
       let sut = testEnv.appMenuViewModel!
-      sut.isOpenAtLoginEnabled = true
+      sut.isOpenAtLoginEnabled = currentStatus
       
       sut.resetAll()
       
-      #expect(sut.isOpenAtLoginEnabled == false)
-      #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemIsEnabled == false)
+      if currentStatus == true {
+        #expect(sut.isOpenAtLoginEnabled == false)
+        #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemState == false)
+      } else {
+        #expect(sut.isOpenAtLoginEnabled == currentStatus)
+        #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemState == nil)
+      }
     }
     
     @MainActor

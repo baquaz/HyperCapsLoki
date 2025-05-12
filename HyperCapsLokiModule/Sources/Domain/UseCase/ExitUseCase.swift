@@ -25,12 +25,19 @@ public final class ExitUseCaseImpl: ExitUseCase {
   }
   
   public func terminate() {
+    Applog.print(context: .application, "Start quitting...")
     NSApplication.shared.terminate(nil)
   }
   
   public func exit() {
+    Applog.print(
+      context: .application,
+      "🚪 App Exit:",
+      " - reset Caps Lock key mapping",
+      " - disable keyboard events handler",
+      separator: "\n"
+    )
     remapper.resetUserKeyMappingCapsLock()
     eventsHandler.setEventTap(enabled: false)
-    print("exit completed!")
   }
 }

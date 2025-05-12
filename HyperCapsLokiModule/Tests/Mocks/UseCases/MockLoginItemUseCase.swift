@@ -15,7 +15,7 @@ final class MockLoginItemUseCase: LoginItemUseCase {
   var shouldThrowError: Bool = false
   
   private(set) var receivedSaveIsEnabled: Bool?
-  private(set) var receivedSetLoginItemIsEnabled: Bool?
+  private(set) var receivedSetLoginItemState: Bool?
   
   func checkLoginItemEnabledStatus() -> Bool {
     checkLoginItemEnabledStatusCalled = true
@@ -34,6 +34,6 @@ final class MockLoginItemUseCase: LoginItemUseCase {
         userInfo: [NSLocalizedDescriptionKey: "Mock register error"]
       )
     }
-    receivedSetLoginItemIsEnabled = isEnabled
+    receivedSetLoginItemState = isEnabled
   }
 }

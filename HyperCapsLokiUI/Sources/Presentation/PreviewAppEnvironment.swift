@@ -25,6 +25,7 @@ extension AppEnvironment {
     launchUseCase: PreviewUseCase(),
     remapKeyUseCase: PreviewUseCase(),
     hyperkeyFeatureUseCase: PreviewUseCase(),
+    logsUseCase: PreviewUseCase(),
     exitUseCase: PreviewUseCase()
   )
 }
@@ -71,6 +72,7 @@ class PreviewUseCase:
   LaunchUseCase,
   RemapKeyUseCase,
   HyperkeyFeatureUseCase,
+  LogsUseCase,
   ExitUseCase
 {
   
@@ -87,6 +89,9 @@ class PreviewUseCase:
   func getHyperkeyEnabledSequenceKeys() -> [Key] { [] }
   func setHyperkeySequence(enabled: Bool, for key: Key) { }
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) { }
+  func saveLogs() throws -> URL { URL(string: "http://apple.com")! }
+  func copyToClipboard(savedLogsPath: URL) { }
+  func showInFinderSavedLogs(_ url: URL) { }
   func terminate() { }
   func exit() { }
 }

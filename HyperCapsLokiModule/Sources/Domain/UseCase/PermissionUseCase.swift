@@ -37,7 +37,11 @@ public struct AccessibilityPermissionUseCaseImpl: AccessibilityPermissionUseCase
   
   public func monitorChanges(completion: @escaping (_ isPermissionGranted: Bool) -> Void) {
     permissionService.startMonitoring() { isGranted in
-      print("[PERM]: usecase completion granted: \(isGranted)")
+      Applog.print(
+        context: .permissions,
+        "Permission granted:",
+        isGranted ? "YES ✅" : "NO ❌"
+      )
       completion(isGranted)
     }
   }

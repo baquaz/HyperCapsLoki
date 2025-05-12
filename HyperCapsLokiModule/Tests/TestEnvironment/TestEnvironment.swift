@@ -7,11 +7,20 @@
 
 import Foundation
 @testable import HyperCapsLokiModule
+@testable import AppLogger
 
 struct TestEnvironment {
   // MARK: - App
   var appState: AppState!
   var appDelegate: AppDelegate!
+  
+  var logStrategy: LogStrategy!
+  var mockBufferedLogStrategy: MockBufferedFileLogStrategy {
+    logStrategy as! MockBufferedFileLogStrategy
+  }
+  var mockNonBufferedLogStrategy: MockNonBufferredFileLogStrategy {
+    logStrategy as! MockNonBufferredFileLogStrategy
+  }
   
   // MARK: - Core
   var loginItemHandler: AppLoginItemService!
@@ -76,11 +85,17 @@ struct TestEnvironment {
     hyperkeyFeatureUseCase as! MockHyperkeyFeatureUseCase
   }
   
+  var logsUseCase: LogsUseCase!
+  var mockLogsUseCase: MockLogsUseCase {
+    logsUseCase as! MockLogsUseCase
+  }
+  
   var exitUseCase: ExitUseCase!
   var mockExitUseCase: MockExitUseCase {
     exitUseCase as! MockExitUseCase
   }
   
-  // MARK: - View Model
+  // MARK: - View Models
   var appMenuViewModel: AppMenuViewModel!
+  var logsViewModel: LogsViewModel!
 }

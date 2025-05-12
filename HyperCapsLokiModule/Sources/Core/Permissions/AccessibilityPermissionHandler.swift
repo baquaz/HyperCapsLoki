@@ -86,11 +86,14 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
   }
   
   private func scheduleTimer(completion: @escaping (_ permissionGranted: Bool) -> Void) {
-    print("[PERM]: startMonitoring with interval: \(currentInterval)")
     permissionCheckTimer.start(interval: currentInterval, repeating: false)
     { [weak self] in
       guard let self else { return }
-      print("[AccessibilityMonitor] checking permission…")
+      Applog.print(
+        context: .permissions,
+        "Checking Accessibility permission…",
+        "(next check in: \(currentInterval))"
+      )
       let isGranted = isPermissionGranted()
       adjustMonitoringInterval(forPermission: isGranted)
       

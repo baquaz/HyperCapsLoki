@@ -23,6 +23,7 @@ final class MockDependencyBuilder: DepenedencyBuilder {
         launchUseCase: MockLaunchUseCase(),
         remapKeyUseCase: MockRemapKeyUseCase(),
         hyperkeyFeatureUseCase: MockHyperkeyFeatureUseCase(),
+        logsUseCase: MockLogsUseCase(),
         exitUseCase: MockExitUseCase()
       )
     )

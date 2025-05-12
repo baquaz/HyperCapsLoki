@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import SharedAssets
+import AppLogger
 
 @Observable
 @MainActor
@@ -28,6 +29,9 @@ public final class AppMenuViewModel {
   
   // MARK: Colors
   private var colorsPalette: [Int: Color] = [:]
+  
+//  // MARK: - Logs Save Result
+  public var onSaveLogs: (() -> Void)?
   
   // MARK: Use Cases
   internal let loginItemUseCase: LoginItemUseCase
@@ -54,10 +58,12 @@ public final class AppMenuViewModel {
     self.exitUseCase = exitUseCase
     
     allHyperkeySequenceKeys = Key.allHyperkeySequenceKeys
-    hyperkeyEnabledSequenceKeys = storageRepository.getHyperkeyEnabledSequenceKeys()
+    hyperkeyEnabledSequenceKeys = storageRepository
+      .getHyperkeyEnabledSequenceKeys()
     
     isOpenAtLoginEnabled = storageRepository.getLoginItemEnabledState()
-    isHyperkeyFeatureActive = storageRepository.getHyperkeyFeatureState() ?? true
+    isHyperkeyFeatureActive = storageRepository
+      .getHyperkeyFeatureState() ?? true
     selectedKey = storageRepository.getSelectedHyperkey()
     
     setSequenceColorsPalette()
@@ -99,12 +105,18 @@ public final class AppMenuViewModel {
   }
   
   // MARK: - Actions
-  public func setLoginItem(_ isEnabled: Bool) {
+  public func setLoginItem(_ status: Bool) {
+    let currentStatus = loginItemUseCase.checkLoginItemEnabledStatus()
+    guard status != currentStatus else { return }
+    
     do {
-      try loginItemUseCase.setLoginItem(isEnabled)
-      isOpenAtLoginEnabled = isEnabled
+      try loginItemUseCase.setLoginItem(status)
+      isOpenAtLoginEnabled = status
+      Applog.print(tag: .success, context: .application,
+                   "Set app launch at login to:", status ? "YES ✅": "NO ❌")
     } catch {
-      print("Error setting login item: \(error)")
+      Applog.print(tag: .error, context: .application,
+                   "Error setting login item failed!", error, separator: "\n")
     }
   }
   
@@ -116,6 +128,8 @@ public final class AppMenuViewModel {
   public func setActiveStatus(_ isActive: Bool) {
     isHyperkeyFeatureActive = isActive
     hyperkeyFeatureUseCase.setHyperkeyFeature(active: isActive, forced: true)
+    Applog.print(context: .hyperkey,
+                 "Hyperkey feature is now:", isActive ? "ON ✅" : "OFF ❌")
   }
   
   @MainActor
@@ -126,16 +140,31 @@ public final class AppMenuViewModel {
   
   @MainActor
   public func resetRemappingToDefault() {
-    onSelectKey(defaultHyperkey)
+    // Automatically triggers UI key picker update and `onChange` listener
+    selectedKey = defaultHyperkey
   }
   
   @MainActor
+  public func triggerSaveLogs() {
+    onSaveLogs?()
+  }
+  
+  @available(*, unavailable, message: "No needed for now")
+  @MainActor
+  public func clearSavedLogsResult() { }
+  
+  @MainActor
   public func resetAll() {
+    Applog.print(context: .application, "Settings Reset all...")
     setActiveStatus(true)
-    onSelectKey(nil)
+    
+    // Automatically triggers UI key picker update and `onChange` listener
+    selectedKey = nil
+    
     hyperkeyFeatureUseCase.setHyperkeySequenceKeysAll(enabled: true)
     hyperkeyEnabledSequenceKeys = hyperkeyFeatureUseCase
       .getHyperkeyEnabledSequenceKeys()
+    
     setLoginItem(false)
   }
   

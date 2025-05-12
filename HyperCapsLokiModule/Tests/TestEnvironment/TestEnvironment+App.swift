@@ -37,6 +37,7 @@ extension TestEnvironment {
             launchUseCase: launchUseCase ?? MockLaunchUseCase(),
             remapKeyUseCase: remapKeyUseCase ?? MockRemapKeyUseCase(),
             hyperkeyFeatureUseCase: hyperkeyFeatureUseCase ?? MockHyperkeyFeatureUseCase(),
+            logsUseCase: logsUseCase ?? MockLogsUseCase(),
             exitUseCase: exitUseCase ?? MockExitUseCase()
           )
       )
@@ -66,6 +67,20 @@ extension TestEnvironment {
       copy.appDelegate.runtimeManager = runtimeOverride
     }
     
+    return copy
+  }
+  
+  @discardableResult
+  func withBufferedLogStrategy() -> Self {
+    var copy = self
+    copy.logStrategy = MockBufferedFileLogStrategy()
+    return copy
+  }
+
+  @discardableResult
+  func withNonBufferedLogStrategy(throwingError: Bool = false) -> Self {
+    var copy = self
+    copy.logStrategy = MockNonBufferredFileLogStrategy()
     return copy
   }
   

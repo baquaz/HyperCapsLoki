@@ -65,9 +65,12 @@ open class EventsHandler {
       )
       CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
       CGEvent.tapEnable(tap: eventTap, enable: true)
-      print("Event tap set up successfully")
+      
+      Applog.print(context: .keyboardEvents,
+                   "Event tap set up successfully")
     } else {
-      print("Failed to create event tap")
+      Applog.print(tag: .warning, context: .keyboardEvents,
+                   "Failed to create event tap")
     }
   }
   
@@ -75,6 +78,12 @@ open class EventsHandler {
   open func setEventTap(enabled: Bool) {
     if let eventTap {
       CGEvent.tapEnable(tap: eventTap, enable: enabled)
+      Applog.print(context: .keyboardEvents,
+                   "Keyboard events handler:",
+                   enabled ? "ENABLED ✅" : "DISABLED ❌")
+    } else {
+      Applog.print(context: .keyboardEvents,
+                   "Keyboard events handler not set up yet.")
     }
   }
   
@@ -148,19 +157,7 @@ open class EventsHandler {
         return nil
       }
       
-      print("Key code: \(keyCode), Flags: \(flags), Type: \(type == .keyDown ? "KeyDown" : "KeyUp")")
-      
-      print(
-      """
-      🔍 Debug:
-      - EventTap CGKeyCode: \(keyCode)
-      - Expected Hyper CGKeyCode (\(hyperkey?.rawValue ?? "")): \(hyperKeyCode as Any)
-
-      """
-      )
-      
       if keyCode == hyperKeyCode {
-        
         handleHyperkeyPress(type)
         
         lastKeyCode = keyCode
@@ -175,13 +172,10 @@ open class EventsHandler {
       
       // Handle other key events when Hyperkey is active
       if isHyperkeyActive {
-        print("Hyper key active, handling key event with modifiers")
         event.flags.insert(availableEventFlags)
+        Applog.print(context: .keyboardEvents,
+                     "<Hyperkey> active, handling key event with modifiers")
       }
-      
-    } else if type == .flagsChanged {
-      let flags = event.flags.rawValue
-      print("Flags changed: \(flags)")
     }
     
     return Unmanaged.passRetained(event)
@@ -201,7 +195,8 @@ open class EventsHandler {
   }
   
   private func handleKeyDown() {
-    print("Hyper key DOWN intercepted")
+    Applog.print(
+      context: .keyboardEvents, "<Hyperkey> DOWN intercepted")
     startCapsLockTriggerTimer()
     
     if !isHyperkeyActive {
@@ -211,13 +206,15 @@ open class EventsHandler {
   }
   
   private func handleKeyUp() {
-    print("Hyper key UP intercepted")
-    
+    Applog.print(context: .keyboardEvents,
+                 "<Hyperkey> UP intercepted")
     if capsLockReady {
-      print("Caps lock ready - injecting caps lock")
+      Applog.print(context: .keyboardEvents,
+                   "Toggle Caps Lock action")
       systemEventsInjector.injectCapsLockStateToggle()
     } else {
-      print("Caps lock unavailable")
+      Applog.print(context: .keyboardEvents,
+                   "Caps lock unavailable")
     }
     
     isHyperkeyActive = false

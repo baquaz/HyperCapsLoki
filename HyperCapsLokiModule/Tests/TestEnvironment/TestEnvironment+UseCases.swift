@@ -60,6 +60,14 @@ extension TestEnvironment {
   
   @MainActor
   @discardableResult
+  func withLogsUseCase(_ logsUseCase: LogsUseCase? = nil) -> Self {
+    var copy = self
+    copy.logsUseCase = logsUseCase ?? MockLogsUseCase()
+    return copy
+  }
+  
+  @MainActor
+  @discardableResult
   func withExitUseCase(_ exitUseCase: ExitUseCase? = nil) -> Self {
     var copy = self
     copy.exitUseCase = exitUseCase ?? MockExitUseCase()

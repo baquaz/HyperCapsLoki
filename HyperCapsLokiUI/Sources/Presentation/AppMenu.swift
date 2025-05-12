@@ -11,28 +11,39 @@ import SharedAssets
 
 public struct AppMenu: View {
   @Environment(AppState.self) private var appState
-  @State private var vm: AppMenuViewModel?
+  @State private var appViewModel: AppMenuViewModel?
+  @State private var presenter = LogsWindowPresenter()
   
   public init() { }
   
   public var body: some View {
     Group {
-      if let vm {
-        AppMenuContent(vm: vm)
+      if let appViewModel {
+        AppMenuContent(vm: appViewModel)
       } else {
         Text("Loading app state...")
       }
     }.task {
-      if vm == nil, let container = appState.container {
-        vm = AppMenuViewModel(
-          defaultHyperkey: container.environment.defaultHyperkey,
-          storageRepository: container.environment.storageRepository,
-          loginItemUseCase: container.environment.loginItemUseCase,
-          permissionUseCase: container.environment.permissionUseCase,
-          hyperkeyFeatureUseCase: container.environment.hyperkeyFeatureUseCase,
-          remapKeyUseCase: container.environment.remapKeyUseCase,
-          exitUseCase: container.environment.exitUseCase
-        )
+      if let container = appState.container {
+        if appViewModel == nil {
+          appViewModel = AppMenuViewModel(
+            defaultHyperkey: container.environment.defaultHyperkey,
+            storageRepository: container.environment.storageRepository,
+            loginItemUseCase: container.environment.loginItemUseCase,
+            permissionUseCase: container.environment.permissionUseCase,
+            hyperkeyFeatureUseCase: container.environment.hyperkeyFeatureUseCase,
+            remapKeyUseCase: container.environment.remapKeyUseCase,
+            exitUseCase: container.environment.exitUseCase
+          )
+        }
+        
+        appViewModel?.onSaveLogs = {
+          let logsViewModel = LogsViewModel(logsUseCase:
+                                              container.environment.logsUseCase)
+          logsViewModel.reset()
+          logsViewModel.saveLogs()
+          presenter.show(using: logsViewModel)
+        }
       }
     }
   }
@@ -55,7 +66,7 @@ struct AppMenuContent: View {
       BottomSection(vm: vm)
     }
     .padding(.all, 16)
-    .frame(width: 400)
+    .frame(width: 420)
   }
 }
 
@@ -167,7 +178,8 @@ struct RemappingSection: View {
         Toggle(
           "",
           isOn:
-            Binding(              get: { vm.isHyperkeyFeatureActive },
+            Binding(
+              get: { vm.isHyperkeyFeatureActive },
               set: { newValue in
                 vm.setActiveStatus(newValue)
               })
@@ -297,6 +309,16 @@ struct BottomSection: View {
         
         Spacer()
         
+        Button("Save Logs") {
+          vm.triggerSaveLogs()
+        }
+        .buttonStyle(.bordered)
+//        .sheet(item: $vm.logsSaveResult) { result in
+//          LogsResultSheet(result: vm.logsSaveResult) {
+//            vm.clearSavedLogsResult()
+//          }
+//        }
+
         Button("Reset All") {
           vm.resetAll()
         }

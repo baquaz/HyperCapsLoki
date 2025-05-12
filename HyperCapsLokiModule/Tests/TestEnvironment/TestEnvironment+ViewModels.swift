@@ -41,4 +41,20 @@ extension TestEnvironment {
     return copy
   }
   
+  @MainActor
+  @discardableResult
+  func withLogsViewModel(
+    _ logsViewModel: LogsViewModel? = nil,
+    autoCreateUseCases: Bool = false
+  ) -> Self {
+    var copy = self
+    if autoCreateUseCases {
+      copy.logsUseCase = MockLogsUseCase()
+    }
+    
+    copy.logsViewModel = logsViewModel ?? LogsViewModel(
+      logsUseCase: copy.logsUseCase
+    )
+    return copy
+  }
 }

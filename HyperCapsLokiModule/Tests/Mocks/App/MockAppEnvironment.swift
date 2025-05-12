@@ -11,6 +11,7 @@ import Cocoa
 
 final class MockAppEnvironment: AppEnvironmentProtocol {
   
+  
   let defaultHyperkey: Key = .f15
   
   var remapper: any RemapExecutor = MockRemapper()
@@ -23,6 +24,7 @@ final class MockAppEnvironment: AppEnvironmentProtocol {
   var launchUseCase: any LaunchUseCase
   var remapKeyUseCase: any RemapKeyUseCase
   var hyperkeyFeatureUseCase: any HyperkeyFeatureUseCase
+  var logsUseCase: any LogsUseCase
   var exitUseCase: any ExitUseCase
   
   // MARK: - Init
@@ -35,6 +37,7 @@ final class MockAppEnvironment: AppEnvironmentProtocol {
     launchUseCase: any LaunchUseCase,
     remapKeyUseCase: any RemapKeyUseCase,
     hyperkeyFeatureUseCase: any HyperkeyFeatureUseCase,
+    logsUseCase: any LogsUseCase,
     exitUseCase: any ExitUseCase
   ) {
     self.remapper = remapper
@@ -45,6 +48,7 @@ final class MockAppEnvironment: AppEnvironmentProtocol {
     self.launchUseCase = launchUseCase
     self.remapKeyUseCase = remapKeyUseCase
     self.hyperkeyFeatureUseCase = hyperkeyFeatureUseCase
+    self.logsUseCase = logsUseCase
     self.exitUseCase = exitUseCase
   }
 }

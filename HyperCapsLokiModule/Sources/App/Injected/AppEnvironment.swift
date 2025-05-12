@@ -27,6 +27,7 @@ public protocol AppEnvironmentProtocol {
   var launchUseCase: LaunchUseCase { get }
   var remapKeyUseCase: RemapKeyUseCase { get }
   var hyperkeyFeatureUseCase: HyperkeyFeatureUseCase { get }
+  var logsUseCase: LogsUseCase { get }
   var exitUseCase: ExitUseCase { get }
 }
 
@@ -47,6 +48,7 @@ public struct AppEnvironment: AppEnvironmentProtocol {
   public let launchUseCase: LaunchUseCase
   public let remapKeyUseCase: RemapKeyUseCase
   public let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
+  public let logsUseCase: LogsUseCase
   public let exitUseCase: ExitUseCase
   
   public init(
@@ -58,6 +60,7 @@ public struct AppEnvironment: AppEnvironmentProtocol {
     launchUseCase: LaunchUseCase,
     remapKeyUseCase: RemapKeyUseCase,
     hyperkeyFeatureUseCase: HyperkeyFeatureUseCase,
+    logsUseCase: LogsUseCase,
     exitUseCase: ExitUseCase
   ) {
     self.remapper = remapper
@@ -68,6 +71,7 @@ public struct AppEnvironment: AppEnvironmentProtocol {
     self.launchUseCase = launchUseCase
     self.remapKeyUseCase = remapKeyUseCase
     self.hyperkeyFeatureUseCase = hyperkeyFeatureUseCase
+    self.logsUseCase = logsUseCase
     self.exitUseCase = exitUseCase
   }
 }

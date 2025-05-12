@@ -28,11 +28,13 @@ public struct Remapper: RemapExecutor {
   // MARK: - Remap
   public func remapUserKeyMappingCapsLock(using key: Key) {
     guard let destinationUsageCode = keysProvider.hidUsageCode(for: key) else {
-      fatalError("\(key.rawValue) key not found.")
+      Applog.print(tag: .critical, context: .keyRemapping,
+                   key.rawValue, "key not found.")
+      return
     }
     let destinationUsage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: destinationUsageCode)
     
-    print("🔍 Debug: Remapping Caps Lock to \(String(format: "0x%X", destinationUsage))")
+    Applog.print(context: .keyRemapping,"Remapping Caps Lock...")
         
     var userKeyMapping = getCurrentUserKeyMapping()
     
@@ -49,14 +51,14 @@ public struct Remapper: RemapExecutor {
       let data = try JSONSerialization.data(withJSONObject: userKeyMapping, options: [])
       if let jsonString = String(data: data, encoding: .utf8) {
         let command = "hidutil property --set '{\"UserKeyMapping\": \(jsonString)}'"
-        print("Executing command: \(command)")
         
-        let output = shell(command)
-        print("Command output: \(output)")
-        print("Caps Lock remapped to \(key.rawValue).")
+        _ = shell(command)
+        Applog.print(context: .keyRemapping,
+                     "Caps Lock remapped to \(key.rawValue).")
       }
     } catch {
-      print("Error serializing JSON: \(error)")
+      Applog.print(tag: .critical, context: .keyRemapping,
+                   "Error serializing UserKeyMapping JSON: \(error)")
     }
   }
   
@@ -71,14 +73,13 @@ public struct Remapper: RemapExecutor {
       let data = try JSONSerialization.data(withJSONObject: userKeyMapping, options: [])
       if let jsonString = String(data: data, encoding: .utf8) {
         let command = "hidutil property --set '{\"UserKeyMapping\": \(jsonString)}'"
-        print("Executing command to reset key mappings: \(command)")
-        
-        let output = shell(command)
-        print("Command output: \(output)")
-        print("Key mappings have been reset.")
+
+        _ = shell(command)
+        Applog.print(context: .keyRemapping, "Caps Lock remapping has been removed.")
       }
     } catch {
-      print("Error serializing JSON: \(error)")
+      Applog.print(tag: .critical, context: .keyRemapping,
+                   "Error serializing UserKeyMapping JSON: \(error)")
     }
   }
   
@@ -107,13 +108,12 @@ public struct Remapper: RemapExecutor {
   // MARK: - Current User Key Mapping
   private func getCurrentUserKeyMapping() -> [[String: Any]] {
     let command = "hidutil property --get \"UserKeyMapping\""
-    print("Executing command: \(command)")
-    
     let output = shell(command)
-    print("Command output: \(output)")
     
     guard let data = output.data(using: .utf8) else {
-      fatalError("Failed to convert shell output to data")
+      Applog.print(tag: .critical, context: .keyRemapping,
+                   "Failed to convert shell output to data")
+      return []
     }
     do {
       let plist = try PropertyListSerialization.propertyList(from: data, format: nil)
@@ -126,10 +126,11 @@ public struct Remapper: RemapExecutor {
         return mappings
       } else {
         return []
-//        fatalError("Unexpected plist structure: \(plist)")
       }
     } catch {
-      fatalError(error.localizedDescription)
+      Applog.print(tag: .critical, context: .keyRemapping,
+                   error.localizedDescription)
+      return []
     }
   }
   

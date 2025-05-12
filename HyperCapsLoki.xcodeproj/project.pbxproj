@@ -10,9 +10,11 @@
 		B0C4E4972DD0241E0072C299 /* HyperCapsLokiModule in Frameworks */ = {isa = PBXBuildFile; productRef = B0C4E4962DD0241E0072C299 /* HyperCapsLokiModule */; };
 		B0C4E4992DD0241E0072C299 /* HyperCapsLokiUI in Frameworks */ = {isa = PBXBuildFile; productRef = B0C4E4982DD0241E0072C299 /* HyperCapsLokiUI */; };
 		B0C4E49B2DD0241E0072C299 /* SharedAssets in Frameworks */ = {isa = PBXBuildFile; productRef = B0C4E49A2DD0241E0072C299 /* SharedAssets */; };
+		B0E0218E2DD164A500C67135 /* AppLogger in Frameworks */ = {isa = PBXBuildFile; productRef = B0E0218D2DD164A500C67135 /* AppLogger */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B08AEC952DD162E9009EDDD1 /* AppLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppLogger; sourceTree = "<group>"; };
 		B0C32E022D21C16F0096F6AD /* HyperCapsLoki.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HyperCapsLoki.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0C4E4932DD0223D0072C299 /* HyperCapsLokiModule */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HyperCapsLokiModule; sourceTree = "<group>"; };
 		B0C4E4942DD0223D0072C299 /* HyperCapsLokiUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HyperCapsLokiUI; sourceTree = "<group>"; };
@@ -34,6 +36,7 @@
 			files = (
 				B0C4E49B2DD0241E0072C299 /* SharedAssets in Frameworks */,
 				B0C4E4972DD0241E0072C299 /* HyperCapsLokiModule in Frameworks */,
+				B0E0218E2DD164A500C67135 /* AppLogger in Frameworks */,
 				B0C4E4992DD0241E0072C299 /* HyperCapsLokiUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -47,6 +50,7 @@
 				B0C32E042D21C16F0096F6AD /* HyperCapsLoki */,
 				B0C4E4932DD0223D0072C299 /* HyperCapsLokiModule */,
 				B0C4E4942DD0223D0072C299 /* HyperCapsLokiUI */,
+				B08AEC952DD162E9009EDDD1 /* AppLogger */,
 				B0C4E4952DD0223D0072C299 /* SharedAssets */,
 				B0C7A0152DD01D6800C59B75 /* Frameworks */,
 				B0C32E032D21C16F0096F6AD /* Products */,
@@ -91,6 +95,7 @@
 				B0C4E4962DD0241E0072C299 /* HyperCapsLokiModule */,
 				B0C4E4982DD0241E0072C299 /* HyperCapsLokiUI */,
 				B0C4E49A2DD0241E0072C299 /* SharedAssets */,
+				B0E0218D2DD164A500C67135 /* AppLogger */,
 			);
 			productName = MiniHyperkey;
 			productReference = B0C32E022D21C16F0096F6AD /* HyperCapsLoki.app */;
@@ -366,6 +371,10 @@
 		B0C4E49A2DD0241E0072C299 /* SharedAssets */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedAssets;
+		};
+		B0E0218D2DD164A500C67135 /* AppLogger */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppLogger;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

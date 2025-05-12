@@ -56,6 +56,8 @@ public struct AppDependencyBuilder: DepenedencyBuilder {
       remapper: remapper
     )
     
+    let logsUseCase = LogsUseCaseImpl()
+    
     let exitUseCase = ExitUseCaseImpl(
       remapper: remapper,
       eventsHandler: eventsHandler
@@ -71,6 +73,7 @@ public struct AppDependencyBuilder: DepenedencyBuilder {
       launchUseCase: launchUseCase,
       remapKeyUseCase: remapKeyUseCase,
       hyperkeyFeatureUseCase: hyperkeyFeatureUseCase,
+      logsUseCase: logsUseCase,
       exitUseCase: exitUseCase
     )
     
