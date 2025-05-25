@@ -30,8 +30,11 @@ public final class AppMenuViewModel {
   // MARK: Colors
   private var colorsPalette: [Int: Color] = [:]
   
-//  // MARK: - Logs Save Result
+  // MARK: - Logs Save Result
   public var onSaveLogs: (() -> Void)?
+  
+  // MARK - On presenting about
+  public var onPresentingAbout: (() -> Void)?
   
   // MARK: Use Cases
   internal let loginItemUseCase: LoginItemUseCase
@@ -147,6 +150,11 @@ public final class AppMenuViewModel {
   @MainActor
   public func triggerSaveLogs() {
     onSaveLogs?()
+  }
+  
+  @MainActor
+  public func triggerAbout() {
+    onPresentingAbout?()
   }
   
   @available(*, unavailable, message: "No needed for now")

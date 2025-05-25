@@ -12,7 +12,8 @@ import SharedAssets
 public struct AppMenu: View {
   @Environment(AppState.self) private var appState
   @State private var appViewModel: AppMenuViewModel?
-  @State private var presenter = LogsWindowPresenter()
+  @State private var logsPresenter = LogsWindowPresenter()
+  @State private var aboutPresenter = AboutWindowPresenter()
   
   public init() { }
   
@@ -42,7 +43,11 @@ public struct AppMenu: View {
                                               container.environment.logsUseCase)
           logsViewModel.reset()
           logsViewModel.saveLogs()
-          presenter.show(using: logsViewModel)
+          logsPresenter.show(using: logsViewModel)
+        }
+        
+        appViewModel?.onPresentingAbout = {
+          aboutPresenter.show()
         }
       }
     }
@@ -303,7 +308,7 @@ struct BottomSection: View {
       
       HStack(spacing: 20) {
         Button("About") {
-          // TODO: about info
+          vm.triggerAbout()
         }
         .buttonStyle(.bordered)
         

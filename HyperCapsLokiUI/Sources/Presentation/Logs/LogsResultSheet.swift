@@ -85,7 +85,7 @@ struct LogsResultSheet: View {
   )
   
   let vm = LogsViewModel(logsUseCase: PreviewUseCase())
-  vm.saveLogsResult = failure
+  vm.saveLogsResult = success
   return LogsResultSheet(vm: vm)
 }
 
@@ -115,10 +115,10 @@ struct LogsResultSheet_Previews: PreviewProvider {
   static var previews: some View {
     Group {
       LogsResultSheet(vm: vmSuccess)
-        .previewDisplayName("Logs")
+        .previewDisplayName("Success")
       
       LogsResultSheet(vm: vmFailure)
-        .previewDisplayName("Logs")
+        .previewDisplayName("Failure")
     }
   }
 }
