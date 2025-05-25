@@ -14,10 +14,6 @@ public enum SharedAssets {
     NSImage(resource: .logo)
   }
   
-  public static var buyMeCoffeButton: NSImage {
-    NSImage(resource: .bmcButton)
-  }
-  
   public static var buyMeCoffeeQR: NSImage {
     NSImage(resource: .bmcQr)
   }

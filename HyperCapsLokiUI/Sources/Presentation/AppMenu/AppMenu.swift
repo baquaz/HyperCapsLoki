@@ -318,11 +318,6 @@ struct BottomSection: View {
           vm.triggerSaveLogs()
         }
         .buttonStyle(.bordered)
-//        .sheet(item: $vm.logsSaveResult) { result in
-//          LogsResultSheet(result: vm.logsSaveResult) {
-//            vm.clearSavedLogsResult()
-//          }
-//        }
 
         Button("Reset All") {
           vm.resetAll()

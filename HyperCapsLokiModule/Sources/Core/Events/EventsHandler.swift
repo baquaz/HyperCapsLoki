@@ -146,7 +146,6 @@ open class EventsHandler {
   ) -> Unmanaged<CGEvent>? {
     if type == .keyDown || type == .keyUp {
       let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode))
-      let flags = event.flags.rawValue
       let hyperKeyCode = hyperkey?.carbonKeyCode
       
       // Avoid multiple handling of the same hyper key event

@@ -16,7 +16,7 @@ public struct AppDependencyBuilder: DepenedencyBuilder {
   public init() { }
   
   public func build() -> DIContainer {
-    // MARK: Core
+    // MARK: - Core
     let loginItemHandler = AppLoginItemHandler()
     let remapper = Remapper()
     let eventsHandler = EventsHandler(
@@ -24,10 +24,10 @@ public struct AppDependencyBuilder: DepenedencyBuilder {
       capsLockTriggerTimer: DefaultAsyncTimer()
     )
     
-    // MARK: Repositories
+    // MARK: - Repositories
     let storageRepo = StorageRepositoryImpl(dataSource: Storage())
     
-    // MARK: Use Cases
+    // MARK: - Use Cases
     let loginItemUseCase = LoginItemUseCaseImpl(
       loginItemHandler: loginItemHandler,
       storageRepository: storageRepo
@@ -63,7 +63,7 @@ public struct AppDependencyBuilder: DepenedencyBuilder {
       eventsHandler: eventsHandler
     )
     
-    // MARK: Environment
+    // MARK: - Environment
     let environment = AppEnvironment(
       remapper: remapper,
       eventsHandler: eventsHandler,
