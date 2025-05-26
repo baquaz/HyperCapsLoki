@@ -15,7 +15,8 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SharedAssets"),
-
+            name: "SharedAssets",
+            path: "."
+        ),
     ]
 )

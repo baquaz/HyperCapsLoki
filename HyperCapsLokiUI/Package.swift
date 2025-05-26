@@ -23,7 +23,9 @@ let package = Package(
             dependencies: [
               "HyperCapsLokiModule",
               "SharedAssets"
-            ]
+            ],
+            path: ".",
+            sources: ["Presentation"]
         ),
     ]
 )

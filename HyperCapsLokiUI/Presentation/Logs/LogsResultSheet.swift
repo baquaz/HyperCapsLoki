@@ -76,13 +76,6 @@ struct LogsResultSheet: View {
 // MARK: - Preview
 #Preview {
   let success = LogSaveResult.success(URL(fileURLWithPath: "/tmp/test.log"))
-  let failure = LogSaveResult.failure(
-    NSError(
-      domain: "Logs",
-      code: 1,
-      userInfo: [NSLocalizedDescriptionKey: "Oops!"]
-    )
-  )
   
   let vm = LogsViewModel(logsUseCase: PreviewUseCase())
   vm.saveLogsResult = success
