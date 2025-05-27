@@ -11,16 +11,16 @@ import Testing
 
 // swiftlint:disable file_length
 extension ViewModelsTests {
-  
+
   @Suite("App Menu View Model Tests")
   struct AppMenuViewModelTests { }
 }
 
 extension ViewModelsTests.AppMenuViewModelTests {
-  
+
   @Suite("Initial Setup Tests")
   struct InitialSetupTests {
-    
+
     @MainActor
     @Test("Init sets up dependencies", arguments: [Key.f13])
     func setUpDependencies(_ expectedDefaultHyperkey: Key) async throws {
@@ -32,9 +32,9 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withHyperkeyFeatureUseCase()
         .withRemapUseCase()
         .withExitUseCase()
-      
+
       let sut: AppMenuViewModel
-      
+
       // Act
       sut = .init(
         defaultHyperkey: expectedDefaultHyperkey,
@@ -45,14 +45,14 @@ extension ViewModelsTests.AppMenuViewModelTests {
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
       )
-      
+
       // Assert
       #expect(sut.defaultHyperkey == expectedDefaultHyperkey)
       #expect(sut.hyperkeyFeatureUseCase === testEnv.hyperkeyFeatureUseCase)
       #expect(sut.remapKeyUseCase === testEnv.remapKeyUseCase)
       #expect(sut.exitUseCase === testEnv.exitUseCase)
     }
-    
+
     @MainActor
     @Test(
       "Init sets up Hyperkey Sequence Keys: all, enabled from storage",
@@ -67,12 +67,12 @@ extension ViewModelsTests.AppMenuViewModelTests {
       expectedEnabledKeys: [Key]
     ) async throws {
       let stubbed = Key.f1
-      
+
       let expectedAllKeys = Key.allHyperkeySequenceKeys
-      
+
       var mockStorage = MockStorage()
       expectedEnabledKeys.forEach { mockStorage[$0] = true }
-      
+
       let testEnv = TestEnvironment()
         .withStorage(mockStorage)
         .withStorageRepository()
@@ -81,9 +81,9 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withHyperkeyFeatureUseCase()
         .withRemapUseCase()
         .withExitUseCase()
-      
+
       let sut: AppMenuViewModel
-      
+
       // Act
       sut = .init(
         defaultHyperkey: stubbed,
@@ -94,7 +94,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
       )
-      
+
       // Assert
       #expect(sut.allHyperkeySequenceKeys == expectedAllKeys)
       #expect(
@@ -102,7 +102,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         expectedEnabledKeys.filter { sut.allHyperkeySequenceKeys.contains($0) }
       )
     }
-    
+
     @MainActor
     @Test(
       "Init sets up Hyperkey Feature Active from storage or by default true",
@@ -110,9 +110,9 @@ extension ViewModelsTests.AppMenuViewModelTests {
     )
     func setUpHyperkeyFeatureActive(_ storageValue: Bool?) async throws {
       let stubbed = Key.f2
-      
+
       let mockStorage = MockStorage(isHyperkeyFeatureActive: storageValue)
-      
+
       let testEnv = TestEnvironment()
         .withStorage(mockStorage)
         .withStorageRepository()
@@ -121,9 +121,9 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withHyperkeyFeatureUseCase()
         .withRemapUseCase()
         .withExitUseCase()
-      
+
       let sut: AppMenuViewModel
-      
+
       // Act
       sut = .init(
         defaultHyperkey: stubbed,
@@ -134,7 +134,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
       )
-      
+
       // Assert
       if storageValue == nil {
         #expect(sut.isHyperkeyFeatureActive == true)
@@ -142,7 +142,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         #expect(sut.isHyperkeyFeatureActive == storageValue)
       }
     }
-    
+
     @MainActor
     @Test(
       "Init sets up Selected Hyperkey from storage",
@@ -150,11 +150,11 @@ extension ViewModelsTests.AppMenuViewModelTests {
     )
     func setUpSelectedKey(_ expectedSelectedKey: Key?) async throws {
       let stubbed = Key.f3
-      
+
       let mockStorage = MockStorage(
         selectedHyperkey: expectedSelectedKey?.rawValue
       )
-      
+
       let testEnv = TestEnvironment()
         .withStorage(mockStorage)
         .withStorageRepository()
@@ -163,9 +163,9 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withHyperkeyFeatureUseCase()
         .withRemapUseCase()
         .withExitUseCase()
-      
+
       let sut: AppMenuViewModel
-      
+
       // Act
       sut = .init(
         defaultHyperkey: stubbed,
@@ -176,7 +176,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         remapKeyUseCase: testEnv.remapKeyUseCase,
         exitUseCase: testEnv.exitUseCase
       )
-      
+
       // Assert
       #expect(sut.selectedKey == expectedSelectedKey)
     }
@@ -184,7 +184,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
 }
 
 extension ViewModelsTests.AppMenuViewModelTests {
-  
+
   @Suite("Sequence Items Tests")
   struct SequenceItemsTests {
     // swiftlint:disable comma
@@ -205,22 +205,22 @@ extension ViewModelsTests.AppMenuViewModelTests {
       for key: Key, enabledSequenceKeys: [Key], expected: Bool
     ) async throws {
       let mockStorage = MockStorage(isHyperkeyFeatureActive: true)
-      
+
       let testEnv = TestEnvironment()
         .withStorage(mockStorage)
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
       testEnv.appMenuViewModel.hyperkeyEnabledSequenceKeys = enabledSequenceKeys
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       // Act
       let result = sut.isSequenceEnabled(for: key)
 
       // Assert
       #expect(result == expected)
     }
-    
+
     @MainActor
     @Test("Check: Sequence Disabled When Hyperkey Feature Is Disabled")
     func checkSequenceDisabled() async throws {
@@ -228,20 +228,20 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       testEnv.appMenuViewModel.hyperkeyEnabledSequenceKeys = [.leftCommand]
       // simulate feature disabled
       testEnv.appMenuViewModel.isHyperkeyFeatureActive = false
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       // Act
       let result = sut.isSequenceEnabled(for: .leftCommand)
-      
+
       // Assert
       #expect(result == false)
     }
-    
+
     @MainActor
     @Test(
       "Setting Hyperkey Sequence Key Enabled/Disabled Status",
@@ -263,12 +263,12 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
       testEnv.appMenuViewModel.hyperkeyEnabledSequenceKeys = enabledSequenceKeys
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       // Act
       sut.setHyperkeySequence(enabled: enabled, for: key)
-      
+
       // Assert
       #expect(sut.hyperkeyEnabledSequenceKeys.contains(key) == enabled)
       #expect(testEnv.mockHyperkeyFeatureUseCase.receivedHyperkeySequenceKey?
@@ -282,10 +282,10 @@ extension ViewModelsTests.AppMenuViewModelTests {
 }
 
 extension ViewModelsTests.AppMenuViewModelTests {
-  
+
   @Suite("Text Tests")
   struct TextTests {
-    
+
     @MainActor
     @Test(
       "Getting Correct Text For Key",
@@ -302,21 +302,21 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       let result = sut.getTextForKey(key)
-      
+
       #expect(result == expected)
     }
   }
 }
 
 extension ViewModelsTests.AppMenuViewModelTests {
-  
+
   @Suite("Actions Tests")
   struct ActionsTests {
-    
+
     @MainActor
     @Test("Open Accessibility Permission Settings Triggers Use Case")
     func openPermissionSettingsTriggersUseCase() async throws {
@@ -324,14 +324,14 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       sut.openAccessibilityPermissionSettings()
-      
+
       #expect(testEnv.mockPermissionUseCase.openAccessibilityPermissionSettingsCalled)
     }
-    
+
     @MainActor
     @Test(
       "Successful Setting Login Item State Updates View Model",
@@ -342,14 +342,14 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       sut.setLoginItem(expectedState)
-      
+
       #expect(sut.isOpenAtLoginEnabled == expectedState)
     }
-    
+
     @MainActor
     @Test(
       "Setting Login Item New Different State Triggers Use Case",
@@ -360,11 +360,11 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
       // Act
       sut.setLoginItem(state)
-      
+
       // Assert
       if testEnv.mockLoginItemUseCase.loginItemEnabledState == state {
         // same old state - nothing is changed
@@ -374,7 +374,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemState == state)
       }
     }
-    
+
     @MainActor
     @Test("Failed Setting Login Item ON Does Not Update View Model")
     func failedSettingLoginItemOn() async throws {
@@ -382,14 +382,14 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       testEnv.mockLoginItemUseCase.shouldThrowError = true
-      
+
       let sut = testEnv.appMenuViewModel!
       sut.isOpenAtLoginEnabled = false
-      
+
       sut.setLoginItem(true)
-      
+
       #expect(sut.isOpenAtLoginEnabled == false)
     }
 
@@ -400,19 +400,19 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       testEnv.mockLoginItemUseCase.shouldThrowError = true
-      
+
       let sut = testEnv.appMenuViewModel!
       sut.isOpenAtLoginEnabled = true
-      
+
       // Act
       sut.setLoginItem(false)
-      
+
       // Assert
       #expect(sut.isOpenAtLoginEnabled == true)
     }
-    
+
     @MainActor
     @Test(
       "Setting Active Status",
@@ -423,16 +423,16 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       sut.setActiveStatus(expected)
-      
+
       #expect(sut.isHyperkeyFeatureActive == expected)
       #expect(testEnv.mockHyperkeyFeatureUseCase.receivedHyperkeyFeatureStatus?.isActive == expected)
       #expect(testEnv.mockHyperkeyFeatureUseCase.receivedHyperkeyFeatureStatus?.forced == true)
     }
-    
+
     @MainActor
     @Test(
       "Selecting Hyperkey",
@@ -443,15 +443,15 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       sut.onSelectKey(expected)
-      
+
       #expect(sut.selectedKey == expected)
       #expect(testEnv.mockRemapUseCase.receivedExecuteNewKey == expected)
     }
-    
+
     @MainActor
     @Test("Reset Remapping To Default")
     func resetRemappingToDefault() async throws {
@@ -459,17 +459,17 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
       let expected = TestEnvironment.defaultAppMenuViewModelHyperkey
-      
+
       // Act
       sut.resetRemappingToDefault()
-      
+
       // Assert
       #expect(sut.selectedKey == expected)
     }
-    
+
     @MainActor
     @Test("Reset All Enables Hyperkey Feature Status")
     func resetAllToEnableHyperkeyFeature() async throws {
@@ -477,13 +477,13 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
       let expected = true
-      
+
       // Act
       sut.resetAll()
-      
+
       // Assert
       #expect(sut.isHyperkeyFeatureActive == expected)
       #expect(testEnv.mockHyperkeyFeatureUseCase.receivedHyperkeyFeatureStatus?
@@ -493,7 +493,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .forced == true
       )
     }
-    
+
     @MainActor
     @Test(
       "Reset All Clears Selected Key",
@@ -504,14 +504,14 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
       sut.selectedKey = currentSelectedKey // simulate current selected key
-      
+
       let expected: Key? = nil
-      
+
       sut.resetAll()
-      
+
       #expect(sut.selectedKey == expected)
       #expect(testEnv.mockRemapUseCase.receivedExecuteNewKey == expected)
     }
@@ -528,21 +528,21 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       testEnv.mockHyperkeyFeatureUseCase.enabledSequenceKeys = expectedEnabledKeys
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       // Act
       sut.resetAll()
-      
+
       // Assert
       #expect(sut.hyperkeyEnabledSequenceKeys == expectedEnabledKeys)
-      
+
       #expect(testEnv.mockHyperkeyFeatureUseCase
         .receivedHyperkeySequenceKeysAll == true)
     }
-    
+
     @MainActor
     @Test(
       "Reset All Sets Login Item OFF If Needed",
@@ -553,13 +553,13 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       testEnv.mockLoginItemUseCase.loginItemEnabledState = currentStatus
       let sut = testEnv.appMenuViewModel!
       sut.isOpenAtLoginEnabled = currentStatus
-      
+
       sut.resetAll()
-      
+
       if currentStatus == true {
         #expect(sut.isOpenAtLoginEnabled == false)
         #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemState == false)
@@ -568,7 +568,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         #expect(testEnv.mockLoginItemUseCase.receivedSetLoginItemState == nil)
       }
     }
-    
+
     @MainActor
     @Test("Quit")
     func quit() async throws {
@@ -576,11 +576,11 @@ extension ViewModelsTests.AppMenuViewModelTests {
         .withStorage()
         .withStorageRepository()
         .withAppMenuViewModel(autoCreateUseCases: true)
-      
+
       let sut = testEnv.appMenuViewModel!
-      
+
       sut.quit()
-      
+
       #expect(testEnv.mockExitUseCase.terminateCalled)
     }
   }

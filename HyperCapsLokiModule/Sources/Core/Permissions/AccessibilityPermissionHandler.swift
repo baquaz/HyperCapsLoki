@@ -38,12 +38,12 @@ AccessibilityPermissionMonitoring & AccessibilityPermissionChecking & Accessibil
 final class AccessibilityPermissionHandler: AccessibilityPermissionService {
   internal let permissionCheckTimer: AsyncTimer
   private let permissionStatusProvider: () -> Bool
-  
+
   private var currentInterval: Duration
   private let fastInterval: Duration
   private let backOffIntervals: [Duration]
   private var backOffIndex = 0
-  
+
   // MARK: - Init
   init(
     fastInterval: Duration = .seconds(3.0),
@@ -64,7 +64,7 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
     self.permissionCheckTimer = permissionCheckTimer
     self.permissionStatusProvider = permissionStatusProvider
   }
-  
+
   // MARK: - Open Settings
   func openAccessibilitySettings() {
     guard let url = URL(
@@ -72,19 +72,19 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
         "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
     )
     else { return }
-      
+
     NSWorkspace.shared.open(url)
   }
-  
+
   // MARK: - Monitoring
   func startMonitoring(completion: @escaping (_ permissionGranted: Bool) -> Void) {
     scheduleTimer(completion: completion)
   }
-  
+
   func stopMonitoring() {
     permissionCheckTimer.cancel()
   }
-  
+
   private func scheduleTimer(completion: @escaping (_ permissionGranted: Bool) -> Void) {
     permissionCheckTimer
       .start(interval: currentInterval, repeating: false) { [weak self] in
@@ -96,12 +96,12 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
       )
       let isGranted = isPermissionGranted()
       adjustMonitoringInterval(forPermission: isGranted)
-      
+
       completion(isGranted)
       scheduleTimer(completion: completion)
     }
   }
-  
+
   private func adjustMonitoringInterval(forPermission granted: Bool) {
     if granted {
       // Slow down
@@ -115,12 +115,12 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
       currentInterval = fastInterval
     }
   }
-  
+
   // MARK: - Checking
   func isPermissionGranted() -> Bool {
     permissionStatusProvider()
   }
-  
+
   func requestAuthorizationIfNeeded() -> Bool {
     let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
     return AXIsProcessTrustedWithOptions(options)

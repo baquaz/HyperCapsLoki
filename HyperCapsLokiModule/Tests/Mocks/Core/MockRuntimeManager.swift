@@ -10,18 +10,18 @@ import Foundation
 
 final class MockRuntimeManager: RuntimeProtocol {
   weak var appState: AppState?
-  
+
   private(set) var didCallStart = false
   private(set) var didCallExit = false
-  
+
   var onStart: (() -> Void)?
   var onExit: (() -> Void)?
-  
+
   func start() {
     didCallStart = true
     onStart?()
   }
-  
+
   func exit() {
     didCallExit = true
     onExit?()

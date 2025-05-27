@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - App
 extension TestEnvironment {
-  
+
   @MainActor
   @discardableResult
   func withAppState(
@@ -19,7 +19,7 @@ extension TestEnvironment {
   ) -> Self {
     var copy = self
     copy.appState = appState
-    
+
     if autoCreateAppEnvironment {
       copy.appState.container = DIContainer(
         environment:
@@ -42,10 +42,10 @@ extension TestEnvironment {
           )
       )
     }
-    
+
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withAppDelegate(
@@ -55,21 +55,21 @@ extension TestEnvironment {
   ) -> Self {
     var copy = self
     copy.appDelegate = appDelegate ?? AppDelegate()
-    
+
     if shouldAutoWireRuntime {
       copy.appDelegate.makeRuntimeManager = { appState in
         copy.runTimeManager.appState = appState
         return copy.runTimeManager
       }
     }
-    
+
     if let runtimeOverride {
       copy.appDelegate.runtimeManager = runtimeOverride
     }
-    
+
     return copy
   }
-  
+
   @discardableResult
   func withBufferedLogStrategy() -> Self {
     var copy = self
@@ -83,5 +83,5 @@ extension TestEnvironment {
     copy.logStrategy = MockNonBufferredFileLogStrategy()
     return copy
   }
-  
+
 }

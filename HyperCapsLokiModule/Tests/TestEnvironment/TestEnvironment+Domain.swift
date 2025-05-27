@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Domain
 extension TestEnvironment {
-  
+
   @MainActor
   @discardableResult
   func withStorageRepository(_ storageRepository: StorageRepository? = nil)

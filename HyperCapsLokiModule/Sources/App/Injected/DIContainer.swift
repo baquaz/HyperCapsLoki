@@ -9,7 +9,7 @@ import Foundation
 
 public struct DIContainer {
   public var environment: AppEnvironmentProtocol
-  
+
   public init(environment: AppEnvironmentProtocol) {
     self.environment = environment
   }

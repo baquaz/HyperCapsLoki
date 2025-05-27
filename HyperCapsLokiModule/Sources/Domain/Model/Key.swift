@@ -15,7 +15,7 @@ typealias HIDUsageCode = Int
 /// Enum defining all supported keys with their corresponding HID usage and Carbon key codes.
 public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
   public var id: Self { self }
-  
+
   case capsLock = "caps lock"
   case leftCommand = "left command"
   case leftOption = "left option"
@@ -28,7 +28,7 @@ public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
   case menuKeyboard = "menu keyboard"
   case f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12,
        f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24
-  
+
   public var symbol: String {
     switch self {
       case .leftCommand: "⌘"
@@ -38,7 +38,7 @@ public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
       default: ""
     }
   }
-  
+
   public var alias: String {
     switch self {
       case .leftCommand: "meta"
@@ -48,7 +48,7 @@ public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
       default: ""
     }
   }
-  
+
   /// Supported HID Keyboard Usage Codes with their corresponding key names.
   ///
   /// https://developer.apple.com/documentation/hiddriverkit/keyboard-or-keypad-enum
@@ -65,7 +65,7 @@ public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
       case .rightShift:   kHIDUsage_KeyboardRightShift
       case .rightControl: kHIDUsage_KeyboardRightControl
       case .menuKeyboard: kHIDUsage_KeyboardMenu
-        
+
       case .f1:   kHIDUsage_KeyboardF1
       case .f2:   kHIDUsage_KeyboardF2
       case .f3:   kHIDUsage_KeyboardF3
@@ -92,7 +92,7 @@ public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
       case .f24:  kHIDUsage_KeyboardF24
     }
   }
-  
+
   /// Returns the corresponding Carbon (HIToolbox) key code for the key.
   var carbonKeyCode: CGKeyCode {
     switch self {
@@ -106,7 +106,7 @@ public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
       case .rightShift:   CGKeyCode(kVK_RightShift)
       case .rightControl: CGKeyCode(kVK_RightControl)
       case .menuKeyboard: CGKeyCode(kVK_ContextualMenu)
-        
+
       case .f1:  CGKeyCode(kVK_F1)
       case .f2:  CGKeyCode(kVK_F2)
       case .f3:  CGKeyCode(kVK_F3)
@@ -127,7 +127,7 @@ public enum Key: String, CaseIterable, Hashable, Identifiable, Sendable {
       case .f18: CGKeyCode(kVK_F18)
       case .f19: CGKeyCode(kVK_F19)
       case .f20: CGKeyCode(kVK_F20)
-        
+
       default:
         // HID and Carbon don't align for non-function keys, use default mapping
         CGKeyCode(hidUsageKeyboardCode & 0xFFFF)
@@ -143,7 +143,7 @@ extension Key {
     .leftControl,
     .leftShift
   ]
-  
+
   static var allHyperkeySequenceEventFlags: [Key: CGEventFlags] {
     Dictionary(
       uniqueKeysWithValues:

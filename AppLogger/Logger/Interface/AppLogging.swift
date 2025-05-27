@@ -28,7 +28,7 @@ public protocol AppLogging {
     function: String,
     line: Int
   )
-  
+
   static func printCustom(
     tag: (any LoggingTag)?,
     context: (any LoggingContext)?,
@@ -38,6 +38,6 @@ public protocol AppLogging {
     function: String,
     line: Int
   )
-  
+
   static func saveLogs() async throws -> URL
 }

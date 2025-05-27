@@ -14,26 +14,26 @@ public class AppDelegate: NSObject, NSApplicationDelegate {
   internal var runtimeManager: RuntimeProtocol?
   internal var makeRuntimeManager: (_ appState: AppState?) -> RuntimeProtocol =
   { RuntimeManager(appState: $0) }
-  
+
   // MARK: - AppState inject
   public func inject(appState: AppState) {
     self.appState = appState
   }
-  
+
   // MARK: - applicationDidFinishLaunching
   public func applicationDidFinishLaunching(_ notification: Notification) {
-    #if DEBUG
+#if DEBUG
     if CommandLine.arguments.contains("-ResetAppState") {
       resetAppState()
     }
-    #endif
-    
+#endif
+
     Task {
       runtimeManager = makeRuntimeManager(appState)
       runtimeManager?.start()
     }
   }
-  
+
   // MARK: - applicationShouldTerminate
   public func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
     Task {
@@ -42,13 +42,13 @@ public class AppDelegate: NSObject, NSApplicationDelegate {
     }
     return .terminateLater
   }
-  
-  #if DEBUG
+
+#if DEBUG
   func resetAppState() {
     if let appDomain = Bundle.main.bundleIdentifier {
       UserDefaults.standard.removePersistentDomain(forName: appDomain)
       UserDefaults.standard.synchronize()
     }
   }
-  #endif
+#endif
 }

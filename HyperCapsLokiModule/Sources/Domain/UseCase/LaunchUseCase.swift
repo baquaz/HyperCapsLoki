@@ -17,7 +17,7 @@ public final class LaunchUseCaseImpl: LaunchUseCase {
   private let remapper: RemapExecutor
   private let eventsHandler: EventsHandler
   internal let storageRepository: StorageRepository
-  
+
   // MARK: - Init
   init(
     loginItemHandler: any AppLoginItemService,
@@ -30,25 +30,25 @@ public final class LaunchUseCaseImpl: LaunchUseCase {
     self.eventsHandler = eventsHandler
     self.storageRepository = storageRepository
   }
-  
+
   public func launch() {
     let hyperkeyFeatureIsActive = storageRepository
       .getHyperkeyFeatureState() == true
-    
+
     eventsHandler.setUpEventTap()
     if !hyperkeyFeatureIsActive {
       eventsHandler.setEventTap(enabled: false)
     }
-    
+
     let selectedKey = storageRepository.getSelectedHyperkey()
     if let selectedKey, hyperkeyFeatureIsActive {
       remapper.remapUserKeyMappingCapsLock(using: selectedKey)
     }
-    
+
     storageRepository.getHyperkeySequenceUnsetKeys().forEach {
       storageRepository.setHyperkeySequence(enabled: true, for: $0)
     }
-    
+
     eventsHandler.set(selectedKey)
     eventsHandler.set(
       availableSequenceKeys: storageRepository.getHyperkeyEnabledSequenceKeys()

@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Data
 extension TestEnvironment {
-  
+
   @discardableResult
   func withStorage(_ storage: StorageProtocol = MockStorage()) -> Self {
     var copy = self

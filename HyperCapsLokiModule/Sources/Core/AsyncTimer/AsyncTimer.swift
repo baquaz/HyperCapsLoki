@@ -14,10 +14,10 @@ public protocol AsyncTimer {
 
 final class DefaultAsyncTimer: AsyncTimer {
   private var task: Task<Void, Never>?
-  
+
   public func start(interval: Duration, repeating: Bool, action: @escaping @MainActor () -> Void) {
     cancel()
-    
+
     task = Task {
       repeat {
         try? await Task.sleep(for: interval)
@@ -25,7 +25,7 @@ final class DefaultAsyncTimer: AsyncTimer {
       } while repeating && !Task.isCancelled
     }
   }
-  
+
   public func cancel() {
     task?.cancel()
     task = nil

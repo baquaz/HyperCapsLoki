@@ -11,16 +11,16 @@ import AppKit
 
 public protocol AppEnvironmentProtocol {
   var defaultHyperkey: Key { get }
-  
+
   // MARK: - Remapper
   var remapper: RemapExecutor { get }
-  
+
   // MARK: - Events Handler
   var eventsHandler: EventsHandler { get }
-  
+
   // MARK: - Storage Repo
   var storageRepository: StorageRepository { get }
-  
+
   // MARK: - Use Cases
   var loginItemUseCase: LoginItemUseCase { get }
   var permissionUseCase: AccessibilityPermissionUseCase { get }
@@ -34,14 +34,14 @@ public protocol AppEnvironmentProtocol {
 // MARK: - App Environment
 public struct AppEnvironment: AppEnvironmentProtocol {
   public let defaultHyperkey: Key = .f15
-  
+
   // Core components
   public let remapper: RemapExecutor
   public let eventsHandler: EventsHandler
-  
+
   // Repositories
   public let storageRepository: StorageRepository
-  
+
   // Use cases
   public let loginItemUseCase: LoginItemUseCase
   public let permissionUseCase: AccessibilityPermissionUseCase
@@ -50,7 +50,7 @@ public struct AppEnvironment: AppEnvironmentProtocol {
   public let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
   public let logsUseCase: LogsUseCase
   public let exitUseCase: ExitUseCase
-  
+
   public init(
     remapper: RemapExecutor,
     eventsHandler: EventsHandler,

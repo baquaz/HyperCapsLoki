@@ -17,7 +17,7 @@ public protocol LoginItemUseCase {
 public struct LoginItemUseCaseImpl: LoginItemUseCase {
   private let loginItemHandler: AppLoginItemService
   internal let storageRepository: StorageRepository
-  
+
   // MARK: - Init
   init(
     loginItemHandler: any AppLoginItemService,
@@ -26,11 +26,11 @@ public struct LoginItemUseCaseImpl: LoginItemUseCase {
     self.loginItemHandler = loginItemHandler
     self.storageRepository = storageRepository
   }
-  
+
   public func checkLoginItemEnabledStatus() -> Bool {
     loginItemHandler.checkStatus()
   }
-  
+
   public func setLoginItem(_ isEnabled: Bool) throws {
     do {
       if isEnabled {
@@ -41,7 +41,7 @@ public struct LoginItemUseCaseImpl: LoginItemUseCase {
     }
     saveState(isEnabled)
   }
-  
+
   public func saveState(_ isEnabled: Bool) {
     storageRepository.setLoginItemEnabledState(isEnabled)
   }

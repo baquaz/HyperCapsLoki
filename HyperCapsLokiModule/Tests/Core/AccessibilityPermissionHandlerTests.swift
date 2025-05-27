@@ -10,10 +10,10 @@ import Testing
 @testable import HyperCapsLokiModule
 
 extension CoreTests {
-  
+
   @Suite("Accessibility Permission Tests")
   struct AccessibilityPermissionTests {
-    
+
     @MainActor
     @Test(
       "startMonitoring calls completion",
@@ -23,7 +23,7 @@ extension CoreTests {
       let timer = MockAsyncTimer()
       var isPermissionGranted = false
       var results: [Bool] = []
-      
+
       let sut = AccessibilityPermissionHandler(
         fastInterval: .seconds(1.0),
         backoffIntervals: [
@@ -34,27 +34,27 @@ extension CoreTests {
         permissionCheckTimer: timer) {
           isPermissionGranted
         }
-      
+
       // Act
       sut.startMonitoring { results.append($0) }
-      
+
       // Assert
-      
+
       // 1st check: permission is false
       await timer.simulateExpiration()
       #expect(results == [false])
-      
+
       // 2nd check: permission becomes true
       isPermissionGranted = true
       await timer.simulateExpiration()
       #expect(results == [false, true])
-      
+
       // 3rd check should not be called after stopMonitoring
       sut.stopMonitoring()
       await timer.simulateExpiration()
       #expect(results == [false, true])  // unchanged
     }
-    
+
   }
-  
+
 }

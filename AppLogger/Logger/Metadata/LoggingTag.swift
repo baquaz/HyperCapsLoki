@@ -19,7 +19,7 @@ public enum DefaultLoggingTag: LoggingTag {
   case warning
   case error
   case critical
-  
+
   public var label: String {
     switch self {
       case .debug:

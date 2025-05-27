@@ -10,9 +10,9 @@ import Foundation
 
 // MARK: - View Models
 extension TestEnvironment {
-  
+
   static let defaultAppMenuViewModelHyperkey: Key = Key.f1
-  
+
   @MainActor
   @discardableResult
   func withAppMenuViewModel(
@@ -20,7 +20,7 @@ extension TestEnvironment {
     autoCreateUseCases: Bool = false
   ) -> Self {
     var copy = self
-    
+
     if autoCreateUseCases {
       copy.loginItemUseCase = MockLoginItemUseCase()
       copy.permissionUseCase = MockPermissionUseCase()
@@ -28,7 +28,7 @@ extension TestEnvironment {
       copy.remapKeyUseCase = MockRemapKeyUseCase()
       copy.exitUseCase = MockExitUseCase()
     }
-    
+
     copy.appMenuViewModel = appMenuViewModel ?? AppMenuViewModel(
       defaultHyperkey: TestEnvironment.defaultAppMenuViewModelHyperkey,
       storageRepository: copy.storageRepository,
@@ -40,7 +40,7 @@ extension TestEnvironment {
     )
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withLogsViewModel(
@@ -51,7 +51,7 @@ extension TestEnvironment {
     if autoCreateUseCases {
       copy.logsUseCase = MockLogsUseCase()
     }
-    
+
     copy.logsViewModel = logsViewModel ?? LogsViewModel(
       logsUseCase: copy.logsUseCase
     )

@@ -17,18 +17,18 @@ public protocol ExitUseCase: AnyObject {
 public final class ExitUseCaseImpl: ExitUseCase {
   private var remapper: RemapExecutor
   private var eventsHandler: EventsHandler
-  
+
   // MARK: - Init
   init(remapper: any RemapExecutor, eventsHandler: EventsHandler) {
     self.remapper = remapper
     self.eventsHandler = eventsHandler
   }
-  
+
   public func terminate() {
     Applog.print(context: .application, "Start quitting...")
     NSApplication.shared.terminate(nil)
   }
-  
+
   public func exit() {
     Applog.print(
       context: .application,

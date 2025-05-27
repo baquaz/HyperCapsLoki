@@ -11,7 +11,7 @@ import Cocoa
 @MainActor
 protocol RuntimeProtocol {
   var appState: AppState? { get set }
-  
+
   func start()
   func exit()
 }
@@ -19,11 +19,11 @@ protocol RuntimeProtocol {
 final class RuntimeManager: RuntimeProtocol {
   internal weak var appState: AppState?
   internal var onPermissionChangedHandled: (() -> Void)?
-  
+
   var environment: AppEnvironmentProtocol? {
     appState?.container?.environment
   }
-  
+
   // MARK: - Init
   init(appState: AppState?) {
     self.appState = appState
@@ -32,34 +32,34 @@ final class RuntimeManager: RuntimeProtocol {
   func start() {
     let isLoginItem = environment?.loginItemUseCase.checkLoginItemEnabledStatus() ?? false
     environment?.loginItemUseCase.saveState(isLoginItem)
-    
+
     let grantedPermission = environment?
       .permissionUseCase.ensureAccessibilityPermissionsAreGranted()
-    
+
     if grantedPermission == true {
       appState?.accessibilityPermissionGranted = true
       environment?.launchUseCase.launch()
     } else {
       appState?.accessibilityPermissionGranted = false
     }
-    
+
     setUpMonitoringPermission()
   }
-  
+
   func exit() {
     cancelMonitoringPermission()
     environment?.exitUseCase.exit()
   }
-  
+
   internal func setUpMonitoringPermission() {
     environment?.permissionUseCase.monitorChanges { [weak self, weak appState] isPermissionGranted in
       guard let self, let appState else { return }
-      
+
       let previousPermissionState = appState.accessibilityPermissionGranted
       guard isPermissionGranted != previousPermissionState else { return }
-      
+
       appState.accessibilityPermissionGranted = isPermissionGranted
-      
+
       Task {
         if isPermissionGranted {
           environment?.launchUseCase.launch()
@@ -68,12 +68,12 @@ final class RuntimeManager: RuntimeProtocol {
           environment?.hyperkeyFeatureUseCase
             .setHyperkeyFeature(active: false, forced: false)
         }
-        
+
         onPermissionChangedHandled?()
       }
     }
   }
-  
+
   private func cancelMonitoringPermission() {
     environment?.permissionUseCase.stopMonitoring()
   }

@@ -13,11 +13,11 @@ import Cocoa
 struct KeysProvider {
   // MARK: - Init
   static let shared = KeysProvider()
-  
+
   private init() { }
-  
+
   // MARK: - Create
-  
+
   /// Combines HID _Usage Page_ with _Usage ID_ into single integer
   ///
   /// example:
@@ -36,9 +36,9 @@ struct KeysProvider {
   func makeHIDUsageNumber(page: Int, usage: Int) -> Int {
     (page << 32) | usage
   }
-  
+
   // MARK: - Read
-  
+
   /// Retrieves the _Carbon_ key code for a given key name.
   ///
   /// - Parameter key: The `Key` for which the Carbon key code is required.
@@ -46,7 +46,7 @@ struct KeysProvider {
   func carbonKeyCode(for key: Key) -> CGKeyCode? {
     key.carbonKeyCode
   }
-  
+
   /// Retrieves the HID usage code for a given key name.
   ///
   /// - Parameter key: The `Key` name for which the HID usage code is required.
@@ -55,7 +55,7 @@ struct KeysProvider {
   func hidUsageCode(for key: Key) -> HIDUsageCode? {
     key.hidUsageKeyboardCode
   }
-  
+
   /// Retrieves the key name for a given HID usage code.
   ///
   /// - Parameter code: The HID usage code to search for.
@@ -64,20 +64,20 @@ struct KeysProvider {
   func keyName(for code: HIDUsageCode) -> String? {
     Key.allCases.first { $0.hidUsageKeyboardCode == code }?.rawValue
   }
-  
+
   /// Retrieves all possible HID Keyboard Usages
   ///
   /// - Returns: HID Keyboard Usages
   ///
   func retrieveKeyboardUsages() -> [String: Int] {
     var keyMapping: [String: Int] = [:]
-    
+
     // HID Manager
     let hidManager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-    
+
     let matchingDict: [String: Any] = [:] // Match all devices
     IOHIDManagerSetDeviceMatching(hidManager, matchingDict as CFDictionary)
-    
+
     // Open HID Manager
     let openResult = IOHIDManagerOpen(hidManager, IOOptionBits(kIOHIDOptionsTypeNone))
     if openResult != kIOReturnSuccess {
@@ -88,7 +88,7 @@ struct KeysProvider {
       )
       return keyMapping
     }
-    
+
     // Get All Matching Devices
     guard let devices = IOHIDManagerCopyDevices(hidManager) as? Set<IOHIDDevice> else {
       Applog.print(
@@ -98,19 +98,19 @@ struct KeysProvider {
       )
       return keyMapping
     }
-    
+
     Applog.print(context: .keyboardEvents, "Devices found: \(devices.count)")
     for device in devices {
       // Print Device Properties
       if let product = IOHIDDeviceGetProperty(device, kIOHIDProductKey as CFString) as? String {
         Applog.print(context: .keyboardEvents, "found Device: \(product)")
       }
-      
+
       // Get All Elements for the Device
       guard let elements = IOHIDDeviceCopyMatchingElements(device, nil, IOOptionBits(kIOHIDOptionsTypeNone)) as? [IOHIDElement] else {
         continue
       }
-      
+
       for element in elements {
         let usagePage = IOHIDElementGetUsagePage(element)
         let usage = IOHIDElementGetUsage(element)
@@ -121,12 +121,12 @@ struct KeysProvider {
         }
       }
     }
-    
+
     return keyMapping
   }
-  
+
   // MARK: - Transform
-  
+
   /// Transform a collection of keys to their HID usage codes using a Set.
   ///
   /// - Parameter keys: A set of `KeyName`.
@@ -135,7 +135,7 @@ struct KeysProvider {
   func transform(keys: Set<Key>) -> Set<HIDUsageCode> {
     Set(keys.compactMap { hidUsageCode(for: $0) })
   }
-  
+
   /// Transform a collection of HID usage codes to their corresponding key names using a Set.
   ///
   /// - Parameter codes: A set of HID usage codes.
@@ -144,9 +144,9 @@ struct KeysProvider {
   func transform(usageCodes codes: Set<HIDUsageCode>) -> Set<String> {
     Set(codes.compactMap { keyName(for: $0) })
   }
-  
+
   // MARK: - Operations
-  
+
   /// Computes the intersection of two sets of key names.
   ///
   /// - Parameters:
@@ -157,7 +157,7 @@ struct KeysProvider {
   func intersection(of keys1: Set<Key>, and keys2: Set<Key>) -> Set<Key> {
     keys1.intersection(keys2)
   }
-  
+
   /// Computes the union of two sets of key names.
   ///
   /// - Parameters:

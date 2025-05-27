@@ -18,11 +18,11 @@ final class AppLoginItemHandler: AppLoginItemService {
   func checkStatus() -> Bool {
     SMAppService.mainApp.status == .enabled
   }
-  
+
   func register() throws {
     try SMAppService.mainApp.register()
   }
-  
+
   func unregister() throws {
     try SMAppService.mainApp.unregister()
   }

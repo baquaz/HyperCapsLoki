@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Core
 extension TestEnvironment {
-  
+
   @discardableResult
   func withLoginItemHandler(
     _ loginItemHandler: AppLoginItemService = MockLoginItemHandler()
@@ -19,7 +19,7 @@ extension TestEnvironment {
     copy.loginItemHandler = loginItemHandler
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withAccessibilityPermissionService(
@@ -30,7 +30,7 @@ extension TestEnvironment {
     accessibilityPermissionHandler ?? MockAccessibilityPermissionService()
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withEventsHandler(_ eventsHandler: MockEventsHandler? = nil)
@@ -46,7 +46,7 @@ extension TestEnvironment {
     }
     return copy
   }
-  
+
   @discardableResult
   func withSystemEventsInjector(
     _ systemEventsInjector: SystemEventsInjection = MockSystemEventsInjector()
@@ -55,7 +55,7 @@ extension TestEnvironment {
     copy.systemEventsInjector = systemEventsInjector
     return copy
   }
-  
+
   @discardableResult
   func withCapsLockTriggerTimer(_ capsLockTriggerTimer: AsyncTimer = MockAsyncTimer())
   -> Self {
@@ -63,13 +63,13 @@ extension TestEnvironment {
     copy.capsLockTriggerTimer = capsLockTriggerTimer
     return copy
   }
-  
+
   func withRemapper(_ remaper: RemapExecutor = MockRemapper()) -> Self {
     var copy = self
     copy.remapper = remaper
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withRuntimeManager(
@@ -79,5 +79,5 @@ extension TestEnvironment {
     copy.runTimeManager = runtimeManager ?? MockRuntimeManager()
     return copy
   }
-  
+
 }

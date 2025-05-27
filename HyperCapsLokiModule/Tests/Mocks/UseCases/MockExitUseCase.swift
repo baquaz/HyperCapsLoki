@@ -11,11 +11,11 @@ import Foundation
 final class MockExitUseCase: ExitUseCase {
   var terminateCalled = false
   var exitCalled = false
-  
+
   func terminate() {
     terminateCalled = true
   }
-  
+
   func exit() {
     exitCalled = true
   }

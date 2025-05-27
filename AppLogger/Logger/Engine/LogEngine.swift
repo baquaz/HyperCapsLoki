@@ -14,7 +14,7 @@ final class LogEngine: @unchecked Sendable {
     qos: .utility
   )
   internal var strategy: LogStrategy = BufferedFileLogStrategy()
-  
+
   func log(
     output: String,
     tag: any LoggingTag,
@@ -28,7 +28,7 @@ final class LogEngine: @unchecked Sendable {
       )
     }
   }
-  
+
   func log(
     output: String,
     tag: LoggingTag? = nil,
@@ -43,7 +43,7 @@ final class LogEngine: @unchecked Sendable {
       )
     }
   }
-  
+
   func setStrategy(_ newStrategy: LogStrategy) {
     logQueue.async { [weak self] in
       self?.strategy = newStrategy

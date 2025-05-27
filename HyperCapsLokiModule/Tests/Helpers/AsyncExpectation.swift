@@ -9,11 +9,11 @@ import Foundation
 
 actor AsyncExpectation {
   private var continuation: CheckedContinuation<Void, Never>?
-  
+
   func fulfill() {
     continuation?.resume()
   }
-  
+
   func wait() async {
     await withCheckedContinuation { continuation = $0 }
   }

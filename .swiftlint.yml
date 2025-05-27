@@ -33,7 +33,6 @@ disabled_rules:
   - line_length # Let long URLs, method chains, or strings breathe
   - function_body_length # Okay for some real-world cases
   - blanket_disable_command
-  - trailing_whitespace #temporarily
   - switch_case_alignment
 
 analyzer_rules:

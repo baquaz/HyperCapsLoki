@@ -13,22 +13,22 @@ final class MockLoginItemHandler: AppLoginItemService {
   var isEnabled: Bool = false
   var shouldThrowOnRegister: Bool = false
   var shouldThrowOnUnregister: Bool = false
-  
+
   private(set) var didRegister: Bool = false
   private(set) var didUnregister: Bool = false
-    
+
   func checkStatus() -> Bool {
     checkStatusCalled = true
     return isEnabled
   }
-  
+
   func register() throws {
     if shouldThrowOnRegister {
       throw NSError(domain: "MockError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Mock register error"])
     }
     didRegister = true
   }
-  
+
   func unregister() throws {
     if shouldThrowOnUnregister {
       throw NSError(domain: "MockError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Mock unregister error"])

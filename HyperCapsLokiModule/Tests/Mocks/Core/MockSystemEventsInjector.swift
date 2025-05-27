@@ -12,14 +12,14 @@ import Cocoa
 class MockSystemEventsInjector: SystemEventsInjection {
   var hyperkeyDownSequence: [CGEventFlags] = []
   var hyperkeyUpSequence: [CGEventFlags] = []
-  
+
   var injectedSequence: [Bool] = []
   private(set) var capsLockToggled = false
-  
+
   func injectHyperkeyFlagsSequence(isKeyDown: Bool) {
     injectedSequence.append(isKeyDown)
   }
-  
+
   func injectCapsLockStateToggle() {
     capsLockToggled = true
   }

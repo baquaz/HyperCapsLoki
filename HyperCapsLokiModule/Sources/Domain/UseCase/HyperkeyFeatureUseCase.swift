@@ -19,11 +19,11 @@ public protocol HyperkeyFeatureUseCase: AnyObject {
   ///     If `false` -  disables feature, but remains state (UI) for future reactivation
   ///
   func setHyperkeyFeature(active isActive: Bool, forced: Bool)
-  
+
   func getHyperkeyEnabledSequenceKeys() -> [Key]
-  
+
   func setHyperkeySequence(enabled: Bool, for key: Key)
-  
+
   func setHyperkeySequenceKeysAll(enabled isEnabled: Bool)
 }
 
@@ -41,12 +41,12 @@ public final class HyperkeyFeatureUseCaseImpl: HyperkeyFeatureUseCase {
     self.remapper = remapper
     self.storageRepository = storageRepository
   }
-  
+
   public func setHyperkeyFeature(active isActive: Bool, forced: Bool) {
     eventsHandler.setEventTap(enabled: isActive)
-    
+
     let selectedKey = storageRepository.getSelectedHyperkey()
-    
+
     if isActive {
       if let selectedKey {
         remapper.remapUserKeyMappingCapsLock(using: selectedKey)
@@ -56,23 +56,23 @@ public final class HyperkeyFeatureUseCaseImpl: HyperkeyFeatureUseCase {
         remapper.resetUserKeyMappingCapsLock()
       }
     }
-    
+
     if forced {
       storageRepository.setHyperkeyFeatureState(isActive)
     }
   }
-  
+
   public func getHyperkeyEnabledSequenceKeys() -> [Key] {
     storageRepository.getHyperkeyEnabledSequenceKeys()
   }
-  
+
   public func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) {
     storageRepository.setHyperkeySequence(enabled: isEnabled, for: key)
     eventsHandler.set(
       availableSequenceKeys: storageRepository.getHyperkeyEnabledSequenceKeys()
     )
   }
-  
+
   public func setHyperkeySequenceKeysAll(enabled isEnabled: Bool) {
     storageRepository.setHyperkeySequenceKeysAll(enabled: isEnabled)
     eventsHandler.set(

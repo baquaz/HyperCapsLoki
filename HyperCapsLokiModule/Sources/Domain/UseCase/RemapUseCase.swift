@@ -16,7 +16,7 @@ public final class RemapKeyUseCaseImpl: RemapKeyUseCase {
   internal let storageRepo: StorageRepository
   private let eventsHandler: EventsHandler
   private let remapper: RemapExecutor
-  
+
   init(
     storageRepo: any StorageRepository,
     eventsHandler: EventsHandler,
@@ -26,10 +26,10 @@ public final class RemapKeyUseCaseImpl: RemapKeyUseCase {
     self.eventsHandler = eventsHandler
     self.remapper = remapper
   }
-  
+
   public func execute(newKey: Key?) {
     let isHyperkeyFeatureActive = storageRepo.getHyperkeyFeatureState() == true
-    
+
     if isHyperkeyFeatureActive {
       if let newKey {
         remapper.remapUserKeyMappingCapsLock(using: newKey)
@@ -37,7 +37,7 @@ public final class RemapKeyUseCaseImpl: RemapKeyUseCase {
         remapper.resetUserKeyMappingCapsLock()
       }
     }
-    
+
     eventsHandler.set(newKey)
     storageRepo.saveSelectedHyperkey(newKey)
   }

@@ -19,15 +19,15 @@ public protocol LogsUseCase: AnyObject {
 public final class LogsUseCaseImpl: LogsUseCase {
   // MARK: Init
   public init() { }
-  
+
   public func saveLogs() throws -> URL {
     return try AppLogger.saveLogs()
   }
-  
+
   public func showInFinderSavedLogs(_ url: URL) {
     NSWorkspace.shared.activateFileViewerSelecting([url])
   }
-  
+
   public func copyToClipboard(savedLogsPath: URL) {
     NSPasteboard.general.clearContents()
     NSPasteboard.general.setString(savedLogsPath.path(), forType: .string)

@@ -14,9 +14,9 @@ public protocol LoggingContext: Sendable {
 
 public struct DefaultLoggingContext: RawRepresentable, Hashable, Sendable {
   public let rawValue: String
-  
+
   public var label: String { "<\(rawValue)>" }
-  
+
   public init(rawValue: String) {
     self.rawValue = rawValue
   }

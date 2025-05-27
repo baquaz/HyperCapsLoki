@@ -10,27 +10,27 @@ import Foundation
 
 final class MockPermissionUseCase: AccessibilityPermissionUseCase {
   var isGranted = false
-  
+
   var receivedCompletion: ((Bool) -> Void)?
   private(set) var ensureAccessibilityPermissionsCalled = false
   private(set) var openAccessibilityPermissionSettingsCalled = false
   private(set) var stopMonitoringCalled = false
-  
+
   func openAccessibilityPermissionSettings() {
     openAccessibilityPermissionSettingsCalled = true
   }
-  
+
   func ensureAccessibilityPermissionsAreGranted() -> Bool {
     ensureAccessibilityPermissionsCalled = true
     return isGranted
   }
-  
+
   func monitorChanges(completion: @escaping (Bool) -> Void) {
     receivedCompletion = completion
   }
-  
+
   func stopMonitoring() {
     stopMonitoringCalled = true
   }
-  
+
 }

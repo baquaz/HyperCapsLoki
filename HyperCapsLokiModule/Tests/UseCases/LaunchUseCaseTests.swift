@@ -10,10 +10,10 @@ import Testing
 @testable import HyperCapsLokiModule
 
 extension UseCasesTests {
-  
+
   @Suite("Launch Use Case Tests")
   struct LaunchUseCaseTests {
-    
+
     @MainActor
     @Test(
       "Launch sets up event tap handler correctly for hyperkey feature state",
@@ -21,30 +21,30 @@ extension UseCasesTests {
     )
     func launchSetsUpEventTapHandlerCorrectly(isHyperkeyFeatureActive: Bool) async throws {
       let mockStorage = MockStorage(isHyperkeyFeatureActive: isHyperkeyFeatureActive)
-      
+
       let testEnv = TestEnvironment()
         .withLoginItemHandler()
         .withRemapper()
         .withEventsHandler()
         .withStorage(mockStorage)
         .withStorageRepository()
-      
+
       let sut = LaunchUseCaseImpl(
         loginItemHandler: testEnv.mockLoginItemHandler,
         remapper: testEnv.mockRemapper,
         eventsHandler: testEnv.mockEventsHandler,
         storageRepository: testEnv.storageRepository
       )
-      
+
       sut.launch()
-      
+
       #expect(testEnv.mockEventsHandler.setUpEventTapCalled)
-      
+
       // for hyperkey feature inactive, events handler gets disabled
       #expect(testEnv.mockEventsHandler.receivedSetEventTapValue
               == (isHyperkeyFeatureActive ? nil : false))
     }
-    
+
     @MainActor
     @Test(
       "Launch remaps user key mapping CapsLock for selected key and hyperkey feature state",
@@ -64,30 +64,30 @@ extension UseCasesTests {
         isHyperkeyFeatureActive: isHyperkeyFeatureActive,
         selectedHyperkey: selectedKey?.rawValue
       )
-      
+
       let testEnv = TestEnvironment()
         .withLoginItemHandler()
         .withRemapper()
         .withEventsHandler()
         .withStorage(mockStorage)
         .withStorageRepository()
-      
+
       let sut = LaunchUseCaseImpl(
         loginItemHandler: testEnv.mockLoginItemHandler,
         remapper: testEnv.mockRemapper,
         eventsHandler: testEnv.mockEventsHandler,
         storageRepository: testEnv.storageRepository
       )
-      
+
       // Act
       sut.launch()
-      
+
       // Assert
       #expect(testEnv.mockRemapper.receivedRemappingCapsLockKey ==
               (isHyperkeyFeatureActive ? selectedKey : nil)
       )
     }
-    
+
     @MainActor
     @Test(
       "Launch initially enables all unset sequence keys",
@@ -102,36 +102,36 @@ extension UseCasesTests {
     func launchInitiallyEnablesAllUnsetSequenceKeys(unsetSequenceKeys: [Key]) async throws {
       var mockStorage = MockStorage()
       let stubbed = false
-      
+
       mockStorage.commandKeyInSequence
       = unsetSequenceKeys.contains(.leftCommand) ? nil : stubbed
-      
+
       mockStorage.controlKeyInSequence =
       unsetSequenceKeys.contains(.leftControl) ? nil : stubbed
-      
+
       mockStorage.optionKeyInSequence =
       unsetSequenceKeys.contains(.leftOption) ? nil : stubbed
-      
+
       mockStorage.shiftKeyInSequence =
       unsetSequenceKeys.contains(.leftShift) ? nil : stubbed
-      
+
       let testEnv = TestEnvironment()
         .withLoginItemHandler()
         .withRemapper()
         .withEventsHandler()
         .withStorage(mockStorage)
         .withStorageRepository()
-      
+
       let sut = LaunchUseCaseImpl(
         loginItemHandler: testEnv.mockLoginItemHandler,
         remapper: testEnv.mockRemapper,
         eventsHandler: testEnv.mockEventsHandler,
         storageRepository: testEnv.storageRepository
       )
-      
+
       // Act
       sut.launch()
-      
+
       // Assert
       #expect(
         sut.storageRepository.dataSource.commandKeyInSequence ==
@@ -150,6 +150,6 @@ extension UseCasesTests {
         unsetSequenceKeys.contains(.leftShift)
       )
     }
-    
+
   }
 }

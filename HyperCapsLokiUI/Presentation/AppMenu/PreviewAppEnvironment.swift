@@ -46,7 +46,7 @@ class PreviewEventsHandler: EventsHandler {
 struct PreviewSystemEventsInjector: SystemEventsInjection {
   var hyperkeyDownSequence: [CGEventFlags] = []
   var hyperkeyUpSequence: [CGEventFlags] = []
-  
+
   func setUpHyperkeySequenceKeyUp(_ sequence: [CGEventFlags]) {}
   func setUpHyperkeySequenceKeyDown(_ sequence: [CGEventFlags]) {}
   func injectHyperkeyFlagsSequence(isKeyDown: Bool) {}
@@ -55,15 +55,15 @@ struct PreviewSystemEventsInjector: SystemEventsInjection {
 
 final class PreviewAsyncTimer: AsyncTimer {
   func simulateExpiration() async {
-    
+
   }
-  
+
   func start(
     interval: Duration,
     repeating: Bool,
     action: @escaping @MainActor @Sendable () -> Void
   ) {}
-  
+
   func cancel() {}
 }
 
@@ -75,7 +75,7 @@ class PreviewUseCase:
   HyperkeyFeatureUseCase,
   LogsUseCase,
   ExitUseCase {
-  
+
   func checkLoginItemEnabledStatus() -> Bool { false }
   func saveState(_ isEnabled: Bool) { }
   func setLoginItem(_ isEnabled: Bool) throws { }
@@ -103,16 +103,16 @@ struct PreviewRemapExecutor: RemapExecutor {
 
 struct PreviewStorage: StorageRepository {
   var dataSource: any StorageProtocol = Storage()
-  
+
   func getLoginItemEnabledState() -> Bool { false }
   func setLoginItemEnabledState(_ isEnabled: Bool) { }
-  
+
   func getHyperkeyFeatureState() -> Bool? { nil }
   func setHyperkeyFeatureState(_ isActive: Bool) {  }
-  
+
   func getSelectedHyperkey() -> Key? { .f15 }
   func saveSelectedHyperkey(_ key: Key?) { }
-  
+
   func getHyperkeySequenceUnsetKeys() -> [Key] { [] }
   func getHyperkeyEnabledSequenceKeys() -> [Key] { [] }
   func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) { }

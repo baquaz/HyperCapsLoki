@@ -14,9 +14,9 @@ public struct AppMenu: View {
   @State private var appViewModel: AppMenuViewModel?
   @State private var logsPresenter = LogsWindowPresenter()
   @State private var aboutPresenter = AboutWindowPresenter()
-  
+
   public init() { }
-  
+
   public var body: some View {
     Group {
       if let appViewModel {
@@ -37,7 +37,7 @@ public struct AppMenu: View {
             exitUseCase: container.environment.exitUseCase
           )
         }
-        
+
         appViewModel?.onSaveLogs = {
           let logsViewModel = LogsViewModel(logsUseCase:
                                               container.environment.logsUseCase)
@@ -45,7 +45,7 @@ public struct AppMenu: View {
           logsViewModel.saveLogs()
           logsPresenter.show(using: logsViewModel)
         }
-        
+
         appViewModel?.onPresentingAbout = {
           aboutPresenter.show()
         }
@@ -58,7 +58,7 @@ public struct AppMenu: View {
 struct AppMenuContent: View {
   @Environment(AppState.self) private var appState
   @Bindable var vm: AppMenuViewModel
-  
+
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
       Headline()
@@ -78,7 +78,7 @@ struct AppMenuContent: View {
 // MARK: -
 struct Headline: View {
   @Environment(AppState.self) private var appState
-  
+
   var body: some View {
     HStack(alignment: .center, spacing: 16) {
       Image(nsImage: SharedAssets.logo)
@@ -86,7 +86,7 @@ struct Headline: View {
         .interpolation(.high)
         .scaledToFit()
         .frame(height: 64)
-      
+
       VStack(alignment: .leading) {
         Spacer()
         Text("Hyper Caps Loki")
@@ -103,12 +103,12 @@ struct Headline: View {
 struct PermissionInfoSection: View {
   @Environment(AppState.self) private var appState
   @Bindable var vm: AppMenuViewModel
-  
+
   var body: some View {
     if !appState.accessibilityPermissionGranted {
       HStack(alignment: .center) {
         Spacer()
-        
+
         VStack {
           Button("Open Accessibility Settings") {
             vm.openAccessibilityPermissionSettings()
@@ -116,7 +116,7 @@ struct PermissionInfoSection: View {
           .buttonStyle(.borderedProminent)
           Text("App needs permission to track keyboard events")
         }
-        
+
         Spacer()
       }
     }
@@ -126,7 +126,7 @@ struct PermissionInfoSection: View {
 // MARK: -
 struct SubHeadline: View {
   @Environment(AppState.self) private var appState
-  
+
   var body: some View {
     Text("Settings")
       .font(.title3)
@@ -141,7 +141,7 @@ struct SubHeadline: View {
 struct RemappingSection: View {
   @Environment(AppState.self) private var appState
   @Bindable var vm: AppMenuViewModel
-  
+
   var body: some View {
     VStack(alignment: .leading) {
       Button("Set Default Remapping") {
@@ -150,21 +150,21 @@ struct RemappingSection: View {
       .buttonStyle(.bordered)
       .padding(.bottom, 10)
       .disabled(!appState.accessibilityPermissionGranted)
-      
+
       HStack {
         Circle()
           .fill(
             (vm.isHyperkeyFeatureActive && appState.accessibilityPermissionGranted)
             ? Color.green : Color.secondary)
           .fixedSize()
-        
+
         Text("Caps Lock remapped to:")
           .fixedSize()
           .opacity(
             (vm.isHyperkeyFeatureActive &&
              appState.accessibilityPermissionGranted) ? 1 : 0.6
           )
-        
+
         Picker("", selection: $vm.selectedKey) {
           ForEach(vm.availableKeys, id: \.self) { key in
             Text(vm.getTextForKey(key))
@@ -177,9 +177,9 @@ struct RemappingSection: View {
           vm.onSelectKey(newValue)
         }
         .disabled(!appState.accessibilityPermissionGranted)
-        
+
         Spacer()
-        
+
         Toggle(
           "",
           isOn:
@@ -201,13 +201,13 @@ struct RemappingSection: View {
 struct HyperkeySequenceSection: View {
   @Environment(AppState.self) private var appState
   @Bindable var vm: AppMenuViewModel
-  
+
   var body: some View {
     HStack(spacing: 4) {
       Spacer()
       ForEach(Array(vm.allHyperkeySequenceKeys.enumerated()), id: \.offset) { index, key in
         VStack {
-          
+
           Toggle(
             isOn: Binding(
               get: { vm.isSequenceEnabled(for: key) },
@@ -231,7 +231,7 @@ struct HyperkeySequenceSection: View {
             !vm.isHyperkeyFeatureActive ||
             !appState.accessibilityPermissionGranted
           )
-          
+
           VStack {
             Text(key.alias.uppercased())
               .fixedSize()
@@ -264,7 +264,7 @@ struct TopLabelCheckboxStyle: ToggleStyle {
             .font(.largeTitle)
             .lineLimit(1)
             .frame(maxWidth: .infinity)
-          
+
           Image(systemName: configuration.isOn ? "checkmark.square" : "square")
             .resizable()
             .scaledToFit()
@@ -285,10 +285,10 @@ struct TopLabelCheckboxStyle: ToggleStyle {
 struct BottomSection: View {
   @Environment(AppState.self) private var appState
   @Bindable var vm: AppMenuViewModel
-  
+
   var body: some View {
     VStack {
-    
+
       HStack(alignment: .bottom) {
         Toggle(
           isOn:
@@ -307,15 +307,15 @@ struct BottomSection: View {
 
         Spacer()
       }.padding(.bottom)
-      
+
       HStack(spacing: 20) {
         Button("About") {
           vm.triggerAbout()
         }
         .buttonStyle(.bordered)
-        
+
         Spacer()
-        
+
         Button("Save Logs") {
           vm.triggerSaveLogs()
         }
@@ -326,7 +326,7 @@ struct BottomSection: View {
         }
         .buttonStyle(.bordered)
         .disabled(!appState.accessibilityPermissionGranted)
-        
+
         Button("Quit ( ⌘Q )") {
           vm.quit()
         }
@@ -340,7 +340,7 @@ struct BottomSection: View {
 #Preview {
   let appState = AppState()
   appState.container = .init(environment: AppEnvironment.preview)
-  
+
   return AppMenu()
     .environment(appState)
     .tint(SharedAssets.accentColor)

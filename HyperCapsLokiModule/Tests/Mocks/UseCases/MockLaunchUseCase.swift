@@ -10,7 +10,7 @@ import Foundation
 
 final class MockLaunchUseCase: LaunchUseCase {
   private(set) var launchCalled = false
-  
+
   func launch() {
     launchCalled = true
   }

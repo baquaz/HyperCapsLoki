@@ -10,10 +10,10 @@ import Foundation
 // MARK: - StorageProtocol
 public protocol StorageProtocol {
   var isLoginItemEnabled: Bool? { get set }
-  
+
   var isHyperkeyFeatureActive: Bool? { get set }
   var selectedHyperkey: String? { get set }
-  
+
   // Hyperkey Sequence Keys
   var commandKeyInSequence: Bool? { get set }
   var controlKeyInSequence: Bool? { get set }
@@ -32,7 +32,7 @@ extension StorageProtocol {
       default: return nil
     }
   }
-  
+
   subscript(key: Key) -> Bool? {
     get {
       guard let path = keyPath(for: key) else { return nil }
@@ -47,28 +47,28 @@ extension StorageProtocol {
 
 // MARK: - Storage
 public struct Storage: StorageProtocol {
-  
+
   @UserDefaultsBacked(key: "isLoginItemEnabled", defaultValue: true)
   public var isLoginItemEnabled: Bool?
-  
+
   @UserDefaultsBacked(key: "isHyperkeyFeatureActive", defaultValue: true)
   public var isHyperkeyFeatureActive: Bool?
-  
+
   @UserDefaultsBacked(key: "selectedHyperkey", defaultValue: nil)
   public var selectedHyperkey: String?
-  
+
   // MARK: - Hyperkey Sequence Keys
   @UserDefaultsBacked(key: "commandKeyInSequence", defaultValue: nil)
   public var commandKeyInSequence: Bool?
-  
+
   @UserDefaultsBacked(key: "controlKeyInSequence", defaultValue: nil)
   public var controlKeyInSequence: Bool?
-  
+
   @UserDefaultsBacked(key: "optionKeyInSequence", defaultValue: nil)
   public var optionKeyInSequence: Bool?
-  
+
   @UserDefaultsBacked(key: "shiftKeyInSequence", defaultValue: nil)
   public var shiftKeyInSequence: Bool?
-  
+
   public init() { }
 }

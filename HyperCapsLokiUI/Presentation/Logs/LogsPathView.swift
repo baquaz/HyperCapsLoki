@@ -10,11 +10,11 @@ import SwiftUI
 struct LogsPathView: View {
   let text: String
   let maxLines: Int
-  
+
   var onCopy: (() -> Void)?
-  
+
   @State private var textHeight: CGFloat = 0
-  
+
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       ScrollView(.vertical) {
@@ -37,7 +37,7 @@ struct LogsPathView: View {
           .stroke(Color.gray.opacity(0.3))
       )
       .frame(height: min(textHeight, estimatedHeight(for: maxLines)))
-      
+
       HStack {
         Spacer()
         Button("Copy") {
@@ -47,7 +47,7 @@ struct LogsPathView: View {
       }
     }
   }
-  
+
   private func estimatedHeight(for lines: Int) -> CGFloat {
     let lineHeight = NSFont
       .monospacedSystemFont(ofSize: 12, weight: .regular)

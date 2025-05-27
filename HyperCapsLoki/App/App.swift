@@ -13,14 +13,14 @@ import HyperCapsLokiModule
 struct HyperCapsLokiApp: App {
   @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
   @State private var appState = AppState()
-  
+
   static var dependencies: DepenedencyBuilder = AppDependencyBuilder()
-  
+
   init() {
     appState.container = Self.dependencies.build()
     appDelegate.inject(appState: appState)
   }
-  
+
   var body: some Scene {
     MenuBarExtra("HyperCapsLoki", systemImage: "keyboard.onehanded.right") {
       AppMenu()

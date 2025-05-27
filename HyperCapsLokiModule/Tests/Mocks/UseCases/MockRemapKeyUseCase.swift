@@ -10,7 +10,7 @@ import Foundation
 
 final class MockRemapKeyUseCase: RemapKeyUseCase {
   private(set) var receivedExecuteNewKey: Key?
-  
+
   func execute(newKey: Key?) {
     receivedExecuteNewKey = newKey
   }

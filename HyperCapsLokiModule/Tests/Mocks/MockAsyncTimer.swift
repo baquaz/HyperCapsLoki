@@ -13,7 +13,7 @@ final class MockAsyncTimer: AsyncTimer {
   private(set) var cancelled = false
   private(set) var expired = false
   private var onExpire: (@MainActor () -> Void)?
-  
+
   func start(
     interval: Duration,
     repeating: Bool,
@@ -24,12 +24,12 @@ final class MockAsyncTimer: AsyncTimer {
     expired = false
     onExpire = action
   }
-  
+
   func cancel() {
     cancelled = true
     onExpire = nil
   }
-  
+
   @MainActor
   func simulateExpiration() async {
     guard !cancelled, let action = onExpire else { return }

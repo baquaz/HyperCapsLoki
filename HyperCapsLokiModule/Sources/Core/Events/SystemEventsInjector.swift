@@ -13,10 +13,10 @@ import IOKit.hid
 public protocol SystemEventsInjection {
   var hyperkeyDownSequence: [CGEventFlags] { get set }
   var hyperkeyUpSequence: [CGEventFlags] { get set }
-  
+
   mutating func setUpHyperkeySequenceKeyDown(_ sequence: [CGEventFlags])
   mutating func setUpHyperkeySequenceKeyUp(_ sequence: [CGEventFlags])
-  
+
   func injectHyperkeyFlagsSequence(isKeyDown: Bool)
   func injectCapsLockStateToggle()
 }
@@ -26,11 +26,11 @@ public extension SystemEventsInjection {
   mutating func setUpHyperkeySequenceKeyDown(_ sequence: [CGEventFlags]) {
     hyperkeyDownSequence = deduplicated(sequence)
   }
-  
+
   mutating func setUpHyperkeySequenceKeyUp(_ sequence: [CGEventFlags]) {
     hyperkeyUpSequence = deduplicated(sequence)
   }
-  
+
   private func deduplicated(_ flags: [CGEventFlags]) -> [CGEventFlags] {
     flags.reduce(into: []) { result, flagsStep in
       if !result.contains(flagsStep) {
@@ -38,18 +38,18 @@ public extension SystemEventsInjection {
       }
     }
   }
-  
+
   // MARK: - Inject Hyperkey
   func injectHyperkeyFlagsSequence(isKeyDown: Bool) {
     let flagsSequence = isKeyDown ? hyperkeyDownSequence : hyperkeyUpSequence
-    
+
     for flags in flagsSequence {
       let eventType: CGEventType = .flagsChanged
       if let flagsChangedEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
         flagsChangedEvent.flags = flags
         flagsChangedEvent.type = eventType
         flagsChangedEvent.post(tap: .cghidEventTap)
-        
+
         // Introduce a small delay for processing
         usleep(5000) // 5 milliseconds
       } else {
@@ -60,7 +60,7 @@ public extension SystemEventsInjection {
         )
       }
     }
-    
+
     // Ensure flags are fully reset
     if !isKeyDown {
       if let resetEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
@@ -71,7 +71,7 @@ public extension SystemEventsInjection {
       }
     }
   }
-  
+
   // MARK: - Inject Caps Lock
   func injectCapsLockStateToggle() {
     var ioConnect: io_connect_t = 0
@@ -81,7 +81,7 @@ public extension SystemEventsInjection {
         kIOHIDSystemClass
       )
     )
-    
+
     if ioService == 0 {
       Applog.print(
         tag: .critical,
@@ -90,10 +90,10 @@ public extension SystemEventsInjection {
       )
       return
     }
-    
+
     let result = IOServiceOpen(
       ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
-    
+
     if result != KERN_SUCCESS {
       Applog.print(
         tag: .critical,
@@ -102,13 +102,13 @@ public extension SystemEventsInjection {
       )
       return
     }
-    
+
     var modifierLockState: Bool = false
-    
+
     // Retrieve the current state of Caps Lock
     let getResult = IOHIDGetModifierLockState(
       ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
-    
+
     if getResult != KERN_SUCCESS {
       Applog.print(
         tag: .critical,
@@ -118,14 +118,14 @@ public extension SystemEventsInjection {
       IOServiceClose(ioConnect)
       return
     }
-    
+
     // Toggle the Caps Lock state
     modifierLockState.toggle()
-    
+
     // Set the new state of Caps Lock
     let setResult = IOHIDSetModifierLockState(
       ioConnect, Int32(kIOHIDCapsLockState), modifierLockState)
-    
+
     if setResult != KERN_SUCCESS {
       Applog.print(
         tag: .critical,
@@ -136,7 +136,7 @@ public extension SystemEventsInjection {
       Applog.print(context: .keyboardEvents,
                    "Caps Lock state toggled successfully.")
     }
-    
+
     IOServiceClose(ioConnect)
   }
 }

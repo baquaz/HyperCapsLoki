@@ -11,6 +11,6 @@ import Foundation
 public final class AppState {
   public var container: DIContainer?
   public var accessibilityPermissionGranted = false
-  
+
   public init() { }
 }

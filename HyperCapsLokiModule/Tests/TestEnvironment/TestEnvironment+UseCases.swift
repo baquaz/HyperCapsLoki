@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Use Cases
 extension TestEnvironment {
-  
+
   @MainActor
   @discardableResult
   func withLoginItemUseCase(
@@ -20,7 +20,7 @@ extension TestEnvironment {
     copy.loginItemUseCase = loginItemUseCase ?? MockLoginItemUseCase()
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withAccessibiltyPermissionUseCase(
@@ -30,14 +30,14 @@ extension TestEnvironment {
     copy.permissionUseCase = permissionUseCase ?? MockPermissionUseCase()
     return copy
   }
-  
+
   @MainActor
   func withLaunchUseCase(_ launchUseCase: LaunchUseCase? = nil) -> Self {
     var copy = self
     copy.launchUseCase = launchUseCase ?? MockLaunchUseCase()
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withHyperkeyFeatureUseCase(
@@ -46,10 +46,10 @@ extension TestEnvironment {
     var copy = self
     copy.hyperkeyFeatureUseCase = hyperkeyFeatureUseCase ??
     MockHyperkeyFeatureUseCase()
-    
+
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withRemapUseCase(_ remapUseCase: RemapKeyUseCase? = nil) -> Self {
@@ -57,7 +57,7 @@ extension TestEnvironment {
     copy.remapKeyUseCase = remapUseCase ?? MockRemapKeyUseCase()
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withLogsUseCase(_ logsUseCase: LogsUseCase? = nil) -> Self {
@@ -65,7 +65,7 @@ extension TestEnvironment {
     copy.logsUseCase = logsUseCase ?? MockLogsUseCase()
     return copy
   }
-  
+
   @MainActor
   @discardableResult
   func withExitUseCase(_ exitUseCase: ExitUseCase? = nil) -> Self {
@@ -73,5 +73,5 @@ extension TestEnvironment {
     copy.exitUseCase = exitUseCase ?? MockExitUseCase()
     return copy
   }
-  
+
 }

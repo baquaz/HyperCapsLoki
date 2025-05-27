@@ -9,12 +9,12 @@ import Foundation
 
 actor AsyncAssertion {
   private var wasCalled = false
-  
+
   /// Call this if the event you want to monitor is triggered.
   func markCalled() {
     wasCalled = true
   }
-  
+
   /// Asserts that `markCalled()` was NOT called within the given timeout.
   func assertNotCalled(timeout: TimeInterval = 1.0) async throws {
     try await withThrowingTaskGroup(of: Void.self) { group in
@@ -22,7 +22,7 @@ actor AsyncAssertion {
       group.addTask {
         try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
       }
-      
+
       // Task 2: Continuously check if it was called
       group.addTask {
         while true {
@@ -33,13 +33,13 @@ actor AsyncAssertion {
           }
         }
       }
-      
+
       // Wait for the timeout to finish
       try await group.next()
       group.cancelAll()
     }
   }
-  
+
   struct TestError: Error, CustomStringConvertible {
     let message: String
     var description: String { message }

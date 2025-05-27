@@ -10,14 +10,14 @@ import HyperCapsLokiModule
 
 struct LogsResultSheet: View {
   @Bindable var vm: LogsViewModel
-  
+
   var body: some View {
     if let result = vm.saveLogsResult {
-      
+
       VStack(spacing: 20) {
         Text(result.isSuccess ? "✅ Logs saved successfully!" : "⚠️ Error")
           .font(.headline)
-        
+
         VStack(alignment: .leading) {
           Text(
             result
@@ -26,7 +26,7 @@ struct LogsResultSheet: View {
             : "Failed to save logs.\n\(result.error?.localizedDescription ?? "")"
           )
           .font(.caption)
-          
+
           if result.isSuccess {
             LogsPathView(
               text: result.url?.path ?? "",
@@ -34,7 +34,7 @@ struct LogsResultSheet: View {
               onCopy: vm.copyToClipboardSavedLogsPath
             )
           }
-          
+
           if vm.isToastConfirmationVisible {
             Text("Copied to clipboard")
               .font(.caption2)
@@ -51,16 +51,16 @@ struct LogsResultSheet: View {
           .easeInOut(duration: 0.2),
           value: vm.isToastConfirmationVisible
         )
-        
+
         HStack {
           if let url = result.url {
             Button("Show in Finder") {
               vm.showInFinderSavedLogs(url)
             }
           }
-          
+
           Spacer()
-          
+
           Button("Dismiss") {
             vm.dismiss()
           }
@@ -69,14 +69,14 @@ struct LogsResultSheet: View {
       .padding()
       .frame(minWidth: 350)
     }
-    
+
   }
 }
 
 // MARK: - Preview
 #Preview {
   let success = LogSaveResult.success(URL(fileURLWithPath: "/tmp/test.log"))
-  
+
   let vm = LogsViewModel(logsUseCase: PreviewUseCase())
   vm.saveLogsResult = success
   return LogsResultSheet(vm: vm)
@@ -85,12 +85,12 @@ struct LogsResultSheet: View {
 struct LogsResultSheet_Previews: PreviewProvider {
   static var vmSuccess: LogsViewModel {
     let success = LogSaveResult.success(URL(fileURLWithPath: "/tmp/test.log"))
-    
+
     let vm = LogsViewModel(logsUseCase: PreviewUseCase())
     vm.saveLogsResult = success
     return vm
   }
-  
+
   static var vmFailure: LogsViewModel {
     let failure = LogSaveResult.failure(
       NSError(
@@ -99,17 +99,17 @@ struct LogsResultSheet_Previews: PreviewProvider {
         userInfo: [NSLocalizedDescriptionKey: "Oops!"]
       )
     )
-    
+
     let vm = LogsViewModel(logsUseCase: PreviewUseCase())
     vm.saveLogsResult = failure
     return vm
   }
-  
+
   static var previews: some View {
     Group {
       LogsResultSheet(vm: vmSuccess)
         .previewDisplayName("Success")
-      
+
       LogsResultSheet(vm: vmFailure)
         .previewDisplayName("Failure")
     }

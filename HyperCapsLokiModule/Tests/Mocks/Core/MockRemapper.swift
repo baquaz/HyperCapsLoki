@@ -11,11 +11,11 @@ import Foundation
 final class MockRemapper: RemapExecutor {
   var receivedRemappingCapsLockKey: Key?
   var resetUserKeyMappingCapsLockCalled = false
-  
+
   func remapUserKeyMappingCapsLock(using key: Key) {
     receivedRemappingCapsLockKey = key
   }
-  
+
   func resetUserKeyMappingCapsLock() {
     resetUserKeyMappingCapsLockCalled = true
   }

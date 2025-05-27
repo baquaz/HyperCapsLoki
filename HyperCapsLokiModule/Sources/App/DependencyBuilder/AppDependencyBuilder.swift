@@ -14,7 +14,7 @@ public protocol DepenedencyBuilder {
 
 public struct AppDependencyBuilder: DepenedencyBuilder {
   public init() { }
-  
+
   public func build() -> DIContainer {
     // MARK: - Core
     let loginItemHandler = AppLoginItemHandler()
@@ -23,46 +23,46 @@ public struct AppDependencyBuilder: DepenedencyBuilder {
       systemEventsInjector: SystemEventsInjector(),
       capsLockTriggerTimer: DefaultAsyncTimer()
     )
-    
+
     // MARK: - Repositories
     let storageRepo = StorageRepositoryImpl(dataSource: Storage())
-    
+
     // MARK: - Use Cases
     let loginItemUseCase = LoginItemUseCaseImpl(
       loginItemHandler: loginItemHandler,
       storageRepository: storageRepo
     )
-    
+
     let permissionUseCase = AccessibilityPermissionUseCaseImpl(
       permissionService: AccessibilityPermissionHandler()
     )
-    
+
     let launchUseCase = LaunchUseCaseImpl(
       loginItemHandler: loginItemHandler,
       remapper: remapper,
       eventsHandler: eventsHandler,
       storageRepository: storageRepo
     )
-    
+
     let remapKeyUseCase = RemapKeyUseCaseImpl(
       storageRepo: storageRepo,
       eventsHandler: eventsHandler,
       remapper: remapper
     )
-    
+
     let hyperkeyFeatureUseCase = HyperkeyFeatureUseCaseImpl(
       storageRepository: storageRepo,
       eventsHandler: eventsHandler,
       remapper: remapper
     )
-    
+
     let logsUseCase = LogsUseCaseImpl()
-    
+
     let exitUseCase = ExitUseCaseImpl(
       remapper: remapper,
       eventsHandler: eventsHandler
     )
-    
+
     // MARK: - Environment
     let environment = AppEnvironment(
       remapper: remapper,
@@ -76,7 +76,7 @@ public struct AppDependencyBuilder: DepenedencyBuilder {
       logsUseCase: logsUseCase,
       exitUseCase: exitUseCase
     )
-    
+
     return DIContainer(environment: environment)
   }
 }
