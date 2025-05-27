@@ -10,6 +10,7 @@ import Foundation
 
 // MARK: - Log Recorder
 final class LogRecorder: @unchecked Sendable {
+  // swiftlint:disable large_tuple
   private var messages: [(String, LoggingTag, String)] = []
   private(set) var persistCalled = false
   private let lock = NSLock()

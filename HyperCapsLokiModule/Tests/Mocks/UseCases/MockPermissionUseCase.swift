@@ -33,5 +33,4 @@ final class MockPermissionUseCase: AccessibilityPermissionUseCase {
     stopMonitoringCalled = true
   }
   
-  
 }

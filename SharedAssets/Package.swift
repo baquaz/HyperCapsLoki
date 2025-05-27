@@ -11,12 +11,12 @@ let package = Package(
     products: [
         .library(
             name: "SharedAssets",
-            targets: ["SharedAssets"]),
+            targets: ["SharedAssets"])
     ],
     targets: [
         .target(
             name: "SharedAssets",
             path: "."
-        ),
+        )
     ]
 )

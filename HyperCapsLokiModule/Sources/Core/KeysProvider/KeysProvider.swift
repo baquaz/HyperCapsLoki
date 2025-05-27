@@ -14,7 +14,7 @@ struct KeysProvider {
   // MARK: - Init
   static let shared = KeysProvider()
   
-  private init(){}
+  private init() { }
   
   // MARK: - Create
   
@@ -62,7 +62,7 @@ struct KeysProvider {
   /// - Returns: The corresponding `Key` name, or `nil` if the code is not recognized.
   ///
   func keyName(for code: HIDUsageCode) -> String? {
-    Key.allCases.first(where: { $0.hidUsageKeyboardCode == code })?.rawValue
+    Key.allCases.first { $0.hidUsageKeyboardCode == code }?.rawValue
   }
   
   /// Retrieves all possible HID Keyboard Usages
@@ -81,15 +81,21 @@ struct KeysProvider {
     // Open HID Manager
     let openResult = IOHIDManagerOpen(hidManager, IOOptionBits(kIOHIDOptionsTypeNone))
     if openResult != kIOReturnSuccess {
-      Applog.print(tag: .error, context: .keyboardEvents,
-                   "failed to open HID Manager with error: \(openResult)")
+      Applog.print(
+        tag: .error,
+        context: .keyboardEvents,
+        "failed to open HID Manager with error: \(openResult)"
+      )
       return keyMapping
     }
     
     // Get All Matching Devices
     guard let devices = IOHIDManagerCopyDevices(hidManager) as? Set<IOHIDDevice> else {
-      Applog.print(tag: .warning, context: .keyboardEvents,
-                   "No HID devices found.")
+      Applog.print(
+        tag: .warning,
+        context: .keyboardEvents,
+        "No HID devices found."
+      )
       return keyMapping
     }
     
@@ -127,7 +133,7 @@ struct KeysProvider {
   /// - Returns: A set of corresponding HID usage codes.
   ///
   func transform(keys: Set<Key>) -> Set<HIDUsageCode> {
-    Set(keys.compactMap( { hidUsageCode(for: $0) } ))
+    Set(keys.compactMap { hidUsageCode(for: $0) })
   }
   
   /// Transform a collection of HID usage codes to their corresponding key names using a Set.
@@ -136,7 +142,7 @@ struct KeysProvider {
   /// - Returns: A set of corresponding `KeyName`.
   ///
   func transform(usageCodes codes: Set<HIDUsageCode>) -> Set<String> {
-    Set(codes.compactMap( { keyName(for: $0) } ))
+    Set(codes.compactMap { keyName(for: $0) })
   }
   
   // MARK: - Operations
@@ -163,5 +169,3 @@ struct KeysProvider {
     keys1.union(keys2)
   }
 }
-
-

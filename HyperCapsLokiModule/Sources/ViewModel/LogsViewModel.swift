@@ -34,8 +34,13 @@ public final class LogsViewModel {
       saveLogsResult = .success(savedFileURL)
     } catch {
       saveLogsResult = .failure(error)
-      Applog.print(tag: .error, context: .application,
-                   "Saving logs failed:", error.localizedDescription)
+      
+      Applog.print(
+        tag: .error,
+        context: .application,
+        "Saving logs failed:",
+        error.localizedDescription
+      )
     }
   }
   

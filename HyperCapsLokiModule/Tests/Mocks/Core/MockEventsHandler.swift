@@ -19,7 +19,6 @@ class MockEventsHandler: EventsHandler {
   private(set) var receivedHyperkey: Key?
   private(set) var receivedAvailableSequenceKeys: [Key]?
   
-  
   override func setUpEventTap() {
     setUpEventTapCalled = true
   }

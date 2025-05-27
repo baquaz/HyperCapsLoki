@@ -79,6 +79,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B0C32E272D21C1710096F6AD /* Build configuration list for PBXNativeTarget "HyperCapsLoki" */;
 			buildPhases = (
+				B0CF0FDC2DE4E58A006B7D75 /* SwiftLint */,
 				B0C32DFE2D21C16F0096F6AD /* Sources */,
 				B0C32DFF2D21C16F0096F6AD /* Frameworks */,
 				B0C32E002D21C16F0096F6AD /* Resources */,
@@ -146,6 +147,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B0CF0FDC2DE4E58A006B7D75 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nCONFIG_FILE=\"${SRCROOT}/.swiftlint.yml\"\n\nif command -v swiftlint >/dev/null 2>&1\nthen\n    echo \"⚙️ SwiftLint found — linting...\"\n    swiftlint lint --config \"$CONFIG_FILE\" --reporter xcode\nelse\n    echo \"🚫 SwiftLint not installed.\"\n    echo \"warning: \\`swiftlint\\` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B0C32DFE2D21C16F0096F6AD /* Sources */ = {
@@ -294,6 +317,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Hyper Caps Loki";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -323,6 +347,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Hyper Caps Loki";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";

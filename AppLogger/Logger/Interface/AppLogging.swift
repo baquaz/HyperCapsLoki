@@ -7,7 +7,7 @@
 
 import Foundation
 
-///
+// swiftlint:disable function_parameter_count
 public protocol AppLogging {
   /// Prints pre-defined log
   /// - Parameters:

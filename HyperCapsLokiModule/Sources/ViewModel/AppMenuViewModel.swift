@@ -33,7 +33,7 @@ public final class AppMenuViewModel {
   // MARK: - Logs Save Result
   public var onSaveLogs: (() -> Void)?
   
-  // MARK - On presenting about
+  // MARK: - On Presenting About
   public var onPresentingAbout: (() -> Void)?
   
   // MARK: Use Cases
@@ -74,10 +74,10 @@ public final class AppMenuViewModel {
   
   private func setSequenceColorsPalette() {
     colorsPalette = [
-      0 : SharedAssets.themeTertiary,
-      1 : SharedAssets.themeSecondary,
-      2 : SharedAssets.themePrimary,
-      3 : SharedAssets.themeBold
+      0: SharedAssets.themeTertiary,
+      1: SharedAssets.themeSecondary,
+      2: SharedAssets.themePrimary,
+      3: SharedAssets.themeBold
     ]
   }
   
@@ -115,11 +115,21 @@ public final class AppMenuViewModel {
     do {
       try loginItemUseCase.setLoginItem(status)
       isOpenAtLoginEnabled = status
-      Applog.print(tag: .success, context: .application,
-                   "Set app launch at login to:", status ? "YES ✅": "NO ❌")
+      
+      Applog.print(
+        tag: .success,
+        context: .application,
+        "Set app launch at login to:", 
+        status ? "YES ✅" : "NO ❌"
+      )
     } catch {
-      Applog.print(tag: .error, context: .application,
-                   "Error setting login item failed!", error, separator: "\n")
+      Applog.print(
+        tag: .error,
+        context: .application,
+        "Error setting login item failed!",
+        error,
+        separator: "\n"
+      )
     }
   }
   
@@ -131,8 +141,12 @@ public final class AppMenuViewModel {
   public func setActiveStatus(_ isActive: Bool) {
     isHyperkeyFeatureActive = isActive
     hyperkeyFeatureUseCase.setHyperkeyFeature(active: isActive, forced: true)
-    Applog.print(context: .hyperkey,
-                 "Hyperkey feature is now:", isActive ? "ON ✅" : "OFF ❌")
+    
+    Applog.print(
+      context: .hyperkey,
+      "Hyperkey feature is now:",
+      isActive ? "ON ✅" : "OFF ❌"
+    )
   }
   
   @MainActor

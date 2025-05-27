@@ -9,6 +9,7 @@ import Foundation
 import Testing
 @testable import HyperCapsLokiModule
 
+// swiftlint:disable file_length
 extension ViewModelsTests {
   
   @Suite("App Menu View Model Tests")
@@ -59,7 +60,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         [
           [Key.leftCommand, .leftControl],
           [Key.leftCommand, .leftControl, .f1 ], // f1 not sequence key
-          [],
+          []
         ]
     )
     func setUpHyperkeySequenceKeys(
@@ -134,7 +135,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         exitUseCase: testEnv.exitUseCase
       )
       
-      //Assert
+      // Assert
       if storageValue == nil {
         #expect(sut.isHyperkeyFeatureActive == true)
       } else {
@@ -176,7 +177,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
         exitUseCase: testEnv.exitUseCase
       )
       
-      //Assert
+      // Assert
       #expect(sut.selectedKey == expectedSelectedKey)
     }
   }
@@ -186,7 +187,7 @@ extension ViewModelsTests.AppMenuViewModelTests {
   
   @Suite("Sequence Items Tests")
   struct SequenceItemsTests {
-    
+    // swiftlint:disable comma
     @MainActor
     @Test(
       "Check: Is Sequence Key Enabled When Hyperkey Feature Is Active",
@@ -315,7 +316,6 @@ extension ViewModelsTests.AppMenuViewModelTests {
   
   @Suite("Actions Tests")
   struct ActionsTests {
-    // TODO: all Actions tests
     
     @MainActor
     @Test("Open Accessibility Permission Settings Triggers Use Case")

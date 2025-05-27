@@ -28,13 +28,17 @@ public struct Remapper: RemapExecutor {
   // MARK: - Remap
   public func remapUserKeyMappingCapsLock(using key: Key) {
     guard let destinationUsageCode = keysProvider.hidUsageCode(for: key) else {
-      Applog.print(tag: .critical, context: .keyRemapping,
-                   key.rawValue, "key not found.")
+      Applog.print(
+        tag: .critical,
+        context: .keyRemapping,
+        key.rawValue,
+        "key not found."
+      )
       return
     }
     let destinationUsage = keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: destinationUsageCode)
     
-    Applog.print(context: .keyRemapping,"Remapping Caps Lock...")
+    Applog.print(context: .keyRemapping, "Remapping Caps Lock...")
         
     var userKeyMapping = getCurrentUserKeyMapping()
     
@@ -57,8 +61,11 @@ public struct Remapper: RemapExecutor {
                      "Caps Lock remapped to \(key.rawValue).")
       }
     } catch {
-      Applog.print(tag: .critical, context: .keyRemapping,
-                   "Error serializing UserKeyMapping JSON: \(error)")
+      Applog.print(
+        tag: .critical,
+        context: .keyRemapping,
+        "Error serializing UserKeyMapping JSON: \(error)"
+      )
     }
   }
   
@@ -78,8 +85,11 @@ public struct Remapper: RemapExecutor {
         Applog.print(context: .keyRemapping, "Caps Lock remapping has been removed.")
       }
     } catch {
-      Applog.print(tag: .critical, context: .keyRemapping,
-                   "Error serializing UserKeyMapping JSON: \(error)")
+      Applog.print(
+        tag: .critical,
+        context: .keyRemapping,
+        "Error serializing UserKeyMapping JSON: \(error)"
+      )
     }
   }
   
@@ -111,8 +121,11 @@ public struct Remapper: RemapExecutor {
     let output = shell(command)
     
     guard let data = output.data(using: .utf8) else {
-      Applog.print(tag: .critical, context: .keyRemapping,
-                   "Failed to convert shell output to data")
+      Applog.print(
+        tag: .critical,
+        context: .keyRemapping,
+        "Failed to convert shell output to data"
+      )
       return []
     }
     do {
@@ -128,8 +141,11 @@ public struct Remapper: RemapExecutor {
         return []
       }
     } catch {
-      Applog.print(tag: .critical, context: .keyRemapping,
-                   error.localizedDescription)
+      Applog.print(
+        tag: .critical,
+        context: .keyRemapping,
+        error.localizedDescription
+      )
       return []
     }
   }

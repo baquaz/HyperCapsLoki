@@ -69,7 +69,7 @@ extension AppTests {
         }
       
       // Act
-      let _ = sut.applicationShouldTerminate(NSApplication.shared)
+      _ = sut.applicationShouldTerminate(NSApplication.shared)
       
       await runtimeExpectation.wait()
       

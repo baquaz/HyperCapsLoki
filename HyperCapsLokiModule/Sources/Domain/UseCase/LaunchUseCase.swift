@@ -31,8 +31,6 @@ public final class LaunchUseCaseImpl: LaunchUseCase {
     self.storageRepository = storageRepository
   }
   
-  
-  
   public func launch() {
     let hyperkeyFeatureIsActive = storageRepository
       .getHyperkeyFeatureState() == true

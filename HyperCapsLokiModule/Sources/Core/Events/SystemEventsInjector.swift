@@ -5,7 +5,6 @@
 //  Created by Piotr Błachewicz on 19/04/2025.
 //
 
-
 import Foundation
 import Cocoa
 import IOKit.hid
@@ -54,8 +53,11 @@ public extension SystemEventsInjection {
         // Introduce a small delay for processing
         usleep(5000) // 5 milliseconds
       } else {
-        Applog.print(tag: .critical, context: .keyboardEvents,
-                     "Failed injecting part of <Hyperkey> sequence!")
+        Applog.print(
+          tag: .critical,
+          context: .keyboardEvents,
+          "Failed injecting part of <Hyperkey> sequence!"
+        )
       }
     }
     
@@ -81,8 +83,11 @@ public extension SystemEventsInjection {
     )
     
     if ioService == 0 {
-      Applog.print(tag: .critical, context: .keyboardEvents,
-                   "Failed to find IOHID system service.")
+      Applog.print(
+        tag: .critical,
+        context: .keyboardEvents,
+        "Failed to find IOHID system service."
+      )
       return
     }
     
@@ -90,8 +95,11 @@ public extension SystemEventsInjection {
       ioService, mach_task_self_, UInt32(kIOHIDParamConnectType), &ioConnect)
     
     if result != KERN_SUCCESS {
-      Applog.print(tag: .critical, context: .keyboardEvents,
-                   "Failed to open IOService: \(result)")
+      Applog.print(
+        tag: .critical,
+        context: .keyboardEvents,
+        "Failed to open IOService: \(result)"
+      )
       return
     }
     
@@ -102,8 +110,11 @@ public extension SystemEventsInjection {
       ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
     
     if getResult != KERN_SUCCESS {
-      Applog.print(tag: .critical, context: .keyboardEvents,
-                   "Failed to get Caps Lock state: \(getResult)")
+      Applog.print(
+        tag: .critical,
+        context: .keyboardEvents,
+        "Failed to get Caps Lock state: \(getResult)"
+      )
       IOServiceClose(ioConnect)
       return
     }
@@ -116,8 +127,11 @@ public extension SystemEventsInjection {
       ioConnect, Int32(kIOHIDCapsLockState), modifierLockState)
     
     if setResult != KERN_SUCCESS {
-      Applog.print(tag: .critical, context: .keyboardEvents,
-                   "Failed to set Caps Lock state: \(setResult)")
+      Applog.print(
+        tag: .critical,
+        context: .keyboardEvents,
+        "Failed to set Caps Lock state: \(setResult)"
+      )
     } else {
       Applog.print(context: .keyboardEvents,
                    "Caps Lock state toggled successfully.")

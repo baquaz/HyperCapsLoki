@@ -102,8 +102,8 @@ public struct AppLogger: AppLogging {
   // MARK: - Format Location Info
   private static func formatLocationInfo(
     file: String, function: String,
-    line: Int) -> String
-  {
+    line: Int
+  ) -> String {
     "\(file.components(separatedBy: "/").last ?? "---") - \(function) - line \(line)"
   }
 }

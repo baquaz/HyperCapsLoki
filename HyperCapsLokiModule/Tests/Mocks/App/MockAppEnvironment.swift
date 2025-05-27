@@ -11,7 +11,6 @@ import Cocoa
 
 final class MockAppEnvironment: AppEnvironmentProtocol {
   
-  
   let defaultHyperkey: Key = .f15
   
   var remapper: any RemapExecutor = MockRemapper()

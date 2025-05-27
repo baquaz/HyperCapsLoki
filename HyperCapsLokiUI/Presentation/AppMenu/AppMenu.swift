@@ -173,9 +173,9 @@ struct RemappingSection: View {
         }
         .pickerStyle(.menu)
         .fixedSize()
-        .onChange(of: vm.selectedKey, { oldValue, newValue in
+        .onChange(of: vm.selectedKey) { _, newValue in
           vm.onSelectKey(newValue)
-        })
+        }
         .disabled(!appState.accessibilityPermissionGranted)
         
         Spacer()
@@ -254,25 +254,27 @@ struct HyperkeySequenceSection: View {
 // MARK: Top Label Checkbox Style
 struct TopLabelCheckboxStyle: ToggleStyle {
   func makeBody(configuration: Configuration) -> some View {
-    Button(action: {
-      configuration.isOn.toggle()
-    }) {
-      VStack(spacing: 16) {
-        configuration.label
-          .font(.largeTitle)
-          .lineLimit(1)
-          .frame(maxWidth: .infinity)
-        
-        Image(systemName: configuration.isOn ? "checkmark.square" : "square")
-          .resizable()
-          .scaledToFit()
-          .frame(width: 24, height: 24)
-          .frame(maxWidth: .infinity)
-      }
-      .padding(.top, 2)
-      .padding(.bottom, 18)
-      .contentShape(Rectangle())
-    }
+    Button(
+      action: {
+        configuration.isOn.toggle()
+      },
+      label: {
+        VStack(spacing: 16) {
+          configuration.label
+            .font(.largeTitle)
+            .lineLimit(1)
+            .frame(maxWidth: .infinity)
+          
+          Image(systemName: configuration.isOn ? "checkmark.square" : "square")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 24, height: 24)
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.top, 2)
+        .padding(.bottom, 18)
+        .contentShape(Rectangle())
+      })
     .buttonStyle(PlainButtonStyle())
     .background(Color.clear)
     //    .background(Color.red.opacity(0.3)) // debug tap area

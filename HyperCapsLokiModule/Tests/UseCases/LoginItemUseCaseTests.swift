@@ -45,7 +45,7 @@ extension UseCasesTests {
         storageRepository: testEnv.storageRepository
       )
       
-      let _ = sut.checkLoginItemEnabledStatus()
+      _ = sut.checkLoginItemEnabledStatus()
       
       #expect(testEnv.mockLoginItemHandler.checkStatusCalled)
     }

@@ -8,7 +8,6 @@
 import Foundation
 @testable import HyperCapsLokiModule
 
-
 class MockAccessibilityPermissionService: AccessibilityPermissionService {
   private(set) var openAccessibilitySettingsCalled = false
   

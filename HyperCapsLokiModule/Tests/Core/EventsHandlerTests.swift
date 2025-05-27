@@ -78,7 +78,7 @@ extension CoreTests.EventsHandlerTests {
       // Assert
       #expect(
         sut.availableEventFlags.isEmpty == testKeys
-          .filter({ Key.allHyperkeySequenceKeys.contains($0) })
+          .filter { Key.allHyperkeySequenceKeys.contains($0) }
           .isEmpty
       )
       testEnv.systemEventsInjector.hyperkeyUpSequence.forEach { flags in

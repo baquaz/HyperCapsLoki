@@ -11,6 +11,7 @@ import Cocoa
 @MainActor
 protocol RuntimeProtocol {
   var appState: AppState? { get set }
+  
   func start()
   func exit()
 }

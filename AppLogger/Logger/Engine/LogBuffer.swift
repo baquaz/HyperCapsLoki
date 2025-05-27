@@ -9,6 +9,7 @@ import Foundation
 
 public protocol LogBuffering: Sendable {
   var maxByteSize: Int { get }
+  
   func add(_ message: String)
   func dump() -> [String]
 }

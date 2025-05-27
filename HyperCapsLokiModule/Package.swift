@@ -11,7 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "HyperCapsLokiModule",
-            targets: ["HyperCapsLokiModule"]),
+            targets: ["HyperCapsLokiModule"])
     ],
     dependencies: [
       .package(path: "../AppLogger"),
@@ -27,6 +27,6 @@ let package = Package(
               "AppLogger",
               "SharedAssets"
             ]
-        ),
+        )
     ]
 )

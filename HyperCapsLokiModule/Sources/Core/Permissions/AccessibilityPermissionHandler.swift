@@ -53,7 +53,7 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
       .seconds(30),
       .seconds(60),
       .seconds(120),
-      .seconds(300),
+      .seconds(300)
     ],
     permissionCheckTimer: AsyncTimer = DefaultAsyncTimer(),
     permissionStatusProvider: @escaping () -> Bool = { AXIsProcessTrusted() }
@@ -86,8 +86,8 @@ final class AccessibilityPermissionHandler: AccessibilityPermissionService {
   }
   
   private func scheduleTimer(completion: @escaping (_ permissionGranted: Bool) -> Void) {
-    permissionCheckTimer.start(interval: currentInterval, repeating: false)
-    { [weak self] in
+    permissionCheckTimer
+      .start(interval: currentInterval, repeating: false) { [weak self] in
       guard let self else { return }
       Applog.print(
         context: .permissions,

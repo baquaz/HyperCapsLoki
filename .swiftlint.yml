@@ -1,0 +1,56 @@
+included:
+  - HyperCapsLoki/App
+  - HyperCapsLokiModule
+  - HyperCapsLokiUI
+  - AppLogger
+  - SharedAssets
+
+excluded:
+  - .build
+  - DerivedData
+
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - joined_default_parameter
+  - let_var_whitespace
+  - literal_expression_end_indentation
+  - multiline_arguments
+  - nimble_operator
+  - operator_usage_whitespace
+  - overridden_super_call
+  - private_over_fileprivate
+  - prohibited_interface_builder
+  - reduce_boolean
+  - sorted_first_last
+  - toggle_bool
+  - trailing_closure
+
+disabled_rules:
+  - identifier_name # Allow longer or shorter names for flexibility
+  - line_length # Let long URLs, method chains, or strings breathe
+  - function_body_length # Okay for some real-world cases
+  - blanket_disable_command
+  - trailing_whitespace #temporarily
+  - switch_case_alignment
+
+analyzer_rules:
+  - unused_import
+  - redundant_optional_initialization
+
+reporter: xcode # clean output for Xcode CLI
+
+# Customize thresholds
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+
+type_body_length:
+  warning: 300
+  error: 500
+
+function_parameter_count:
+  warning: 5
+  error: 8

@@ -31,9 +31,9 @@ extension CoreTests {
           .seconds(1),
           .seconds(3)
         ],
-        permissionCheckTimer: timer,
-        permissionStatusProvider: { isPermissionGranted }
-      )
+        permissionCheckTimer: timer) {
+          isPermissionGranted
+        }
       
       // Act
       sut.startMonitoring { results.append($0) }

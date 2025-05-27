@@ -20,11 +20,11 @@ open class EventsHandler {
   internal var availableEventFlags: CGEventFlags = []
   
   private var eventTap: CFMachPort?
-  private var lastKeyCode: CGKeyCode? = nil
-  private var lastEventType: CGEventType? = nil
+  private var lastKeyCode: CGKeyCode?
+  private var lastEventType: CGEventType?
   
-  private let eventTapCallback: CGEventTapCallBack = {
-    (proxy, type, event, refcon) in
+  private let eventTapCallback: CGEventTapCallBack =
+  { (proxy, type, event, refcon) in
     let handler = Unmanaged<EventsHandler>
       .fromOpaque(refcon!)
       .takeUnretainedValue()
@@ -69,8 +69,9 @@ open class EventsHandler {
       Applog.print(context: .keyboardEvents,
                    "Event tap set up successfully")
     } else {
-      Applog.print(tag: .warning, context: .keyboardEvents,
-                   "Failed to create event tap")
+      Applog.print(
+        tag: .warning, context: .keyboardEvents, "Failed to create event tap"
+      )
     }
   }
   
@@ -186,8 +187,6 @@ open class EventsHandler {
         handleKeyDown()
       case .keyUp:
         handleKeyUp()
-      case .flagsChanged:
-        fallthrough
       default:
         break
     }
@@ -225,9 +224,9 @@ open class EventsHandler {
     cancelCapsLockTriggerTimer()
     
     capsLockReady = true
-    capsLockTriggerTimer.start(interval: .seconds(1.5), repeating: false, action: { [weak self] in
+    capsLockTriggerTimer.start(interval: .seconds(1.5), repeating: false) { [weak self] in
       self?.capsLockReady = false
-    })
+    }
   }
 
   private func cancelCapsLockTriggerTimer() {

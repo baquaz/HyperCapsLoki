@@ -51,7 +51,6 @@ final class LogEngine: @unchecked Sendable {
   }
 }
 
-
 extension LogEngine {
   public func persistBufferedLogs() throws -> URL {
     guard let fileLogger = strategy as? LogPersisting else {

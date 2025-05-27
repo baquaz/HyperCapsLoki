@@ -10,6 +10,7 @@ import Foundation
 @testable import AppLogger
 
 struct TestEnvironment {
+  // swiftlint:disable force_cast
   // MARK: - App
   var appState: AppState!
   var appDelegate: AppDelegate!

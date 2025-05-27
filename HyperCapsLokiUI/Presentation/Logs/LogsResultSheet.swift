@@ -52,7 +52,7 @@ struct LogsResultSheet: View {
           value: vm.isToastConfirmationVisible
         )
         
-        HStack() {
+        HStack {
           if let url = result.url {
             Button("Show in Finder") {
               vm.showInFinderSavedLogs(url)

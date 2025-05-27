@@ -11,7 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "HyperCapsLokiUI",
-            targets: ["HyperCapsLokiUI"]),
+            targets: ["HyperCapsLokiUI"])
     ],
     dependencies: [
       .package(path: "../HyperCapsLokiModule"),
@@ -26,6 +26,6 @@ let package = Package(
             ],
             path: ".",
             sources: ["Presentation"]
-        ),
+        )
     ]
 )

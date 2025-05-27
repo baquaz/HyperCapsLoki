@@ -212,7 +212,6 @@ extension UseCasesTests.HyperkeyFeatureUseCaseTests {
       mockStorage.shiftKeyInSequence =
       expectedKeys.contains(.leftShift) ? nil : stubbed
       
-      
       let testEnv = TestEnvironment()
         .withStorage(mockStorage)
         .withStorageRepository()
@@ -228,7 +227,7 @@ extension UseCasesTests.HyperkeyFeatureUseCaseTests {
       // Act
       let result = sut.storageRepository.getHyperkeySequenceUnsetKeys()
       
-      //Assert
+      // Assert
       #expect(Set(result) == Set(expectedKeys))
     }
     

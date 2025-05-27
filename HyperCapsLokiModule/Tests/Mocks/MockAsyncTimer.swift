@@ -14,8 +14,10 @@ final class MockAsyncTimer: AsyncTimer {
   private(set) var expired = false
   private var onExpire: (@MainActor () -> Void)?
   
-  func start(interval: Duration,repeating: Bool,
-             action: @escaping @MainActor @Sendable () -> Void
+  func start(
+    interval: Duration,
+    repeating: Bool,
+    action: @escaping @MainActor @Sendable () -> Void
   ) {
     started = true
     cancelled = false

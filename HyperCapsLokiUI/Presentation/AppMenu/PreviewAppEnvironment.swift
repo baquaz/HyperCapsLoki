@@ -46,6 +46,7 @@ class PreviewEventsHandler: EventsHandler {
 struct PreviewSystemEventsInjector: SystemEventsInjection {
   var hyperkeyDownSequence: [CGEventFlags] = []
   var hyperkeyUpSequence: [CGEventFlags] = []
+  
   func setUpHyperkeySequenceKeyUp(_ sequence: [CGEventFlags]) {}
   func setUpHyperkeySequenceKeyDown(_ sequence: [CGEventFlags]) {}
   func injectHyperkeyFlagsSequence(isKeyDown: Bool) {}
@@ -73,8 +74,7 @@ class PreviewUseCase:
   RemapKeyUseCase,
   HyperkeyFeatureUseCase,
   LogsUseCase,
-  ExitUseCase
-{
+  ExitUseCase {
   
   func checkLoginItemEnabledStatus() -> Bool { false }
   func saveState(_ isEnabled: Bool) { }

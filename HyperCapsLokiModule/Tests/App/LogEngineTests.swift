@@ -17,8 +17,11 @@ extension AppTests {
     
     @Test("On Error Persistsing Non Buffered Logs")
     func persistNonBufferedLogsError() async throws {
-      let expectedError = NSError(domain: "AppLoggerEngine", code: 1,
-                                  userInfo: nil)
+      let expectedError = NSError(
+        domain: "AppLoggerEngine",
+        code: 1,
+        userInfo: nil
+      )
       
       let testEnv = TestEnvironment()
         .withNonBufferedLogStrategy()
@@ -41,10 +44,9 @@ extension AppTests {
       let sut = LogEngine()
       sut.strategy = testEnv.mockBufferedLogStrategy
       
-      
       let resultURL = try sut.persistBufferedLogs()
       #expect(resultURL == expectedURL)
-      #expect(await testEnv.mockBufferedLogStrategy.recorder.persistCalled)
+      #expect(testEnv.mockBufferedLogStrategy.recorder.persistCalled)
     }
   }
 }
