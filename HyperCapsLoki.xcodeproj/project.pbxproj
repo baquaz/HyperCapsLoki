@@ -166,7 +166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nCONFIG_FILE=\"${SRCROOT}/.swiftlint.yml\"\n\nif command -v swiftlint >/dev/null 2>&1\nthen\n    echo \"⚙️ SwiftLint found — linting...\"\n    swiftlint --fix && swiftlint lint --config \"$CONFIG_FILE\"\nelse\n    echo \"🚫 SwiftLint not installed.\"\n    echo \"warning: \\`swiftlint\\` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n\n";
+			shellScript = "#!/bin/sh\n\n# First, try dynamic resolution\nSWIFTLINT=$(command -v swiftlint)\n\n# If not found dynamically, fall back to hardcoded path (e.g., Homebrew)\nif [ -z \"$SWIFTLINT\" ]; then\n  if [ -x \"/opt/homebrew/bin/swiftlint\" ]; then\n    SWIFTLINT=\"/opt/homebrew/bin/swiftlint\"\n  elif [ -x \"/usr/local/bin/swiftlint\" ]; then\n    SWIFTLINT=\"/usr/local/bin/swiftlint\"\n  fi\nfi\n\nCONFIG_FILE=\"${SRCROOT}/.swiftlint.yml\"\n\n# Run SwiftLint if we have a path\nif [ -x \"$SWIFTLINT\" ]; then\n  echo \"⚙️ SwiftLint found at $SWIFTLINT\"\n  \n  echo \"🛠️  SwiftLint — FIXING violations...\"\n  \"$SWIFTLINT\" --fix\n  \n  echo \"🔎 SwiftLint — LINTING source files...\"\n  \"$SWIFTLINT\" lint --config \"$CONFIG_FILE\" --reporter xcode\nelse\n  echo \"🚫 SwiftLint not found in PATH or common install locations.\"\n  echo \"warning: Please install SwiftLint — https://github.com/realm/SwiftLint#installation\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
