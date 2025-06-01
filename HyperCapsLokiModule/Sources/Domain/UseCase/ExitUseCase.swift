@@ -37,6 +37,8 @@ public final class ExitUseCaseImpl: ExitUseCase {
       " - disable keyboard events handler",
       separator: "\n"
     )
+
+    // Revert any remapped keys and clean up the event tap
     remapper.resetUserKeyMappingCapsLock()
     eventsHandler.setEventTap(enabled: false)
   }

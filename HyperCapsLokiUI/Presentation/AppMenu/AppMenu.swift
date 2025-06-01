@@ -166,7 +166,7 @@ struct RemappingSection: View {
           )
 
         Picker("", selection: $vm.selectedKey) {
-          ForEach(vm.availableKeys, id: \.self) { key in
+          ForEach(vm.availableRemappingKeys, id: \.self) { key in
             Text(vm.getTextForKey(key))
               .font(.system(.body, design: .monospaced))
           }

@@ -10,14 +10,13 @@ import Foundation
 @MainActor
 public protocol HyperkeyFeatureUseCase: AnyObject {
   /// Changes **Hyperkey** feature forced by user,
-  /// or passively by the system (i.e. due to permission changes)
+  /// or passively by the system (e.g., due to permission changes)
   ///
   /// - Parameters:
   ///   - isActive: enables or disables Hyperkey feature
   ///   - forced:
   ///     If `true` - disables feature totally,
   ///     If `false` -  disables feature, but remains state (UI) for future reactivation
-  ///
   func setHyperkeyFeature(active isActive: Bool, forced: Bool)
 
   func getHyperkeyEnabledSequenceKeys() -> [Key]
@@ -48,15 +47,18 @@ public final class HyperkeyFeatureUseCaseImpl: HyperkeyFeatureUseCase {
     let selectedKey = storageRepository.getSelectedHyperkey()
 
     if isActive {
+      // If feature is active and a key is selected, remap Caps Lock
       if let selectedKey {
         remapper.remapUserKeyMappingCapsLock(using: selectedKey)
       }
     } else {
+      // Only reset remapping if feature was previously active
       if storageRepository.getHyperkeyFeatureState() == true {
         remapper.resetUserKeyMappingCapsLock()
       }
     }
 
+    // If forced, update persistent state to fully reflect current activation status
     if forced {
       storageRepository.setHyperkeyFeatureState(isActive)
     }

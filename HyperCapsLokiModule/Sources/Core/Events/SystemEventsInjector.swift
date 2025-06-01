@@ -10,14 +10,25 @@ import Cocoa
 import IOKit.hid
 
 // MARK: - SystemEventsInjection
+
+/// Protocol defining the behavior for injecting system-level keyboard events.
 public protocol SystemEventsInjection {
+
+  /// Sequence of modifier flags to be injected on hyperkey down.
   var hyperkeyDownSequence: [CGEventFlags] { get set }
+  /// Sequence of modifier flags to be injected on hyperkey up.
   var hyperkeyUpSequence: [CGEventFlags] { get set }
 
+  /// Sets the modifier flag sequence for hyperkey down.
   mutating func setUpHyperkeySequenceKeyDown(_ sequence: [CGEventFlags])
+
+  /// Sets the modifier flag sequence for hyperkey up.
   mutating func setUpHyperkeySequenceKeyUp(_ sequence: [CGEventFlags])
 
+  /// Injects a sequence of modifier flags simulating hyperkey press or release.
   func injectHyperkeyFlagsSequence(isKeyDown: Bool)
+
+  /// Toggles the current state of Caps Lock at the system level.
   func injectCapsLockStateToggle()
 }
 
@@ -40,6 +51,10 @@ public extension SystemEventsInjection {
   }
 
   // MARK: - Inject Hyperkey
+
+  /// Posts a sequence of `.flagsChanged` events to simulate hyperkey modifier press or release.
+  ///
+  /// - Parameter isKeyDown: `true` for key down sequence, `false` for key up.
   func injectHyperkeyFlagsSequence(isKeyDown: Bool) {
     let flagsSequence = isKeyDown ? hyperkeyDownSequence : hyperkeyUpSequence
 
@@ -61,7 +76,7 @@ public extension SystemEventsInjection {
       }
     }
 
-    // Ensure flags are fully reset
+    // Ensure all modifiers are reset after key up
     if !isKeyDown {
       if let resetEvent = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true) {
         resetEvent.flags = []
@@ -73,6 +88,8 @@ public extension SystemEventsInjection {
   }
 
   // MARK: - Inject Caps Lock
+
+  /// Uses IOKit APIs to toggle the system Caps Lock key state.
   func injectCapsLockStateToggle() {
     var ioConnect: io_connect_t = 0
     let ioService = IOServiceGetMatchingService(
@@ -105,7 +122,7 @@ public extension SystemEventsInjection {
 
     var modifierLockState: Bool = false
 
-    // Retrieve the current state of Caps Lock
+    // Read current state of Caps Lock
     let getResult = IOHIDGetModifierLockState(
       ioConnect, Int32(kIOHIDCapsLockState), &modifierLockState)
 

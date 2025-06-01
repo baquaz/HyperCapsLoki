@@ -7,25 +7,42 @@
 
 import Foundation
 
+/// Protocol defining operations for remapping and resetting the Caps Lock key.
 public protocol RemapExecutor {
+  /// Remaps the Caps Lock key to another key defined by the user.
+  ///
+  /// - Parameter key: The target key to which Caps Lock should be remapped.
   func remapUserKeyMappingCapsLock(using key: Key)
+
+  /// Resets the user key mapping for Caps Lock to its original behavior.
   func resetUserKeyMappingCapsLock()
 }
 
 public struct Remapper: RemapExecutor {
 
+  /// Provider for HID usage codes and key mappings.
   let keysProvider: KeysProvider
 
+  /// HID usage value representing the Caps Lock key.
   private var capsLockUsage: Int {
-    keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad, usage: kHIDUsage_KeyboardCapsLock)
+    keysProvider.makeHIDUsageNumber(page: kHIDPage_KeyboardOrKeypad,
+                                    usage: kHIDUsage_KeyboardCapsLock)
   }
 
   // MARK: - Init
+
+  /// Initializes a new `Remapper` instance.
+  ///
+  /// - Parameter keysProvider: Dependency for resolving key-to-HID usage mapping.
   init(keysProvider: KeysProvider = .shared) {
     self.keysProvider = keysProvider
   }
 
   // MARK: - Remap
+
+  /// Remaps the Caps Lock key to a different key by modifying the user key mapping via `hidutil`.
+  ///
+  /// - Parameter key: The target key to map Caps Lock to.
   public func remapUserKeyMappingCapsLock(using key: Key) {
     guard let destinationUsageCode = keysProvider.hidUsageCode(for: key) else {
       Applog.print(
@@ -70,6 +87,8 @@ public struct Remapper: RemapExecutor {
   }
 
   // MARK: - Reset
+
+  /// Removes any custom Caps Lock remapping, restoring it to default behavior.
   public func resetUserKeyMappingCapsLock() {
     var userKeyMapping = getCurrentUserKeyMapping()
 
@@ -93,6 +112,9 @@ public struct Remapper: RemapExecutor {
     }
   }
 
+  /// Removes all entries in the user key mapping that remap the Caps Lock key.
+  ///
+  /// - Parameter userKeyMapping: The current user key mapping list, passed as `inout`.
   private func removeCapsLockRemapping(from userKeyMapping: inout [[String: Any]]) {
     let capsLockUsage = self.capsLockUsage
 
@@ -116,6 +138,10 @@ public struct Remapper: RemapExecutor {
   }
 
   // MARK: - Current User Key Mapping
+
+  /// Retrieves the current user key mapping using `hidutil`.
+  ///
+  /// - Returns: A list of key remapping dictionaries, or an empty array if none exist.
   private func getCurrentUserKeyMapping() -> [[String: Any]] {
     let command = "hidutil property --get \"UserKeyMapping\""
     let output = shell(command)
@@ -151,6 +177,11 @@ public struct Remapper: RemapExecutor {
   }
 
   // MARK: - Shell Executor
+
+  /// Executes a shell command and returns the output.
+  ///
+  /// - Parameter command: The shell command to run.
+  /// - Returns: Standard output from the shell command as a string.
   private func shell(_ command: String) -> String {
     let task = Process()
 

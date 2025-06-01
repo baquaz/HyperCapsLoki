@@ -15,6 +15,8 @@ final class StorageRepositoryImpl: StorageRepository {
   init(dataSource: StorageProtocol) {
     self.dataSource = dataSource
   }
+
+  // MARK: - Login Item State
   func getLoginItemEnabledState() -> Bool {
     dataSource.isLoginItemEnabled ?? false
   }
@@ -23,6 +25,7 @@ final class StorageRepositoryImpl: StorageRepository {
     dataSource.isLoginItemEnabled = isEnabled
   }
 
+  // MARK: - Hyperkey Feature
   func getHyperkeyFeatureState() -> Bool? {
     dataSource.isHyperkeyFeatureActive
   }
@@ -31,6 +34,7 @@ final class StorageRepositoryImpl: StorageRepository {
     dataSource.isHyperkeyFeatureActive = isActive
   }
 
+  // MARK: - Hyperkey Key
   func getSelectedHyperkey() -> Key? {
     Key(rawValue: dataSource.selectedHyperkey ?? "")
   }
@@ -39,6 +43,7 @@ final class StorageRepositoryImpl: StorageRepository {
     dataSource.selectedHyperkey = key?.rawValue
   }
 
+  // MARK: - Hyperkey Sequence
   func getHyperkeySequenceUnsetKeys() -> [Key] {
     Key.allHyperkeySequenceKeys.filter { dataSource[$0] == nil }
   }

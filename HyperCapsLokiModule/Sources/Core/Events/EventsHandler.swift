@@ -9,6 +9,7 @@ import Foundation
 import Cocoa
 import IOKit.hid
 
+/// Handles global keyboard events, including Hyperkey detection and Caps Lock simulation.
 @MainActor
 open class EventsHandler {
   private var systemEventsInjector: SystemEventsInjection
@@ -23,6 +24,7 @@ open class EventsHandler {
   private var lastKeyCode: CGKeyCode?
   private var lastEventType: CGEventType?
 
+  /// Callback for handling tapped keyboard events.
   private let eventTapCallback: CGEventTapCallBack =
   { (proxy, type, event, refcon) in
     let handler = Unmanaged<EventsHandler>
@@ -41,7 +43,8 @@ open class EventsHandler {
   }
 
   // MARK: - Setup Event Tap
-  /// Sets up event tap handler to detect key events and flags
+
+  /// Sets up the macOS event tap to listen for key and modifier events.
   open func setUpEventTap() {
     let eventMask =
     (1 << CGEventType.keyDown.rawValue) |
@@ -76,6 +79,8 @@ open class EventsHandler {
   }
 
   // MARK: - Configure
+
+  /// Enables or disables the event tap.
   open func setEventTap(enabled: Bool) {
     if let eventTap {
       CGEvent.tapEnable(tap: eventTap, enable: enabled)
@@ -88,10 +93,12 @@ open class EventsHandler {
     }
   }
 
+  /// Sets the Hyperkey to listen for.
   open func set(_ hyperkey: Key?) {
     self.hyperkey = hyperkey
   }
 
+  /// Sets the available modifier key combinations for Hyperkey sequence handling.
   open func set(availableSequenceKeys: [Key]) {
     availableEventFlags =
     availableSequenceKeys
@@ -140,6 +147,15 @@ open class EventsHandler {
   }
 
   // MARK: - Event Tap Handler
+
+  /// Main handler for key and modifier events intercepted by the event tap.
+  ///
+  /// - Parameters:
+  ///   - proxy: The event tap proxy, used to post new events into the event stream.
+  ///   - type: The tyoe of the incoming event (e.g., keyDown, keyUp, flags changed).
+  ///   - event: The actual keyboard event being processed.
+  ///
+  /// - Returns: The (possibly modified) event to continue through the system, or `nil` to suppress it.
   open  func handleEventTap(
     proxy: CGEventTapProxy,
     type: CGEventType,
@@ -181,6 +197,7 @@ open class EventsHandler {
     return Unmanaged.passRetained(event)
   }
 
+  /// Delegates key event type to the corresponding Hyperkey press handler.
   open func handleHyperkeyPress(_ type: CGEventType) {
     switch type {
       case .keyDown:
@@ -192,6 +209,7 @@ open class EventsHandler {
     }
   }
 
+  /// Handles logic for Hyperkey pressed down.
   private func handleKeyDown() {
     Applog.print(
       context: .keyboardEvents, "<Hyperkey> DOWN intercepted")
@@ -203,6 +221,7 @@ open class EventsHandler {
     }
   }
 
+  /// Handles logic for Hyperkey released.
   private func handleKeyUp() {
     Applog.print(context: .keyboardEvents,
                  "<Hyperkey> UP intercepted")
@@ -220,6 +239,8 @@ open class EventsHandler {
   }
 
   // MARK: - Caps Lock Trigger Timer
+
+  /// Starts a short timer to allow Caps Lock to be triggered by Hyperkey release.
   private func startCapsLockTriggerTimer() {
     cancelCapsLockTriggerTimer()
 
@@ -229,6 +250,7 @@ open class EventsHandler {
     }
   }
 
+  /// Cancels the Caps Lock trigger timer.
   private func cancelCapsLockTriggerTimer() {
     capsLockTriggerTimer.cancel()
     capsLockReady = false

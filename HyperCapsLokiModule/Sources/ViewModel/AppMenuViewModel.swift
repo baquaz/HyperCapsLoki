@@ -10,33 +10,53 @@ import SwiftUI
 import SharedAssets
 import AppLogger
 
+/// View model for the app's menu UI, managing user interactions
+/// and syncing state with underlying use cases (e.g., remapping, permissions).
 @Observable
 @MainActor
 public final class AppMenuViewModel {
-  // MARK: Sequence
-  public let availableKeys: [Key?] =
+  // MARK: - Sequence
+
+  /// All available keys the user can choose for remapping, excluding Caps Lock.
+  public let availableRemappingKeys: [Key?] =
     [nil] // none key
     + Key.allCases.filter { $0 != .capsLock }
+
+  /// Static list of all Hyperkey sequence-compatible keys.
   public let allHyperkeySequenceKeys: [Key]
 
-  // MARK: Feature
+  // MARK: - Feature State
+
+  /// Indicates whether the app launches at login.
   public var isOpenAtLoginEnabled: Bool
+
+  /// Indicates whether the Hyperkey feature is currently active.
   public var isHyperkeyFeatureActive: Bool
+
+  /// The currently selected Hyperkey.
   public var selectedKey: Key?
 
+  /// Default fallback key used for Hyperkey remapping.
   internal let defaultHyperkey: Key
+
+  /// Cached list of currently active sequence keys.
   internal var hyperkeyEnabledSequenceKeys: [Key]
 
-  // MARK: Colors
+  // MARK: - Visuals
+
+  /// Color palette used for coloring sequence items by index.
   private var colorsPalette: [Int: Color] = [:]
 
-  // MARK: - Logs Save Result
+  // MARK: - Events
+
+  /// Triggered when logs should be saved.
   public var onSaveLogs: (() -> Void)?
 
-  // MARK: - On Presenting About
+  /// Triggered when the "About" screen should be presented.
   public var onPresentingAbout: (() -> Void)?
 
-  // MARK: Use Cases
+  // MARK: - Use Cases
+
   internal let loginItemUseCase: LoginItemUseCase
   internal let permissionUseCase: AccessibilityPermissionUseCase
   internal let hyperkeyFeatureUseCase: HyperkeyFeatureUseCase
@@ -81,11 +101,14 @@ public final class AppMenuViewModel {
     ]
   }
 
-  // MARK: - Hyperkey Sequence Keys
+  // MARK: - Sequence Keys
+
+  /// Checks whether a sequence key is currently enabled and usable.
   public func isSequenceEnabled(for key: Key) -> Bool {
     hyperkeyEnabledSequenceKeys.contains(key) && isHyperkeyFeatureActive
   }
 
+  /// Updates the enabled state of a sequence key and syncs it with the use case.
   @MainActor
   public func setHyperkeySequence(enabled isEnabled: Bool, for key: Key) {
     if isEnabled {
@@ -96,18 +119,20 @@ public final class AppMenuViewModel {
     hyperkeyFeatureUseCase.setHyperkeySequence(enabled: isEnabled, for: key)
   }
 
-  // MARK: - Sequence Item Color
+  // MARK: - UI Helpers
+
   public func getSequenceColor(for index: Int) -> Color {
     colorsPalette[index] ?? .clear
   }
 
-  // MARK: - Text for Key
   public func getTextForKey(_ key: Key?) -> String {
     guard let key else { return "- no key -" }
     return key.rawValue + (key == defaultHyperkey ? " (default)" : "")
   }
 
-  // MARK: - Actions
+  // MARK: - User Actions
+
+  /// Toggles the "open at login" setting and persists it.
   public func setLoginItem(_ status: Bool) {
     let currentStatus = loginItemUseCase.checkLoginItemEnabledStatus()
     guard status != currentStatus else { return }
@@ -137,6 +162,7 @@ public final class AppMenuViewModel {
     permissionUseCase.openAccessibilityPermissionSettings()
   }
 
+  /// Enables or disables the Hyperkey feature.
   @MainActor
   public func setActiveStatus(_ isActive: Bool) {
     isHyperkeyFeatureActive = isActive
@@ -149,12 +175,14 @@ public final class AppMenuViewModel {
     )
   }
 
+  /// Updates the selected remap key.
   @MainActor
   public func onSelectKey(_ key: Key?) {
     selectedKey = key
     remapKeyUseCase.execute(newKey: key)
   }
 
+  /// Resets selected key to the default remap key.
   @MainActor
   public func resetRemappingToDefault() {
     // Automatically triggers UI key picker update and `onChange` listener
@@ -171,10 +199,7 @@ public final class AppMenuViewModel {
     onPresentingAbout?()
   }
 
-  @available(*, unavailable, message: "No needed for now")
-  @MainActor
-  public func clearSavedLogsResult() { }
-
+  /// Resets app settings, sequences, and key selection to default state.
   @MainActor
   public func resetAll() {
     Applog.print(context: .application, "Settings Reset all...")
@@ -190,6 +215,7 @@ public final class AppMenuViewModel {
     setLoginItem(false)
   }
 
+  /// Exits the app cleanly via `ExitUseCase`.
   @MainActor
   public func quit() {
     exitUseCase.terminate()
