@@ -49,7 +49,7 @@ You can get started in two ways:
 
 No extra tools. No setup headaches.
 
-## 🔐 Permissions & Accessibility
+## Permissions & Accessibility
 
 To capture key events, the app uses **macOS Accessibility APIs**. When launched, it:
 
@@ -62,34 +62,87 @@ To capture key events, the app uses **macOS Accessibility APIs**. When launched,
 
 ---
 
-## 🏗️ App Architecture
+## App Architecture
 
 HyperCapsLoki is designed with maintainability and clarity in mind.
-
+ 
 <details>
     <summary><b>Project Structure</b></summary>
 
 <img src=".github/project-structure.png" width="800"/>
 
-  - Clean separation between app, UI, logic, and logs.
-  - Modular components with clear naming.
+The project follows a clean separation between App, UI, business logic, and logging layers.
+It consists of four separate Swift Package Manager (SPM) modules.
+
+This modular approach was chosen to solve an issue where running unit tests would trigger the full app launch,
+even when the tests didn’t interact with the app's @main entry point. Splitting the logic into distinct modules allowed
+isolated testing without invoking the entire app lifecycle.
 </details>
+
+<details>
+    <summary><b>Clean SwiftUI Data Flow</b></summary>
+
+<img src=".github/app-data-flow.png" width="800"/>
+
+- `AppState` is the central environment object that contains the app’s global state and dependencies.
+It is instantiated in the `App` entry point and passed down to both the `AppDelegate` and SwiftUI `Views`.
+
+- **Views** interact with `ViewModels`, which in turn trigger domain-level `UseCases`.
+Each **UseCase** encapsulates a specific action and its required dependencies.
+
+- For persistence, `UseCases` rely on a `StorageRepository` abstraction, with a concrete implementation using `UserDefaults`.
+
+- `Views` subscribe to state changes in `AppState` and automatically update when actions (from `UseCases`) modify the state.
+</details>
+
 
 ---
 
 ## ⌨️ Key Events and Mappings
 
-HyperCapsLoki uses `CGEventTap` to intercept key events system-wide:
+#### Core Behavior
 
-- Maps **Caps Lock** via its **HIDUsageCode** (e.g., `0x39`)
-- Emits simulated modifier keys using **CarbonKeyCode** values.
-- Clean abstraction layers match key events to app-defined key models.
+- Single Press = Caps Lock Toggle
+When the configured Hyperkey is pressed and released alone, it toggles the Caps Lock state. 
+This is useful for users who still want traditional Caps Lock functionality.
 
-```swift
-// Example: Intercepting Caps Lock
-```
+- Hyperkey + Another Key = Modifier Combo
+If the Hyperkey is held and another key is pressed, it no longer toggles Caps Lock. 
+Instead, it acts as a simultaneous combination of:
+⌘ Command
+⌥ Option
+⌃ Control
+⇧ Shift
+This allows you to use one key to unlock powerful shortcut combinations.
 
-> You’ll find a clean separation of domain logic from macOS internals.
+#### 🧬 How It Works Under the Hood
+
+1. **CGEvent Tap Monitoring** 
+<br>
+All keyboard events are intercepted using a `CGEventTap`. This captures `keyDown`, `keyUp`, and `flagsChanged` 
+events before the system processes them.
+
+2. **Timer-Based Caps Lock Trigger**
+<br>
+When the Hyperkey is pressed, a 1.5-second timer is started. If no other key is pressed during that time, the system
+interprets the action as a Caps Lock toggle. If another key is detected, Caps Lock toggle is canceled, and the 
+Hyperkey acts as a modifier.
+
+3. **Carbon Key Code Mapping** 
+<br>
+Each key is first identified by its HID usage code, then mapped to its **Carbon** `CGKeyCode`, ensuring compatibility 
+with macOS system-level key handling APIs. This guarantees precise control over low-level key behavior.
+
+4. **Event Flag Injection**
+<br>
+When the Hyperkey is held, a predefined **sequence of modifier flags** (like `.maskCommand`, `.maskControl`, etc.)
+is injected into the system using a custom `SystemEventsInjection` service. This simulates pressing all modifiers at once.
+
+5. **Caps Lock Toggle via IOHID**
+<br>
+The actual toggle of Caps Lock is done by querying and updating the system’s internal `IOHIDSystem` using
+the `IOHIDGetModifierLockState` and `IOHIDSetModifierLockState` APIs. This allows for a reliable, 
+hardware-level toggle of the Caps Lock state.
 
 ---
 
@@ -100,11 +153,9 @@ The app logs diagnostic events **anonymously** to help troubleshoot issues:
 - Logs only capture behavior related to the app (e.g., remapping failures, event dispatch status).
 - No personally identifiable data is ever stored or transmitted.
 
-```swift
-// Example: Logging system setup
-```
 
-You can easily inspect, filter, or save logs.
+- You can easily inspect, filter, or save logs.
+<img src=".github/app-logs.png" width="500"/>
 
 ---
 
