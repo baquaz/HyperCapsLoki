@@ -13,13 +13,16 @@ public struct AppLogger: AppLogging {
   private static let engine = LogEngine()
 
   private static let isLoggerEnabled: Bool = {
-    guard let logValue = ProcessInfo.processInfo.environment["ENABLE_APP_LOGGER"] else {
-#if DEBUG
-      Swift.print("[APP_LOGGER ⚠️]: Xcode Environment Variable `ENABLE_APP_LOGGER` is missing, logs are disabled")
-#endif
-      return false
+    if let env = ProcessInfo.processInfo.environment["ENABLE_APP_LOGGER"]?.lowercased() {
+      return env == "true"
     }
-    return logValue.lowercased() == "true"
+
+#if DEBUG
+    Swift.print("[APP_LOGGER ⚠️]: Xcode Environment Variable `ENABLE_APP_LOGGER` is missing, logs are disabled")
+    return false
+#else
+    return true
+#endif
   }()
 
   // MARK: - Set Custom LogStrategy
