@@ -23,8 +23,9 @@ final class LogsWindowPresenter {
     let logsView = LogsResultSheet(vm: viewModel)
     let hosting = NSHostingController(rootView: logsView)
 
+    let windowSize = NSSize(width: 350, height: 220)
     let newWindow = NSWindow(
-      contentRect: NSRect(x: 0, y: 0, width: 350, height: 220),
+      contentRect: Utils.centeredRect(for: windowSize),
       styleMask: [.titled, .closable],
       backing: .buffered,
       defer: false
@@ -33,7 +34,6 @@ final class LogsWindowPresenter {
     newWindow.title = "Logs"
     newWindow.isReleasedWhenClosed = false
     newWindow.contentViewController = hosting
-    newWindow.center()
     newWindow.makeKeyAndOrderFront(nil)
     newWindow.level = .floating
 

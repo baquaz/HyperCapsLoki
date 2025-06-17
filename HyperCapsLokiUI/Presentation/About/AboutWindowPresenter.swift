@@ -25,8 +25,9 @@ final class AboutWindowPresenter {
 
     let hosting = NSHostingController(rootView: aboutView)
 
+    let windowSize = NSSize(width: 360, height: 300)
     let newWindow = NSWindow(
-      contentRect: NSRect(x: 0, y: 0, width: 360, height: 300),
+      contentRect: Utils.centeredRect(for: windowSize),
       styleMask: [.titled, .closable],
       backing: .buffered,
       defer: false
@@ -35,7 +36,6 @@ final class AboutWindowPresenter {
     newWindow.title = "About HyperCapsLoki"
     newWindow.isReleasedWhenClosed = false
     newWindow.contentViewController = hosting
-    newWindow.center()
     newWindow.makeKeyAndOrderFront(nil)
     newWindow.level = .floating
 
