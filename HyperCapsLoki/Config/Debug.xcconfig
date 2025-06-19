@@ -1,0 +1,13 @@
+//
+//  Debug.xcconfig
+//  HyperCapsLoki
+//
+//  Created by Piotr Błachewicz on 19/06/2025.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+#include "Base.xcconfig"
+
+ENABLE_TESTABILITY = YES
+SWIFT_OPTIMIZATION_LEVEL = -Onone

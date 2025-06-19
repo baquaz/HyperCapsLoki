@@ -1,0 +1,13 @@
+//
+//  Base.xcconfig
+//  HyperCapsLoki
+//
+//  Created by Piotr Błachewicz on 19/06/2025.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = Sign to Run Locally
+DEVELOPMENT_TEAM =

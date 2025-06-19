@@ -1,0 +1,99 @@
+name: Release HyperCapsLoki macOS App
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up keychain and import signing certificate
+        run: |
+          echo "$CERT_P12" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "$CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+        env:
+          CERT_P12: ${{ secrets.CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+
+      - name: Set up Notarytool API key
+        run: |
+          mkdir -p ~/.private_keys
+          echo "$NOTARY_API_KEY_CONTENT" > ~/.private_keys/AuthKey.p8
+        env:
+          NOTARY_API_KEY_CONTENT: ${{ secrets.NOTARY_API_KEY_CONTENT }}
+
+      - name: Build app with Xcode
+        run: |
+          xcodebuild -scheme HyperCapsLoki -configuration Release -derivedDataPath build \
+            -archivePath build/HyperCapsLoki.xcarchive archive \
+            -xcconfig Configs/SignedRelease.xcconfig \
+            CODE_SIGN_IDENTITY="Developer ID Application" \
+            OTHER_CODE_SIGN_FLAGS="--timestamp --options runtime"
+
+      - name: Export app from archive
+        run: |
+          cat > ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>developer-id</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>${{ secrets.APPLE_TEAM_ID }}</string>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild -exportArchive \
+            -archivePath build/HyperCapsLoki.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/exported
+
+      - name: Create DMG installer
+        run: |
+          mkdir dmg-content
+          cp -R "build/exported/HyperCapsLoki.app" dmg-content/
+          hdiutil create -volname "HyperCapsLoki" -srcfolder dmg-content -ov -format UDZO HyperCapsLoki.dmg
+          mv HyperCapsLoki.dmg build/
+
+      - name: Notarize DMG with notarytool
+        run: |
+          xcrun notarytool submit build/HyperCapsLoki.dmg \
+            --key ~/.private_keys/AuthKey.p8 \
+            --key-id "${{ secrets.NOTARY_API_KEY_ID }}" \
+            --issuer "${{ secrets.NOTARY_API_ISSUER_ID }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --wait
+
+      - name: Staple notarization
+        run: |
+          xcrun stapler staple build/HyperCapsLoki.dmg
+
+      - name: Generate MD5 checksum
+        run: |
+          md5 build/HyperCapsLoki.dmg > build/HyperCapsLoki.md5
+
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/HyperCapsLoki.dmg
+            build/HyperCapsLoki.md5
+          body_path: build/HyperCapsLoki.md5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
