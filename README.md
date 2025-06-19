@@ -66,7 +66,7 @@ To capture key events, the app uses **macOS Accessibility APIs**. When launched,
 
 HyperCapsLoki is designed with maintainability and clarity in mind.
  
-<details>
+<details open>
     <summary><b>Project Structure</b></summary>
 
 <img src=".github/project-structure.png" width="800"/>
@@ -79,7 +79,7 @@ even when the tests didn’t interact with the app's @main entry point. Splittin
 isolated testing without invoking the entire app lifecycle.
 </details>
 
-<details>
+<details open>
     <summary><b>Clean SwiftUI Data Flow</b></summary>
 
 <img src=".github/app-data-flow.png" width="800"/>
@@ -118,29 +118,29 @@ This allows you to use one key to unlock powerful shortcut combinations.
 #### 🧬 How It Works Under the Hood
 
 1. **CGEvent Tap Monitoring** 
-<br>
-All keyboard events are intercepted using a `CGEventTap`. This captures `keyDown`, `keyUp`, and `flagsChanged` 
+
+   All keyboard events are intercepted using a `CGEventTap`. This captures `keyDown`, `keyUp`, and `flagsChanged` 
 events before the system processes them.
 
 2. **Timer-Based Caps Lock Trigger**
-<br>
-When the Hyperkey is pressed, a 1.5-second timer is started. If no other key is pressed during that time, the system
+
+   When the Hyperkey is pressed, a 1.5-second timer is started. If no other key is pressed during that time, the system
 interprets the action as a Caps Lock toggle. If another key is detected, Caps Lock toggle is canceled, and the 
 Hyperkey acts as a modifier.
 
 3. **Carbon Key Code Mapping** 
-<br>
-Each key is first identified by its HID usage code, then mapped to its **Carbon** `CGKeyCode`, ensuring compatibility 
+
+   Each key is first identified by its HID usage code, then mapped to its **Carbon** `CGKeyCode`, ensuring compatibility 
 with macOS system-level key handling APIs. This guarantees precise control over low-level key behavior.
 
 4. **Event Flag Injection**
-<br>
-When the Hyperkey is held, a predefined **sequence of modifier flags** (like `.maskCommand`, `.maskControl`, etc.)
+
+   When the Hyperkey is held, a predefined **sequence of modifier flags** (like `.maskCommand`, `.maskControl`, etc.)
 is injected into the system using a custom `SystemEventsInjection` service. This simulates pressing all modifiers at once.
 
 5. **Caps Lock Toggle via IOHID**
-<br>
-The actual toggle of Caps Lock is done by querying and updating the system’s internal `IOHIDSystem` using
+
+   The actual toggle of Caps Lock is done by querying and updating the system’s internal `IOHIDSystem` using
 the `IOHIDGetModifierLockState` and `IOHIDSetModifierLockState` APIs. This allows for a reliable, 
 hardware-level toggle of the Caps Lock state.
 
