@@ -29,6 +29,3 @@ playground.xcworkspace
 # .swiftpm
 
 .build/
-
-#Code Signing
-HyperCapsLoki/Config/SignedRelease.xcconfig
