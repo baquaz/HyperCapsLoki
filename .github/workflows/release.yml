@@ -18,9 +18,12 @@ jobs:
       - name: List available Xcode versions
         run: ls /Applications | grep Xcode || echo "No Xcode installations found"
 
+      - name: List available Xcode versions
+        run: ls /Applications | grep Xcode || echo "No Xcode installations found"
+
       - name: Select Xcode 16.4
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
-        
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app  # Update when available
+
       - name: Set up keychain and import signing certificate
         run: |
           echo "$CERT_P12" | base64 --decode > certificate.p12
@@ -40,6 +43,15 @@ jobs:
         env:
           NOTARY_API_KEY_CONTENT: ${{ secrets.NOTARY_API_KEY_CONTENT }}
           
+      - name: Create SignedRelease.xcconfig dynamically
+        run: |
+          mkdir -p Configs
+          cat > Configs/SignedRelease.xcconfig <<EOF
+          CODE_SIGN_STYLE = Manual
+          CODE_SIGN_IDENTITY = Developer ID Application
+          DEVELOPMENT_TEAM = ${{ secrets.APPLE_TEAM_ID }}
+          EOF
+
       - name: Create SignedRelease.xcconfig dynamically
         run: |
           mkdir -p Configs
@@ -79,25 +91,46 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build/exported
 
-      - name: Create DMG installer
+      - name: Create .zip for notarization
         run: |
-          mkdir dmg-content
-          cp -R "build/exported/HyperCapsLoki.app" dmg-content/
-          hdiutil create -volname "HyperCapsLoki" -srcfolder dmg-content -ov -format UDZO HyperCapsLoki.dmg
-          mv HyperCapsLoki.dmg build/
+          cd build/exported
+          zip -r -y HyperCapsLoki.zip HyperCapsLoki.app
+          mv HyperCapsLoki.zip ../
 
-      - name: Notarize DMG with notarytool
+      - name: Notarize .zip with notarytool
         run: |
-          xcrun notarytool submit build/HyperCapsLoki.dmg \
+          xcrun notarytool submit build/HyperCapsLoki.zip \
             --key ~/.private_keys/AuthKey.p8 \
             --key-id "${{ secrets.NOTARY_API_KEY_ID }}" \
             --issuer "${{ secrets.NOTARY_API_ISSUER_ID }}" \
             --team-id "${{ secrets.APPLE_TEAM_ID }}" \
             --wait
 
-      - name: Staple notarization
+      - name: Staple .app
         run: |
-          xcrun stapler staple build/HyperCapsLoki.dmg
+          xcrun stapler staple build/exported/HyperCapsLoki.app
+
+      - name: Create DMG installer
+        run: |
+          mkdir dmg-content
+          cp -R "build/exported/HyperCapsLoki.app" dmg-content/
+          ln -s /Applications dmg-content/Applications
+          hdiutil create -volname "HyperCapsLoki" -srcfolder dmg-content -ov -format UDZO HyperCapsLoki.dmg
+          mv HyperCapsLoki.dmg build/
+
+      # Optional: Notarize DMG if needed
+      # - name: Notarize DMG with notarytool
+      #   run: |
+      #     xcrun notarytool submit build/HyperCapsLoki.dmg \
+      #       --key ~/.private_keys/AuthKey.p8 \
+      #       --key-id "${{ secrets.NOTARY_API_KEY_ID }}" \
+      #       --issuer "${{ secrets.NOTARY_API_ISSUER_ID }}" \
+      #       --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+      #       --wait
+
+      # - name: Staple DMG
+      #   run: |
+      #     xcrun stapler staple build/HyperCapsLoki.dmg
 
       - name: Generate MD5 checksum
         run: |
