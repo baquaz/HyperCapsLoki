@@ -43,7 +43,7 @@ If you just tap and release Caps Lock like usual, it behaves as the standard Cap
 
 You can get started in two ways:
 
-- ✅ **Download the [release version]()** and run it like any other macOS app.
+- ✅ **Download the [latest release version](https://github.com/baquaz/HyperCapsLoki/releases)** and run it like any other macOS app.
 (You can verify the app with MD5A checksum for integrity)
 - 🛠️ **Build it yourself** using Xcode – just clone this repo and hit Run.
 
