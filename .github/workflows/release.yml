@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: List available Xcode versions
+        run: ls /Applications | grep Xcode || echo "No Xcode installations found"
 
       - name: List available Xcode versions
         run: ls /Applications | grep Xcode || echo "No Xcode installations found"
@@ -39,6 +42,15 @@ jobs:
           echo "$NOTARY_API_KEY_CONTENT" > ~/.private_keys/AuthKey.p8
         env:
           NOTARY_API_KEY_CONTENT: ${{ secrets.NOTARY_API_KEY_CONTENT }}
+          
+      - name: Create SignedRelease.xcconfig dynamically
+        run: |
+          mkdir -p Configs
+          cat > Configs/SignedRelease.xcconfig <<EOF
+          CODE_SIGN_STYLE = Manual
+          CODE_SIGN_IDENTITY = Developer ID Application
+          DEVELOPMENT_TEAM = ${{ secrets.APPLE_TEAM_ID }}
+          EOF
 
       - name: Create SignedRelease.xcconfig dynamically
         run: |
